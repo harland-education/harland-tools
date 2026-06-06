@@ -1,1 +1,1026 @@
-placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAF7F0">
+<title>Harland Notes Generator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='12'%20fill='%230D0D0F'/%3E%3Ctext%20x='32'%20y='45'%20font-family='Georgia,serif'%20font-size='38'%20font-weight='700'%20text-anchor='middle'%20fill='%23C9A84C'%3EH%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#0D0D0F; --ink:#1A1A20; --stone:#7E776A; --faint:#A9A294;
+  --gold:#C9A84C; --gold-deep:#A8893A; --gold-wash:rgba(201,168,76,0.10);
+  --ivory:#FAF7F0; --cream:#F8F5EF; --paper:#FFFFFF; --hairline:#E5DFD2; --hairline-soft:#EEE9DD;
+  --green:#3B6D11; --green-lt:#EAF3DE; --red:#A32D2D; --red-lt:#FCEBEB;
+  --amber:#854F0B; --amber-lt:#FAEEDA;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+::selection{background:var(--gold); color:var(--obsidian);}
+body{
+  font-family:'DM Sans',sans-serif; background:var(--ivory); color:var(--ink);
+  min-height:100vh; -webkit-font-smoothing:antialiased;
+}
+
+/* ── masthead ───────────────────────────────── */
+.masthead{
+  background:var(--obsidian); color:var(--ivory);
+  padding:30px 36px 26px; border-bottom:2px solid var(--gold);
+}
+.masthead .kicker{
+  font-size:10.5px; letter-spacing:0.28em; text-transform:uppercase;
+  color:var(--gold); font-weight:500; margin-bottom:10px;
+}
+.masthead h1{
+  font-family:'Cormorant Garamond',Georgia,serif; font-size:32px; font-weight:600;
+  letter-spacing:0.005em; line-height:1.1; color:var(--ivory);
+}
+.masthead .sub{font-size:13px; color:var(--faint); margin-top:8px; max-width:640px; line-height:1.55;}
+
+.wrap{display:grid; grid-template-columns:minmax(380px,460px) 1fr; gap:28px; padding:28px 36px 72px; max-width:1480px; margin:0 auto;}
+@media (max-width:980px){ .wrap{grid-template-columns:1fr; padding:20px 18px 56px;} }
+
+/* ── cards ──────────────────────────────────── */
+.card{
+  background:var(--paper); border:1px solid var(--hairline); border-radius:10px;
+  box-shadow:0 1px 1px rgba(13,13,15,0.03), 0 12px 28px -24px rgba(13,13,15,0.25);
+  margin-bottom:18px; overflow:hidden;
+}
+.card-h{
+  display:flex; align-items:baseline; gap:12px;
+  padding:14px 18px 11px; border-bottom:1px solid var(--hairline-soft);
+}
+.card-h .num{
+  font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600;
+  color:var(--gold-deep); line-height:1; min-width:18px;
+}
+.card-h h2{
+  font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--ink); font-weight:700;
+}
+.card-h .zh{font-size:11.5px; color:var(--stone); font-weight:400; letter-spacing:0.04em; margin-left:2px;}
+.card-b{padding:14px 18px 18px;}
+
+label{display:block; font-size:10.5px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:var(--stone); margin:12px 0 5px;}
+label .opt{color:var(--faint); font-weight:500; text-transform:none; letter-spacing:0.01em;}
+input[type=text], input[type=number], textarea, select{
+  width:100%; border:1px solid var(--hairline); border-radius:7px; background:#FDFCF8;
+  padding:8px 11px; font-family:'DM Sans',sans-serif; font-size:13.5px; color:var(--ink);
+  transition:border-color .15s, box-shadow .15s;
+}
+input:focus, textarea:focus, select:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-wash);}
+input:disabled{opacity:.45; cursor:not-allowed; background:#F1ECE0;}
+textarea{resize:vertical; min-height:56px; line-height:1.5;}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+.hint{font-size:11.5px; color:var(--stone); margin-top:5px; line-height:1.45;}
+
+/* ── dynamic blocks ─────────────────────────── */
+.content-block, .hw-block{
+  border:1px solid var(--hairline); border-radius:9px; padding:11px 13px 13px;
+  margin-top:12px; background:var(--cream); position:relative;
+}
+.content-block .tag{
+  position:absolute; top:-8px; left:11px; background:var(--ivory);
+  color:var(--gold-deep); border:1px solid var(--gold);
+  font-family:'DM Mono',monospace; font-size:8.5px; font-weight:500;
+  letter-spacing:0.14em; padding:2px 8px; border-radius:3px;
+}
+.rm{
+  position:absolute; top:7px; right:9px; background:none; border:none; color:var(--faint);
+  font-size:15px; cursor:pointer; line-height:1; padding:2px 4px;
+}
+.rm:hover{color:var(--red);}
+
+/* ── buttons ────────────────────────────────── */
+.btn{
+  display:inline-flex; align-items:center; gap:7px; border:none; cursor:pointer;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.04em;
+  border-radius:7px; padding:9px 15px; transition:all .14s;
+}
+.btn:active{transform:translateY(1px);}
+.btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--hairline);}
+.btn-ghost:hover{border-color:var(--gold); color:var(--gold-deep); background:var(--gold-wash);}
+.btn-navy{background:var(--obsidian); color:var(--ivory);}
+.btn-navy:hover{background:#26262B;}
+.btn-gold{background:var(--gold); color:var(--obsidian);}
+.btn-gold:hover{background:#D4B45E;}
+.btn-line{background:var(--obsidian); color:var(--ivory); position:relative;}
+.btn-line:hover{background:#26262B;}
+.btn-sm{padding:7px 12px; font-size:11.5px;}
+
+/* ── values segmented ───────────────────────── */
+.seg{display:flex; gap:6px;}
+.seg button{
+  flex:1; border:1px solid var(--hairline); background:#FDFCF8; border-radius:6px; padding:7px 0;
+  font-family:'DM Mono',monospace; font-weight:500; font-size:13px; color:var(--faint); cursor:pointer;
+  transition:all .12s;
+}
+.seg button:hover{border-color:var(--gold);}
+.seg button.on{background:var(--obsidian); border-color:var(--obsidian); color:var(--gold);}
+.values-grid{display:grid; grid-template-columns:1fr; gap:9px;}
+.value-row{
+  display:grid; grid-template-columns:1fr 132px; align-items:center; gap:10px;
+  padding:8px 12px; border:1px solid var(--hairline); border-radius:8px; background:var(--cream);
+}
+.value-row .vn{font-size:13px; font-weight:700; color:var(--ink);}
+.value-row .vz{font-size:12px; color:var(--stone); font-weight:400; margin-left:5px;}
+
+/* ── preview ────────────────────────────────── */
+.preview-col{position:sticky; top:18px; align-self:start;}
+@media (max-width:980px){ .preview-col{position:static;} }
+.tabs{display:flex; gap:22px; margin-bottom:0; border-bottom:1px solid var(--hairline); padding:0 4px;}
+.tab{
+  padding:10px 2px 11px; cursor:pointer; font-weight:700; font-size:11px;
+  letter-spacing:0.14em; text-transform:uppercase; color:var(--faint);
+  border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .14s, border-color .14s;
+}
+.tab:hover{color:var(--ink);}
+.tab.on{color:var(--obsidian); border-bottom-color:var(--gold);}
+.pv{
+  background:var(--paper); border:1px solid var(--hairline); border-top:none;
+  border-radius:0 0 10px 10px;
+  box-shadow:0 1px 1px rgba(13,13,15,0.03), 0 12px 28px -24px rgba(13,13,15,0.25);
+  overflow:hidden;
+}
+.pv-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:11px 16px; border-bottom:1px solid var(--hairline-soft); background:var(--cream);
+}
+.pv-bar .t{
+  font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--obsidian);
+  font-weight:600; font-style:italic;
+}
+.pv-body{padding:16px;}
+pre.out{
+  white-space:pre-wrap; word-wrap:break-word; font-family:'DM Mono',monospace;
+  font-size:12.5px; line-height:1.65; color:var(--ink); background:#FCFAF4;
+  border:1px solid var(--hairline-soft); border-radius:8px; padding:16px;
+  max-height:60vh; overflow:auto;
+}
+.checklist{margin-top:14px; border-top:1px solid var(--hairline-soft); padding-top:12px;}
+.checklist .ti{
+  font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--stone); margin-bottom:7px;
+}
+.chk{display:flex; align-items:center; gap:8px; font-size:12.5px; padding:2.5px 0;}
+.chk .dot{
+  width:15px; height:15px; border-radius:50%; display:inline-flex; align-items:center;
+  justify-content:center; font-size:9.5px; font-weight:700; flex-shrink:0;
+}
+.chk.ok .dot{background:var(--green-lt); color:var(--green);}
+.chk.bad .dot{background:var(--red-lt); color:var(--red);}
+.chk.ok{color:var(--green);}
+.chk.bad{color:var(--red);}
+
+.toolbar{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:16px;}
+.points-pill{
+  display:inline-block; background:var(--ivory); color:var(--gold-deep);
+  border:1px solid var(--gold); font-family:'DM Mono',monospace;
+  font-size:11px; font-weight:500; letter-spacing:0.06em;
+  padding:5px 12px; border-radius:4px; margin-top:12px;
+}
+.perfbox{position:relative;}
+.regen{
+  position:absolute; top:0; right:0; font-size:11px; color:var(--gold-deep); background:none;
+  border:none; cursor:pointer; text-decoration:underline; font-weight:700;
+  font-family:'DM Sans',sans-serif;
+}
+.toast{
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(90px);
+  background:var(--obsidian); color:var(--gold); font-weight:700; font-size:12.5px;
+  letter-spacing:0.04em; padding:11px 24px; border-radius:30px;
+  box-shadow:0 14px 36px rgba(13,13,15,.35);
+  transition:transform .25s ease; z-index:50;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.divider{height:1px; background:var(--hairline-soft); margin:16px 0;}
+.first-row{display:flex; align-items:center; gap:9px; margin-top:11px;}
+.first-row input[type=checkbox]{width:15px; height:15px; accent-color:var(--obsidian);}
+.first-row span{font-size:13px; color:var(--ink);}
+.line-dot{width:7px; height:7px; border-radius:50%; background:#06C755; display:inline-block;}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="kicker">Harland Education &middot; Teacher Tools</div>
+  <h1>Class Notes Generator</h1>
+  <div class="sub">Fill the form once. Copy notes in App format or LINE format. Use &ldquo;Next student&rdquo; to keep the lesson and reset student fields.</div>
+</div>
+
+<div class="wrap">
+  <!-- ════════ FORM COLUMN ════════ -->
+  <div class="form-col">
+
+    <div class="toolbar">
+      <button class="btn btn-gold btn-sm" id="btnNext" type="button">Next student, same lesson &rarr;</button>
+      <button class="btn btn-ghost btn-sm" id="btnClear" type="button">Clear all</button>
+    </div>
+
+    <!-- SETUP -->
+    <div class="card">
+      <div class="card-h"><div class="num">&sect;</div><h2>Class Setup</h2></div>
+      <div class="card-b">
+        <div class="row">
+          <div>
+            <label>Class name</label>
+            <input type="text" id="fSubject" list="subjects" placeholder="Harland English">
+            <datalist id="subjects">
+              <option value="Harland English"></option>
+              <option value="Harland Math"></option>
+              <option value="Harland Geometry"></option>
+              <option value="Harland Algebra I"></option>
+              <option value="Harland Algebra II"></option>
+              <option value="Harland HS Physics Foundation"></option>
+              <option value="Harland Chemistry"></option>
+              <option value="Harland Biology"></option>
+              <option value="Harland SAT"></option>
+              <option value="Harland SSAT"></option>
+              <option value="Harland AP Biology"></option>
+              <option value="Harland TOEFL"></option>
+              <option value="Harland IELTS"></option>
+            </datalist>
+          </div>
+          <div>
+            <label>Level <span class="opt">(optional)</span></label>
+            <input type="text" id="fLevel" placeholder="8">
+          </div>
+        </div>
+        <div class="row3">
+          <div>
+            <label>Unit #</label>
+            <input type="number" id="fUnit" min="1" placeholder="1">
+          </div>
+          <div>
+            <label>Class #</label>
+            <input type="number" id="fClass" min="1" placeholder="1">
+          </div>
+          <div>
+            <label>Student name</label>
+            <input type="text" id="fName" placeholder="Emma">
+          </div>
+        </div>
+        <label>Class topic <span class="opt">(one line, used in the comment)</span></label>
+        <input type="text" id="fTopic" placeholder="Colonial America and expository topic sentences">
+      </div>
+    </div>
+
+    <!-- 1 CLASS CONTENT -->
+    <div class="card">
+      <div class="card-h"><div class="num">1</div><h2>Class Content <span class="zh">&#35506;&#31243;&#20839;&#23481;</span></h2></div>
+      <div class="card-b">
+        <div id="contentRows"></div>
+        <div class="first-row">
+          <input type="checkbox" id="fReward">
+          <span>Include &ldquo;Reward Game&rdquo; line</span>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" id="btnAddContent" type="button">+ Add content block</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 HARLAND POINTS -->
+    <div class="card">
+      <div class="card-h"><div class="num">2</div><h2>Harland Points <span class="zh">&#19978;&#27425;&#20316;&#26989;&#25104;&#32318;</span></h2></div>
+      <div class="card-b">
+        <div class="row">
+          <div>
+            <label>Last homework score</label>
+            <input type="number" id="fScore" min="0" placeholder="4">
+          </div>
+          <div>
+            <label>Out of</label>
+            <input type="number" id="fOutOf" min="1" value="6">
+          </div>
+        </div>
+        <div class="first-row">
+          <input type="checkbox" id="fFirstLesson">
+          <span>First lesson &mdash; no prior homework</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 HOMEWORK -->
+    <div class="card">
+      <div class="card-h"><div class="num">3</div><h2>Homework <span class="zh">&#20316;&#26989;[&#23562;&#20139;]</span></h2></div>
+      <div class="card-b">
+        <div id="hwRows"></div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" id="btnAddHw" type="button">+ Add homework item</button>
+        </div>
+        <div class="points-pill" id="pointsPill">This week&rsquo;s possible: 6&#20998;</div>
+        <div class="hint">Next lesson&rsquo;s &ldquo;out of&rdquo; should match this number.</div>
+      </div>
+    </div>
+
+    <!-- 4 PERFORMANCE -->
+    <div class="card">
+      <div class="card-h"><div class="num">4</div><h2>Performance <span class="zh">&#23416;&#29983;&#34920;&#29694;</span></h2></div>
+      <div class="card-b">
+        <label>Worked on <span class="opt">(auto-suggested from content, editable)</span></label>
+        <input type="text" id="fWorked" placeholder="determining and writing topic sentences">
+
+        <div class="divider"></div>
+
+        <label>Did well #1 &mdash; Harland value demonstrated</label>
+        <select id="fVal1">
+          <option value="">Choose a value&hellip;</option>
+        </select>
+        <label>Specific example <span class="opt">&ldquo;&hellip;when they ___&rdquo;</span></label>
+        <input type="text" id="fEx1" placeholder="persisted with a difficult paragraph until the structure was right">
+
+        <label>Did well #2 <span class="opt">(optional)</span></label>
+        <select id="fVal2">
+          <option value="">None</option>
+        </select>
+        <input type="text" id="fEx2" placeholder="specific example for the second value" style="margin-top:6px;">
+
+        <div class="divider"></div>
+
+        <label>To work on next week</label>
+        <input type="text" id="fImp1" placeholder="paragraph transitions">
+        <label>Second improvement <span class="opt">(optional)</span></label>
+        <input type="text" id="fImp2" placeholder="">
+
+        <div class="divider"></div>
+
+        <div class="perfbox">
+          <label>Generated comment <span class="opt">(editable &mdash; edits are kept)</span></label>
+          <button class="regen" id="btnRegen" type="button" style="display:none;">&#8635; regenerate</button>
+          <textarea id="fPerf" rows="6"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 VALUES -->
+    <div class="card">
+      <div class="card-h"><div class="num">5</div><h2>Harland Values <span class="zh">&#26680;&#24515;&#20729;&#20540;</span></h2></div>
+      <div class="card-b">
+        <div class="values-grid" id="valuesGrid"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════ PREVIEW COLUMN ════════ -->
+  <div class="preview-col">
+    <div class="tabs">
+      <div class="tab on" id="tabApp">App / Document</div>
+      <div class="tab" id="tabLine">LINE Message</div>
+    </div>
+    <div class="pv">
+      <div class="pv-bar">
+        <div class="t" id="pvTitle">App / Document format</div>
+        <div>
+          <button class="btn btn-navy btn-sm" id="btnCopyApp" type="button">Copy App notes &rarr;</button>
+          <button class="btn btn-line btn-sm" id="btnCopyLine" type="button" style="display:none;"><span class="line-dot"></span>&nbsp;Copy LINE notes &rarr;</button>
+        </div>
+      </div>
+      <div class="pv-body">
+        <pre class="out" id="outApp"></pre>
+        <pre class="out" id="outLine" style="display:none;"></pre>
+        <div class="checklist">
+          <div class="ti">Quality check</div>
+          <div id="checks"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+// Harland Notes Generator - ES5 only, no unicode literals in script.
+// All non-ASCII characters are expressed as \u escape sequences.
+
+// ---------- constants ----------
+var ZH = {
+  content: '\u8AB2\u7A0B\u5167\u5BB9',          // class content
+  points:  '\u4E0A\u6B21\u4F5C\u696D\u6210\u7E3E', // last homework score
+  homework:'\u4F5C\u696D',                       // homework
+  vip:     '[\u5C0A\u4EAB]',                     // [premium]
+  perf:    '\u5B78\u751F\u8868\u73FE',           // student performance
+  values:  '\u6838\u5FC3\u50F9\u503C',           // core values
+  fen:     '\u5206'                              // points unit
+};
+
+var VALUES = [
+  { en: 'Respect',      zh: '\u5C0A\u91CD' },
+  { en: 'Resilience',   zh: '\u6046\u6BC5\u529B' },
+  { en: 'Attitude',     zh: '\u5B78\u7FD2\u614B\u5EA6' },
+  { en: 'Adaptability', zh: '\u9069\u61C9\u80FD\u529B' },
+  { en: 'Diligence',    zh: '\u5B78\u7FD2\u52E4\u596E\u5EA6' }
+];
+
+var VALUE_PHRASES = ['Respect', 'Resilience', 'a positive Attitude', 'Adaptability', 'Diligence'];
+
+var HW_PRESETS = [
+  { id: 'reading', label: 'Reading (ActivelyLearn)', text: 'Read & answer questions (1' + ZH.fen + '), or read & answer questions in detail (2' + ZH.fen + ')' },
+  { id: 'ixl',     label: 'IXL activity',            text: 'Complete activity to 85% (1' + ZH.fen + '), or 100% (2' + ZH.fen + ')' },
+  { id: 'quizlet', label: 'Quizlet test',            text: 'Complete test to 80% (1' + ZH.fen + '), or 100% (2' + ZH.fen + ')' },
+  { id: 'custom',  label: 'Custom\u2026',            text: '' }
+];
+
+var EMOJI = {
+  k1: '\u0031\uFE0F\u20E3', k2: '\u0032\uFE0F\u20E3', k3: '\u0033\uFE0F\u20E3',
+  k4: '\u0034\uFE0F\u20E3', k5: '\u0035\uFE0F\u20E3',
+  school: '\uD83C\uDFEB', person: '\uD83D\uDC64',
+  book: '\uD83D\uDCD6', pencil: '\u270F\uFE0F', brain: '\uD83E\uDDE0', link: '\uD83D\uDD17',
+  starFull: '\u2605', starEmpty: '\u2606'
+};
+var LINE_DIV = '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501';
+var BULLET = '\u2022';
+
+var perfDirty = false;
+var contentCount = 0;
+var hwCount = 0;
+
+// ---------- helpers ----------
+function $(id){ return document.getElementById(id); }
+function val(id){ var e = $(id); return e ? e.value : ''; }
+function trimv(id){ return val(id).replace(/^\s+|\s+$/g, ''); }
+
+function showToast(msg){
+  var t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show';
+  setTimeout(function(){ t.className = 'toast'; }, 1400);
+}
+
+function fallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('Copied to clipboard'); }
+  catch (e) { showToast('Copy failed - select and copy manually'); }
+  document.body.removeChild(ta);
+}
+
+function copyText(text){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    try {
+      navigator.clipboard.writeText(text).then(
+        function(){ showToast('Copied to clipboard'); },
+        function(){ fallbackCopy(text); }
+      );
+      return;
+    } catch (e) { /* fall through to legacy copy */ }
+  }
+  fallbackCopy(text);
+}
+
+// ---------- dynamic rows: content ----------
+function addContentRow(heading, acts){
+  if (document.querySelectorAll('.content-block').length >= 5) return;
+  contentCount++;
+  var idx = contentCount;
+  var div = document.createElement('div');
+  div.className = 'content-block';
+  div.id = 'cb' + idx;
+  div.innerHTML =
+    '<div class="tag">CONTENT ' + idx + '</div>' +
+    (idx > 1 ? '<button class="rm" type="button" data-rm-content="' + idx + '">&times;</button>' : '') +
+    '<label>Strand and topic <span class="opt">(one line)</span></label>' +
+    '<input type="text" id="cHead' + idx + '" placeholder="Vocabulary: Colonial America">' +
+    '<label>Activities <span class="opt">(one per line)</span></label>' +
+    '<textarea id="cActs' + idx + '" rows="2" placeholder="Evaluated key vocabulary"></textarea>';
+  $('contentRows').appendChild(div);
+  if (heading) $('cHead' + idx).value = heading;
+  if (acts)    $('cActs' + idx).value = acts;
+}
+
+function removeContentRow(idx){
+  var el = $('cb' + idx);
+  if (el) el.parentNode.removeChild(el);
+  render();
+}
+
+// ---------- dynamic rows: homework ----------
+function addHwRow(presetId, link){
+  if (document.querySelectorAll('.hw-block').length >= 5) return;
+  hwCount++;
+  var idx = hwCount;
+  var opts = '';
+  var i;
+  for (i = 0; i < HW_PRESETS.length; i++){
+    var sel = (HW_PRESETS[i].id === presetId) ? ' selected' : '';
+    opts += '<option value="' + HW_PRESETS[i].id + '"' + sel + '>' + HW_PRESETS[i].label + '</option>';
+  }
+  var preset = getPreset(presetId || 'reading');
+  var div = document.createElement('div');
+  div.className = 'hw-block';
+  div.id = 'hb' + idx;
+  div.innerHTML =
+    '<button class="rm" type="button" data-rm-hw="' + idx + '">&times;</button>' +
+    '<label>Type</label>' +
+    '<select id="hType' + idx + '" data-hw="' + idx + '">' + opts + '</select>' +
+    '<label>Task text</label>' +
+    '<input type="text" id="hText' + idx + '" value="">' +
+    '<label>Link <span class="opt">(optional)</span></label>' +
+    '<input type="text" id="hLink' + idx + '" placeholder="https://...">';
+  $('hwRows').appendChild(div);
+  $('hText' + idx).value = preset.text;
+  if (link) $('hLink' + idx).value = link;
+}
+
+function getPreset(id){
+  var i;
+  for (i = 0; i < HW_PRESETS.length; i++){
+    if (HW_PRESETS[i].id === id) return HW_PRESETS[i];
+  }
+  return HW_PRESETS[3];
+}
+
+function removeHwRow(idx){
+  // enforce minimum of one homework row
+  var blocks = document.querySelectorAll('.hw-block');
+  if (blocks.length <= 1){ showToast('At least one homework item is required'); return; }
+  var el = $('hb' + idx);
+  if (el) el.parentNode.removeChild(el);
+  render();
+}
+
+// ---------- values ----------
+function buildValuesGrid(){
+  var html = '';
+  var i;
+  for (i = 0; i < VALUES.length; i++){
+    html +=
+      '<div class="value-row">' +
+        '<div><span class="vn">' + VALUES[i].en + '</span><span class="vz">' + VALUES[i].zh + '</span></div>' +
+        '<div class="seg" data-vseg="' + i + '">' +
+          '<button type="button" data-v="' + i + '" data-s="0">0</button>' +
+          '<button type="button" data-v="' + i + '" data-s="1">1</button>' +
+          '<button type="button" data-v="' + i + '" data-s="2" class="on">2</button>' +
+        '</div>' +
+      '</div>';
+  }
+  $('valuesGrid').innerHTML = html;
+}
+
+function getValueScore(i){
+  var seg = document.querySelector('[data-vseg="' + i + '"]');
+  if (!seg) return 2;
+  var on = seg.querySelector('button.on');
+  return on ? parseInt(on.getAttribute('data-s'), 10) : 2;
+}
+
+function setValueScore(i, s){
+  var seg = document.querySelector('[data-vseg="' + i + '"]');
+  if (!seg) return;
+  var btns = seg.querySelectorAll('button');
+  var j;
+  for (j = 0; j < btns.length; j++){
+    if (parseInt(btns[j].getAttribute('data-s'), 10) === s) btns[j].className = 'on';
+    else btns[j].className = '';
+  }
+}
+
+function buildValueSelects(){
+  var i, o1 = '<option value="">Choose a value\u2026</option>', o2 = '<option value="">None</option>';
+  for (i = 0; i < VALUES.length; i++){
+    o1 += '<option value="' + i + '">' + VALUES[i].en + ' ' + VALUES[i].zh + '</option>';
+    o2 += '<option value="' + i + '">' + VALUES[i].en + ' ' + VALUES[i].zh + '</option>';
+  }
+  $('fVal1').innerHTML = o1;
+  $('fVal2').innerHTML = o2;
+}
+
+// ---------- gather state ----------
+function gather(){
+  var s = {
+    subject: trimv('fSubject'), level: trimv('fLevel'),
+    unit: trimv('fUnit'), classNo: trimv('fClass'),
+    name: trimv('fName') || '(NAME)', topic: trimv('fTopic'),
+    reward: $('fReward').checked,
+    firstLesson: $('fFirstLesson').checked,
+    score: trimv('fScore'), outOf: trimv('fOutOf') || '6',
+    worked: trimv('fWorked'),
+    v1: val('fVal1'), ex1: trimv('fEx1'),
+    v2: val('fVal2'), ex2: trimv('fEx2'),
+    imp1: trimv('fImp1'), imp2: trimv('fImp2'),
+    perf: val('fPerf'),
+    content: [], hw: [], values: []
+  };
+  var blocks = document.querySelectorAll('.content-block');
+  var i, idx;
+  for (i = 0; i < blocks.length; i++){
+    idx = blocks[i].id.replace('cb', '');
+    s.content.push({
+      heading: trimv('cHead' + idx),
+      acts:    val('cActs' + idx)
+    });
+  }
+  var hwBlocks = document.querySelectorAll('.hw-block');
+  for (i = 0; i < hwBlocks.length; i++){
+    idx = hwBlocks[i].id.replace('hb', '');
+    s.hw.push({
+      type: val('hType' + idx),
+      text: trimv('hText' + idx),
+      link: trimv('hLink' + idx)
+    });
+  }
+  for (i = 0; i < VALUES.length; i++){ s.values.push(getValueScore(i)); }
+  return s;
+}
+
+// ---------- performance paragraph ----------
+function buildPerf(s){
+  var name = s.name;
+  var p = 'In this lesson, ' + name + ' studied ' + (s.topic || '(topic)') ;
+  if (s.worked) p += ' and worked on ' + s.worked;
+  p += '. ';
+  if (s.v1 !== ''){
+    var vn1 = VALUE_PHRASES[parseInt(s.v1, 10)];
+    p += name + ' demonstrated ' + vn1 + ' when they ' + (s.ex1 || '(specific example)') + '. ';
+  }
+  if (s.v2 !== ''){
+    var vn2 = VALUE_PHRASES[parseInt(s.v2, 10)];
+    p += 'They also showed ' + vn2 + ' when they ' + (s.ex2 || '(specific example)') + '. ';
+  }
+  if (s.imp1 || s.imp2){
+    p += 'I look forward to helping ' + name + ' improve their ' + (s.imp1 || s.imp2);
+    if (s.imp1 && s.imp2) p += ' and ' + s.imp2;
+    p += '. ';
+  }
+  p += 'Great job, ' + name + '!';
+  return p;
+}
+
+// ---------- output builders ----------
+function headerLine(s){
+  var h = s.subject || 'Harland Class';
+  if (s.level) h += ' Level ' + s.level;
+  h += ', Lesson ' + (s.unit || '1') + '.' + (s.classNo || '1');
+  return h;
+}
+
+function buildApp(s){
+  var out = [];
+  out.push(headerLine(s));
+  out.push('1. Class Content ' + ZH.content);
+  var i, j;
+  for (i = 0; i < s.content.length; i++){
+    var c = s.content[i];
+    if (!c.heading && !c.acts.replace(/\s/g,'')) continue;
+    out.push('   ' + (c.heading || 'Class work'));
+    var acts = c.acts.split('\n');
+    for (j = 0; j < acts.length; j++){
+      var a = acts[j].replace(/^\s+|\s+$/g, '');
+      if (a) out.push('   - ' + a);
+    }
+  }
+  if (s.reward) out.push('   Reward Game');
+  out.push('2. Harland Points ' + ZH.points);
+  if (s.firstLesson){
+    out.push('   - First lesson, no prior homework');
+  } else {
+    out.push('   - ' + (s.score || '(#)') + '/' + s.outOf + ZH.fen);
+  }
+  out.push('3. Homework ' + ZH.homework + ZH.vip);
+  for (i = 0; i < s.hw.length; i++){
+    if (!s.hw[i].text) continue;
+    out.push('- ' + s.hw[i].text);
+    if (s.hw[i].link) out.push(s.hw[i].link);
+  }
+  out.push('4. Performance ' + ZH.perf);
+  out.push('   ' + (s.perf || buildPerf(s)));
+  out.push('5. Harland Values ' + ZH.values);
+  for (i = 0; i < VALUES.length; i++){
+    out.push('   ' + VALUES[i].en + ' ' + VALUES[i].zh + ': ' + s.values[i] + '/2');
+  }
+  return out.join('\n');
+}
+
+function hwEmoji(type){
+  if (type === 'reading') return EMOJI.book;
+  if (type === 'ixl') return EMOJI.pencil;
+  if (type === 'quizlet') return EMOJI.brain;
+  return EMOJI.link;
+}
+
+function stars(n){
+  if (n === 2) return EMOJI.starFull + EMOJI.starFull;
+  if (n === 1) return EMOJI.starFull + EMOJI.starEmpty;
+  return EMOJI.starEmpty + EMOJI.starEmpty;
+}
+
+function buildLine(s){
+  var out = [];
+  out.push(EMOJI.school + ' ' + headerLine(s));
+  out.push(EMOJI.person + ' ' + s.name);
+  out.push(LINE_DIV);
+  out.push(EMOJI.k1 + ' CLASS CONTENT ' + ZH.content);
+  var i, j;
+  for (i = 0; i < s.content.length; i++){
+    var c = s.content[i];
+    if (!c.heading && !c.acts.replace(/\s/g,'')) continue;
+    out.push(c.heading || 'Class work');
+    var acts = c.acts.split('\n');
+    for (j = 0; j < acts.length; j++){
+      var a = acts[j].replace(/^\s+|\s+$/g, '');
+      if (a) out.push(BULLET + ' ' + a);
+    }
+  }
+  if (s.reward) out.push(BULLET + ' Reward Game');
+  out.push(LINE_DIV);
+  out.push(EMOJI.k2 + ' HARLAND POINTS ' + ZH.points);
+  if (s.firstLesson){
+    out.push('First lesson, no prior homework');
+  } else {
+    out.push((s.score || '(#)') + '/' + s.outOf + ZH.fen);
+  }
+  out.push(LINE_DIV);
+  out.push(EMOJI.k3 + ' HOMEWORK ' + ZH.homework + ' ' + ZH.vip);
+  for (i = 0; i < s.hw.length; i++){
+    if (!s.hw[i].text) continue;
+    out.push(hwEmoji(s.hw[i].type) + ' ' + s.hw[i].text);
+    if (s.hw[i].link) out.push(s.hw[i].link);
+  }
+  out.push(LINE_DIV);
+  out.push(EMOJI.k4 + ' PERFORMANCE ' + ZH.perf);
+  out.push(s.perf || buildPerf(s));
+  out.push(LINE_DIV);
+  out.push(EMOJI.k5 + ' HARLAND VALUES ' + ZH.values);
+  for (i = 0; i < VALUES.length; i++){
+    out.push(VALUES[i].en + ' ' + VALUES[i].zh + ' ' + stars(s.values[i]) + ' ' + s.values[i] + '/2');
+  }
+  return out.join('\n');
+}
+
+// ---------- quality checks ----------
+function buildChecks(s){
+  var checks = [];
+  checks.push({ ok: !!trimv('fName'), label: 'Student name entered' });
+  checks.push({ ok: !!s.topic, label: 'Class topic entered (used in the comment)' });
+  var hasContent = false;
+  var i;
+  for (i = 0; i < s.content.length; i++){
+    if (s.content[i].heading) { hasContent = true; break; }
+  }
+  checks.push({ ok: hasContent, label: 'At least one content block filled' });
+  var hwOk = false, hwLinkMissing = false;
+  for (i = 0; i < s.hw.length; i++){
+    if (s.hw[i].text){
+      hwOk = true;
+      if (s.hw[i].type !== 'custom' && !s.hw[i].link) hwLinkMissing = true;
+    }
+  }
+  checks.push({ ok: hwOk, label: 'At least one homework item' });
+  checks.push({ ok: !hwLinkMissing, label: 'Links added for preset homework items' });
+  var exOk = true;
+  if (s.v1 !== '' && !s.ex1) exOk = false;
+  if (s.v2 !== '' && !s.ex2) exOk = false;
+  checks.push({ ok: (s.v1 !== '' && exOk), label: 'Value demonstrated + specific example' });
+  checks.push({ ok: !!s.imp1, label: 'Improvement focus entered' });
+  checks.push({ ok: s.firstLesson || !!s.score, label: 'Last homework score entered (or first lesson ticked)' });
+  return checks;
+}
+
+// ---------- render ----------
+function render(){
+  var s = gather();
+
+  // auto-suggest "worked on" from content block 2 (or 1) if untouched
+  var workedEl = $('fWorked');
+  if (!workedEl.getAttribute('data-touched')){
+    var suggestion = '';
+    var src = '';
+    if (s.content.length > 1 && s.content[1].heading) src = s.content[1].heading;
+    else if (s.content.length > 0 && s.content[0].heading) src = s.content[0].heading;
+    if (src){
+      var ci = src.indexOf(':');
+      suggestion = ci > -1 ? src.slice(ci + 1).replace(/^\s+/, '') : src;
+    }
+    if (suggestion) workedEl.value = suggestion.charAt(0).toLowerCase() + suggestion.slice(1);
+    s.worked = workedEl.value;
+  }
+
+  // renumber content tags after any removal
+  var cbs = document.querySelectorAll('.content-block');
+  var ti;
+  for (ti = 0; ti < cbs.length; ti++){
+    var tagEl = cbs[ti].querySelector('.tag');
+    if (tagEl) tagEl.textContent = 'CONTENT ' + (ti + 1);
+  }
+  // first lesson disables prior-score inputs
+  $('fScore').disabled = s.firstLesson;
+  $('fOutOf').disabled = s.firstLesson;
+
+  // performance paragraph: auto unless dirty
+  if (!perfDirty){
+    $('fPerf').value = buildPerf(s);
+    s.perf = $('fPerf').value;
+    $('btnRegen').style.display = 'none';
+  } else {
+    $('btnRegen').style.display = 'inline';
+  }
+
+  // points pill
+  var hwBlocks = document.querySelectorAll('.hw-block');
+  var possible = 0;
+  var i;
+  for (i = 0; i < hwBlocks.length; i++){
+    var idx = hwBlocks[i].id.replace('hb', '');
+    if (trimv('hText' + idx)) possible += 2;
+  }
+  $('pointsPill').innerHTML = 'This week&rsquo;s possible: ' + possible + ZH.fen;
+
+  // outputs
+  $('outApp').textContent = buildApp(s);
+  $('outLine').textContent = buildLine(s);
+
+  // checks
+  var checks = buildChecks(s);
+  var html = '';
+  for (i = 0; i < checks.length; i++){
+    var cls = checks[i].ok ? 'chk ok' : 'chk bad';
+    var mark = checks[i].ok ? '\u2713' : '!';
+    html += '<div class="' + cls + '"><span class="dot">' + mark + '</span>' + checks[i].label + '</div>';
+  }
+  $('checks').innerHTML = html;
+
+  saveState(s);
+}
+
+// ---------- persistence ----------
+function saveState(s){
+  try {
+    var store = {
+      f: {
+        fSubject: val('fSubject'), fLevel: val('fLevel'), fUnit: val('fUnit'),
+        fClass: val('fClass'), fName: val('fName'), fTopic: val('fTopic'),
+        fScore: val('fScore'), fOutOf: val('fOutOf'),
+        fWorked: val('fWorked'), fVal1: val('fVal1'), fEx1: val('fEx1'),
+        fVal2: val('fVal2'), fEx2: val('fEx2'), fImp1: val('fImp1'), fImp2: val('fImp2'),
+        fPerf: val('fPerf')
+      },
+      reward: $('fReward').checked,
+      firstLesson: $('fFirstLesson').checked,
+      perfDirty: perfDirty,
+      workedTouched: !!$('fWorked').getAttribute('data-touched'),
+      content: s.content,
+      hw: s.hw,
+      values: s.values
+    };
+    window.localStorage.setItem('harlandNotesV2', JSON.stringify(store));
+  } catch (e) { /* storage unavailable - silently continue */ }
+}
+
+function loadState(){
+  var raw = null;
+  try { raw = window.localStorage.getItem('harlandNotesV2'); } catch (e) { raw = null; }
+  if (!raw) return false;
+  var st;
+  try { st = JSON.parse(raw); } catch (e) { return false; }
+  if (!st || !st.f) return false;
+
+  var k;
+  // rebuild dynamic rows first
+  var i;
+  if (st.content && st.content.length){
+    for (i = 0; i < st.content.length; i++){
+      addContentRow(st.content[i].heading, st.content[i].acts);
+    }
+  } else {
+    addContentRow(); addContentRow(); addContentRow();
+  }
+  if (st.hw && st.hw.length){
+    for (i = 0; i < st.hw.length; i++){
+      addHwRow(st.hw[i].type, st.hw[i].link);
+      var idx = hwCount;
+      $('hText' + idx).value = st.hw[i].text || '';
+    }
+  } else {
+    addHwRow('reading'); addHwRow('ixl'); addHwRow('quizlet');
+  }
+  for (k in st.f){
+    if (st.f.hasOwnProperty(k) && $(k)) $(k).value = st.f[k];
+  }
+  $('fReward').checked = !!st.reward;
+  $('fFirstLesson').checked = !!st.firstLesson;
+  perfDirty = !!st.perfDirty;
+  if (st.workedTouched) $('fWorked').setAttribute('data-touched', '1');
+  if (st.values && st.values.length === 5){
+    for (i = 0; i < 5; i++){ setValueScore(i, st.values[i]); }
+  }
+  return true;
+}
+
+// ---------- actions ----------
+function nextStudent(){
+  // keep: subject, level, unit, class, topic, content, homework
+  // clear: name, score, performance fields, values back to 2
+  $('fName').value = '';
+  $('fScore').value = '';
+  $('fVal1').value = '';
+  $('fEx1').value = '';
+  $('fVal2').value = '';
+  $('fEx2').value = '';
+  $('fImp1').value = '';
+  $('fImp2').value = '';
+  perfDirty = false;
+  var i;
+  for (i = 0; i < 5; i++){ setValueScore(i, 2); }
+  render();
+  showToast('Ready for the next student');
+  $('fName').focus();
+}
+
+function clearAll(){
+  try { window.localStorage.removeItem('harlandNotesV2'); } catch (e) {}
+  window.location.reload();
+}
+
+// ---------- init ----------
+function init(){
+  buildValuesGrid();
+  buildValueSelects();
+
+  var restored = loadState();
+  if (!restored){
+    addContentRow(); addContentRow(); addContentRow();
+    addHwRow('reading'); addHwRow('ixl'); addHwRow('quizlet');
+  }
+
+  // delegated listeners
+  document.body.addEventListener('input', function(ev){
+    var t = ev.target;
+    if (t.id === 'fPerf'){ perfDirty = true; }
+    if (t.id === 'fWorked'){ t.setAttribute('data-touched', '1'); }
+    render();
+  });
+
+  document.body.addEventListener('change', function(ev){
+    var t = ev.target;
+    var hwIdx = t.getAttribute('data-hw');
+    if (hwIdx){
+      var preset = getPreset(t.value);
+      var cur = trimv('hText' + hwIdx);
+      var untouched = (cur === '');
+      var pj;
+      for (pj = 0; pj < HW_PRESETS.length; pj++){
+        if (cur === HW_PRESETS[pj].text){ untouched = true; break; }
+      }
+      if (untouched){
+        $('hText' + hwIdx).value = (preset.id !== 'custom') ? preset.text : '';
+      }
+    }
+    render();
+  });
+
+  document.body.addEventListener('click', function(ev){
+    var t = ev.target;
+    var v = t.getAttribute('data-v');
+    if (v !== null && t.tagName === 'BUTTON'){
+      setValueScore(parseInt(v, 10), parseInt(t.getAttribute('data-s'), 10));
+      render();
+      return;
+    }
+    var rc = t.getAttribute('data-rm-content');
+    if (rc){ removeContentRow(rc); return; }
+    var rh = t.getAttribute('data-rm-hw');
+    if (rh){ removeHwRow(rh); return; }
+  });
+
+  $('btnAddContent').addEventListener('click', function(){ addContentRow(); render(); });
+  $('btnAddHw').addEventListener('click', function(){ addHwRow('custom'); render(); });
+  $('btnNext').addEventListener('click', nextStudent);
+  $('btnClear').addEventListener('click', clearAll);
+  $('btnRegen').addEventListener('click', function(){ perfDirty = false; render(); });
+
+  $('tabApp').addEventListener('click', function(){
+    $('tabApp').className = 'tab on'; $('tabLine').className = 'tab';
+    $('outApp').style.display = 'block'; $('outLine').style.display = 'none';
+    $('btnCopyApp').style.display = 'inline-flex'; $('btnCopyLine').style.display = 'none';
+    $('pvTitle').textContent = 'App / Document format';
+  });
+  $('tabLine').addEventListener('click', function(){
+    $('tabLine').className = 'tab on'; $('tabApp').className = 'tab';
+    $('outLine').style.display = 'block'; $('outApp').style.display = 'none';
+    $('btnCopyLine').style.display = 'inline-flex'; $('btnCopyApp').style.display = 'none';
+    $('pvTitle').textContent = 'LINE message format';
+  });
+
+  $('btnCopyApp').addEventListener('click', function(){ copyText($('outApp').textContent); });
+  $('btnCopyLine').addEventListener('click', function(){ copyText($('outLine').textContent); });
+
+  render();
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
