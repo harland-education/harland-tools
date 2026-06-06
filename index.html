@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAF7F0">
+<title>Harland Teacher Tools</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='12'%20fill='%230D0D0F'/%3E%3Ctext%20x='32'%20y='45'%20font-family='Georgia,serif'%20font-size='38'%20font-weight='700'%20text-anchor='middle'%20fill='%23C9A84C'%3EH%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#0D0D0F; --ink:#1A1A20; --stone:#7E776A;
+  --gold:#C9A84C; --gold-deep:#A8893A;
+  --ivory:#FAF7F0; --paper:#FFFFFF; --hairline:#E5DFD2;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+::selection{background:var(--gold); color:var(--obsidian);}
+body{
+  font-family:'DM Sans',sans-serif; background:var(--ivory); color:var(--ink);
+  min-height:100vh; -webkit-font-smoothing:antialiased;
+}
+.masthead{
+  background:var(--obsidian); color:var(--ivory);
+  padding:30px 36px 26px; border-bottom:2px solid var(--gold);
+}
+.masthead .kicker{
+  font-size:10.5px; letter-spacing:0.28em; text-transform:uppercase;
+  color:var(--gold); font-weight:500; margin-bottom:10px;
+}
+.masthead h1{
+  font-family:'Cormorant Garamond',Georgia,serif; font-size:32px; font-weight:600;
+  letter-spacing:0.005em; line-height:1.1; color:var(--ivory);
+}
+.wrap{max-width:640px; margin:0 auto; padding:28px 36px 72px;}
+@media (max-width:560px){ .masthead{padding:24px 18px 20px;} .wrap{padding:20px 18px 56px;} }
+.card{
+  display:block; text-decoration:none; color:inherit;
+  background:var(--paper); border:1px solid var(--hairline); border-radius:10px;
+  box-shadow:0 1px 1px rgba(13,13,15,0.03), 0 12px 28px -24px rgba(13,13,15,0.25);
+  padding:18px 20px; transition:border-color 0.15s, box-shadow 0.15s;
+}
+.card:hover{ border-color:var(--gold); box-shadow:0 1px 1px rgba(13,13,15,0.05), 0 14px 32px -22px rgba(13,13,15,0.35); }
+.card h2{
+  font-family:'Cormorant Garamond',Georgia,serif; font-size:22px; font-weight:600;
+  color:var(--ink); margin-bottom:4px;
+}
+.card .desc{ font-size:13.5px; color:var(--stone); line-height:1.5; }
+.card .go{ font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold-deep); font-weight:700; margin-top:12px; }
+.foot{ font-size:12px; color:var(--stone); line-height:1.6; margin-top:24px; padding-top:18px; border-top:1px solid var(--hairline); }
+.foot strong{ color:var(--ink); font-weight:700; }
+</style>
+</head>
+<body>
+<div class="masthead">
+  <div class="kicker">Harland Education &middot; Teacher Tools</div>
+  <h1>Teacher Tools</h1>
+</div>
+<div class="wrap">
+  <a class="card" href="./notes-generator/">
+    <h2>Class Notes Generator</h2>
+    <div class="desc">Generate standard-format class notes in App and LINE formats.</div>
+    <div class="go">Open tool &rarr;</div>
+  </a>
+  <div class="foot">
+    These tools save drafts in your browser. On a shared computer, use <strong>Clear all</strong> before you leave.
+  </div>
+</div>
+</body>
+</html>
