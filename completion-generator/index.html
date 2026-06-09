@@ -1083,6 +1083,14 @@
     .preview-panel { max-height: none; }
     .form-panel { max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
   }
+
+  /* band-descriptor guide (grading aid) */
+  .band-guide{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:-2px 0 14px;}
+  .band-cell{border:1px solid var(--border);border-radius:7px;padding:8px 9px;font-size:10.5px;line-height:1.45;color:var(--slate);cursor:pointer;background:var(--white);transition:border-color .15s, background .15s;}
+  .band-cell:hover{border-color:var(--gold);}
+  .band-cell.sel{border-color:var(--gold);background:var(--gold-pale);color:var(--gold-deep);}
+  .band-score{display:block;font-weight:700;color:var(--gold-deep);font-size:11px;margin-bottom:3px;letter-spacing:0.04em;}
+  @media (max-width:860px){.band-guide{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
@@ -1127,9 +1135,15 @@
               <option value="4">Unit 4</option>
             </select>
           </div>
-          <div class="field field-full">
-            <label>Writing Focus (Level)</label>
+          <div class="field">
+            <label>Level</label>
             <select id="writingType">
+              <!-- options injected by JS -->
+            </select>
+          </div>
+          <div class="field">
+            <label>Writing Type <span style="font-weight:400;color:var(--mist);">(sets the rubric)</span></label>
+            <select id="rubricType">
               <!-- options injected by JS -->
             </select>
           </div>
@@ -1145,6 +1159,14 @@
           <div class="field">
             <label>Student Name</label>
             <input type="text" id="studentName" value="" placeholder="e.g. Dylan Wu">
+          </div>
+          <div class="field">
+            <label>Pronoun <span style="font-weight:400;color:var(--mist);">(for comments)</span></label>
+            <select id="studentPronoun">
+              <option value="they">they / their</option>
+              <option value="he">he / his</option>
+              <option value="she">she / her</option>
+            </select>
           </div>
           <div class="field">
             <label>Teacher Name</label>
@@ -1202,49 +1224,47 @@
         <div class="section-label">Step 4</div>
         <div class="section-title">Teacher Comments</div>
 
-        <!-- AI Guidance Panels -->
-        <div id="aiGuidanceArea" style="margin-bottom:18px;">
-
-          <!-- Areas to Improve -->
-          <div class="ai-guidance-block" id="improveBlock">
+        <!-- Strengths (manual) -->
+        <div class="field">
+          <label>Strengths <span style="font-weight:400;color:var(--mist);">(write these yourself)</span></label>
+          <textarea id="strengthsText" placeholder="What did the student do well? Write 1-3 specific strengths." style="min-height:80px;"></textarea>
+          <div class="ai-guidance-block" id="strengthBlock" style="margin-top:8px;">
             <div class="ai-block-header">
-              <div class="ai-block-title">
-                <span class="ai-icon">✦</span>
-                <span>3 Areas to Work On</span>
-              </div>
-              <div class="ai-block-sub">AI will suggest areas for improvement based on the rubric scores and level content</div>
-            </div>
-            <div class="ai-suggestions" id="improveSuggestions">
-              <div class="ai-placeholder">Click "Generate" to get AI-guided suggestions based on this student's rubric scores and level.</div>
-            </div>
-            <button class="ai-generate-btn" id="improveBtn" onclick="generateImprove()">
-              <span class="ai-btn-icon">⟳</span> Generate Suggestions
-            </button>
-          </div>
-
-          <!-- Things Improved -->
-          <div class="ai-guidance-block" id="strengthBlock" style="margin-top:12px;">
-            <div class="ai-block-header">
-              <div class="ai-block-title">
-                <span class="ai-icon">✦</span>
-                <span>3 Things the Student Improved</span>
-              </div>
-              <div class="ai-block-sub">AI will highlight growth areas based on rubric performance and level expectations</div>
+              <div class="ai-block-title"><span class="ai-icon">&#10022;</span><span>AI suggestions (reference only)</span></div>
+              <div class="ai-block-sub">Based on the writing sample and rubric. A reference to help you write your own, these do not fill the field.</div>
             </div>
             <div class="ai-suggestions" id="strengthSuggestions">
-              <div class="ai-placeholder">Click "Generate" to get AI-guided strengths based on this student's rubric scores and level.</div>
+              <div class="ai-placeholder">Click Suggest to see AI ideas for this student's strengths.</div>
             </div>
-            <button class="ai-generate-btn" id="strengthBtn" onclick="generateStrengths()">
-              <span class="ai-btn-icon">⟳</span> Generate Suggestions
-            </button>
+            <button class="ai-generate-btn" id="strengthBtn" onclick="generateStrengths()">Suggest strengths</button>
           </div>
-
         </div>
 
+        <!-- Areas to Improve (manual) -->
         <div class="field">
-          <label>Final Comments for the family</label>
-          <div style="font-size:10px;color:var(--mist);margin-bottom:8px;letter-spacing:0.02em;">Use the AI suggestions above as a guide, then write your personalised comment below.</div>
-          <textarea id="teacherComments" placeholder="Write your end-of-unit comments here. Address the student directly, note strengths, and identify areas for continued growth." style="min-height:140px;"></textarea>
+          <label>Areas to Improve <span style="font-weight:400;color:var(--mist);">(write these yourself)</span></label>
+          <textarea id="improveText" placeholder="What should the student work on next? Write 1-3 specific areas." style="min-height:80px;"></textarea>
+          <div class="ai-guidance-block" id="improveBlock" style="margin-top:8px;">
+            <div class="ai-block-header">
+              <div class="ai-block-title"><span class="ai-icon">&#10022;</span><span>AI suggestions (reference only)</span></div>
+              <div class="ai-block-sub">Based on the writing sample and rubric. A reference to help you write your own, these do not fill the field.</div>
+            </div>
+            <div class="ai-suggestions" id="improveSuggestions">
+              <div class="ai-placeholder">Click Suggest to see AI ideas for areas to work on.</div>
+            </div>
+            <button class="ai-generate-btn" id="improveBtn" onclick="generateImprove()">Suggest areas</button>
+          </div>
+        </div>
+
+        <!-- Final Comment (AI-generated from your notes, editable) -->
+        <div class="field">
+          <label>Final Comment for the family</label>
+          <div style="font-size:10px;color:var(--mist);margin-bottom:8px;letter-spacing:0.02em;">Generate a draft in the Harland comment style from your strengths and areas above, then edit freely.</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+            <button class="ai-generate-btn" id="commentBtn" onclick="generateFinalComment()">Generate final comment</button>
+            <span id="commentStatus" style="font-size:12px;color:var(--mist);"></span>
+          </div>
+          <textarea id="teacherComments" placeholder="The generated comment appears here for you to edit. You can also write it from scratch." style="min-height:160px;"></textarea>
         </div>
       </div>
 
@@ -1362,6 +1382,48 @@ var DESCRIPTIVE_CONV = {
   desc: 'Adherence to descriptive paragraph conventions',
   levels: ['Poor or no adherence to descriptive paragraph conventions.', 'Decent adherence to descriptive paragraph conventions.', 'Consistent adherence to descriptive paragraph conventions.', 'Perfect adherence to descriptive paragraph conventions.']
 };
+var PERSUASIVE_CONV = {
+  id: 'conv',
+  name: 'Persuasive Writing Conventions',
+  desc: 'Adherence to persuasive writing conventions',
+  levels: ['Poor or no adherence to persuasive writing conventions.', 'Decent adherence to persuasive conventions, such as stating a clear position and using mostly formal language.', 'Consistent adherence to persuasive conventions, including a clear stance, formal language, and persuasive devices used appropriately.', 'Perfect adherence to persuasive conventions, with a clear and sustained stance, formal language, effective persuasive devices, and counterarguments addressed where appropriate.']
+};
+var EXPOSITORY_CONV = {
+  id: 'conv',
+  name: 'Expository Writing Conventions',
+  desc: 'Adherence to expository writing conventions',
+  levels: ['Poor or no adherence to expository writing conventions.', 'Decent adherence to expository conventions, such as an objective tone and mostly formal language.', 'Consistent adherence to expository conventions, including an objective tone, formal language, and clearly organized factual information.', 'Perfect adherence to expository conventions, with a consistently objective tone, formal language, and logically organized, well-explained information throughout.']
+};
+var NARRATIVE_CONV = {
+  id: 'conv',
+  name: 'Narrative Writing Conventions',
+  desc: 'Adherence to narrative writing conventions',
+  levels: ['Poor or no adherence to narrative writing conventions.', 'Decent adherence to narrative conventions, such as paragraphing the story and keeping a mostly consistent tense.', 'Consistent adherence to narrative conventions, including a consistent tense and point of view and correctly punctuated dialogue.', 'Perfect adherence to narrative conventions, with a consistent tense and point of view, correctly punctuated dialogue, and paragraphing that guides the reader through the story.']
+};
+var ANALYTICAL_CONV = {
+  id: 'conv',
+  name: 'Analytical Writing Conventions',
+  desc: 'Adherence to analytical writing conventions',
+  levels: ['Poor or no adherence to analytical writing conventions.', 'Decent adherence to analytical conventions, such as a mostly formal tone and some supporting evidence.', 'Consistent adherence to analytical conventions, including a formal objective tone, evidence integrated to support claims, and avoidance of personal pronouns.', 'Perfect adherence to analytical conventions, with a formal objective tone throughout, evidence smoothly integrated and clearly referenced, and claims consistently supported by analysis.']
+};
+var RESEARCH_CONV = {
+  id: 'conv',
+  name: 'Research Writing Conventions',
+  desc: 'Adherence to research writing conventions',
+  levels: ['Poor or no adherence to research writing conventions.', 'Decent adherence to research conventions, such as referring to sources and using mostly formal language.', 'Consistent adherence to research conventions, including an objective academic tone, sources integrated to support points, and accurate paraphrasing.', 'Perfect adherence to research conventions, with an objective academic tone, sources accurately integrated and referenced, and information paraphrased and organized to build a clear, well-supported discussion.']
+};
+var PERSUASIVE_DETAILS = {
+  id: 'details',
+  name: 'Details and Examples',
+  desc: 'Reasons, evidence, and examples that support the argument',
+  levels: ['No reasons, evidence, or examples to support the argument.', 'A few reasons or examples are included, but they offer limited support for the argument.', 'A number of relevant reasons, evidence, and examples are included to support the argument.', 'A perfect amount of relevant reasons, evidence, and examples that strongly support and develop the argument.']
+};
+var RESEARCH_DETAILS = {
+  id: 'details',
+  name: 'Details and Examples',
+  desc: 'Evidence and data drawn from credible sources',
+  levels: ['No evidence or examples drawn from sources.', 'A few pieces of evidence or examples from sources are included, with limited relevance.', 'A number of relevant facts, examples, and pieces of evidence from sources are included to support the points.', 'A perfect amount of relevant, well-chosen evidence and data from credible sources that thoroughly support and develop the discussion.']
+};
 
 /* ---------- Building blocks ---------- */
 
@@ -1414,12 +1476,7 @@ var PERSUASIVE_PARA_RUBRIC = {
       name: 'Supporting Sentences',
       desc: 'Quality of supporting sentences',
       levels: ['Insufficient or irrelevant supporting sentences.', 'Some supporting sentences are provided but lacking detail.', 'Adequate supporting sentences with basic descriptions.', 'Strong supporting sentences with vivid details enhance the description.']
-    }, {
-      id: 'details',
-      name: 'Details and Examples',
-      desc: 'Depth through details and examples',
-      levels: ['No details or examples.', 'A few details and/or examples are included.', 'Several details and/or examples are included to add depth to each paragraph.', 'A perfect amount of details and/or examples are included to give each paragraph depth and to clarify key ideas.']
-    }, {
+    }, PERSUASIVE_DETAILS, {
       id: 'closing',
       name: 'Concluding Sentence',
       desc: 'Quality of concluding sentence',
@@ -1427,7 +1484,7 @@ var PERSUASIVE_PARA_RUBRIC = {
     }]
   }, {
     name: 'Style',
-    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, DESCRIPTIVE_CONV]
+    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, PERSUASIVE_CONV]
   }]
 };
 
@@ -1538,12 +1595,7 @@ var PERSUASIVE_ESSAY_RUBRIC = {
       name: 'Supporting Sentences',
       desc: 'Quality of supporting sentences',
       levels: ['Very few sentences that support the topic.', 'A number of clear supporting sentences that support the topic of each paragraph.', 'A sufficient number of supporting sentences that are effective at supporting the topic.', 'A perfect amount of supporting sentences that are clear and effective at supporting.']
-    }, {
-      id: 'details',
-      name: 'Details and Examples',
-      desc: 'Depth through details and examples',
-      levels: ['No details or examples.', 'A few details and/or examples are included.', 'A number of details and/or examples are included to add depth to each paragraph.', 'A perfect amount of details and/or examples are included to give each paragraph depth and to clarify key ideas.']
-    }, {
+    }, PERSUASIVE_DETAILS, {
       id: 'closing',
       name: 'Concluding Sentence',
       desc: 'Quality of concluding sentences',
@@ -1551,7 +1603,7 @@ var PERSUASIVE_ESSAY_RUBRIC = {
     }]
   }, {
     name: 'Style',
-    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, ACADEMIC_CONV]
+    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, PERSUASIVE_CONV]
   }]
 };
 
@@ -1587,12 +1639,7 @@ var EXPOSITORY_ESSAY_RUBRIC = {
     }]
   }, {
     name: 'Style',
-    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, {
-      id: 'conv',
-      name: 'Academic Conventions',
-      desc: 'Adherence to academic conventions',
-      levels: ['Poor or no adherence to academic conventions.', 'Decent adherence to academic writing conventions like indenting paragraphs and using mostly formal language.', 'Consistent adherence to academic writing conventions such as formal language and the avoidance of personal pronouns.', 'Perfect adherence to academic writing conventions such as formal language and the avoidance of personal pronouns, maintaining a professional and objective tone throughout the essay.']
-    }]
+    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, EXPOSITORY_CONV]
   }]
 };
 
@@ -1635,12 +1682,7 @@ var NARRATIVE_ESSAY_RUBRIC = {
       name: 'Grammar',
       desc: 'Grammatical clarity and flow',
       levels: ['The majority of the grammar is incorrect, affecting the readability of the narrative.', 'Grammar is at or slightly below grade level expectations, with occasional errors that do not significantly hinder understanding.', 'Grammar is at or slightly above grade level expectations, with few errors that do not distract from the narrative.', 'Consistent and accurate use of grammar, enhancing the clarity, flow, and professionalism of the narrative, well above grade level expectations.']
-    }, {
-      id: 'conv',
-      name: 'Academic Conventions',
-      desc: 'Adherence to narrative writing conventions',
-      levels: ['Poor or no adherence to academic conventions.', 'Decent adherence to academic writing conventions, such as indenting paragraphs and using mostly formal language.', 'Consistent adherence to academic writing conventions, including formal language and proper narrative structure.', 'Perfect adherence to academic writing conventions, including formal language, proper formatting, and a well-structured narrative.']
-    }]
+    }, NARRATIVE_CONV]
   }]
 };
 
@@ -1651,7 +1693,10 @@ var ADVANCED_PERSUASIVE_RUBRIC = PERSUASIVE_ESSAY_RUBRIC;
 var RESEARCH_ESSAY_RUBRIC = {
   name: 'Research Essay Rubric',
   maxPerRow: 6,
-  categories: PERSUASIVE_ESSAY_RUBRIC.categories
+  categories: [{
+    name: 'Structure',
+    rows: [PERSUASIVE_ESSAY_RUBRIC.categories[0].rows[0], PERSUASIVE_ESSAY_RUBRIC.categories[0].rows[1], RESEARCH_DETAILS, PERSUASIVE_ESSAY_RUBRIC.categories[0].rows[3]]
+  }, { name: 'Style', rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, RESEARCH_CONV] }]
 };
 
 /* ANALYTICAL ESSAY \u2014 Level 12 Units 1\u20133 (sharpened "Details" criterion is analysis-specific) */
@@ -1688,12 +1733,7 @@ var ANALYTICAL_ESSAY_RUBRIC = {
       name: 'Vocabulary',
       desc: 'Sophistication and analytical precision',
       levels: ['Vocabulary is well below grade level.', 'Vocabulary is at or slightly below grade level expectations, but may lack precision.', 'Vocabulary is above grade level expectations, appropriately conveying the analysis.', 'Vocabulary is precise, sophisticated, and well above grade level, enhancing the clarity and depth of the analysis.']
-    }, GRAMMAR_STANDARD, {
-      id: 'conv',
-      name: 'Academic Conventions',
-      desc: 'Adherence to academic conventions',
-      levels: ['Poor or no adherence to academic conventions.', 'Some adherence to academic writing conventions, such as indenting paragraphs and using formal language, but with inconsistencies.', 'Consistent adherence to academic writing conventions, including the use of formal language and avoidance of personal pronouns.', 'Perfect adherence to academic writing conventions, with flawless use of formal language, proper paragraph structure, and strict avoidance of personal pronouns.']
-    }]
+    }, GRAMMAR_STANDARD, ANALYTICAL_CONV]
   }]
 };
 
@@ -2116,11 +2156,62 @@ var LEVEL_RUBRICS = {
   }
 };
 
-/* Helper: get the current rubric */
+/* ============================================================
+   WRITING TYPE -> RUBRIC (rubric is driven by writing type now)
+   ============================================================ */
+var WRITING_TYPES = [
+  { key: 'descriptive_para', label: 'Descriptive Paragraph', group: 'Paragraph', rubric: DESCRIPTIVE_PARA_RUBRIC },
+  { key: 'persuasive_para', label: 'Persuasive Paragraph', group: 'Paragraph', rubric: PERSUASIVE_PARA_RUBRIC },
+  { key: 'expository_para', label: 'Expository Paragraph', group: 'Paragraph', rubric: EXPOSITORY_PARA_RUBRIC },
+  { key: 'analytical_para', label: 'Analytical Paragraph', group: 'Paragraph', rubric: ANALYTICAL_PARA_RUBRIC },
+  { key: 'descriptive_essay', label: 'Descriptive Essay', group: 'Essay', rubric: DESCRIPTIVE_ESSAY_RUBRIC },
+  { key: 'persuasive_essay', label: 'Persuasive Essay', group: 'Essay', rubric: PERSUASIVE_ESSAY_RUBRIC },
+  { key: 'expository_essay', label: 'Expository Essay', group: 'Essay', rubric: EXPOSITORY_ESSAY_RUBRIC },
+  { key: 'narrative_essay', label: 'Narrative Essay', group: 'Essay', rubric: NARRATIVE_ESSAY_RUBRIC },
+  { key: 'analytical_essay', label: 'Analytical Essay', group: 'Essay', rubric: ANALYTICAL_ESSAY_RUBRIC },
+  { key: 'research_essay', label: 'Research Essay', group: 'Essay', rubric: RESEARCH_ESSAY_RUBRIC },
+  { key: 'adv_persuasive_essay', label: 'Advanced Persuasive Essay', group: 'Essay', rubric: ADVANCED_PERSUASIVE_RUBRIC },
+  { key: 'narrative_pres', label: 'Narrative Presentation', group: 'Presentation', rubric: NARRATIVE_PRESENTATION_RUBRIC },
+  { key: 'persuasive_pres', label: 'Persuasive Presentation', group: 'Presentation', rubric: PERSUASIVE_PRESENTATION_RUBRIC },
+  { key: 'descriptive_pres', label: 'Descriptive Presentation', group: 'Presentation', rubric: DESCRIPTIVE_PRESENTATION_RUBRIC },
+  { key: 'analytical_pres', label: 'Analytical Presentation', group: 'Presentation', rubric: ANALYTICAL_PRESENTATION_RUBRIC },
+  { key: 'expository_pres', label: 'Expository Presentation', group: 'Presentation', rubric: EXPOSITORY_PRESENTATION_RUBRIC },
+  { key: 'adv_persuasive_pres', label: 'Advanced Persuasive Presentation', group: 'Presentation', rubric: ADV_PERSUASIVE_PRESENTATION_RUBRIC },
+  { key: 'research_pres', label: 'Research Presentation', group: 'Presentation', rubric: RESEARCH_PRESENTATION_RUBRIC }
+];
+var RUBRIC_BY_TYPE = {};
+(function () {
+  var i;
+  for (i = 0; i < WRITING_TYPES.length; i++) { RUBRIC_BY_TYPE[WRITING_TYPES[i].key] = WRITING_TYPES[i].rubric; }
+})();
+function writingTypeLabel(key) {
+  var i;
+  for (i = 0; i < WRITING_TYPES.length; i++) { if (WRITING_TYPES[i].key === key) return WRITING_TYPES[i].label; }
+  return 'writing project';
+}
+function gradeLetter(pct) {
+  if (pct == null) return '';
+  if (pct >= 90) return 'A';
+  if (pct >= 80) return 'B';
+  if (pct >= 70) return 'C';
+  if (pct >= 60) return 'D';
+  return 'F';
+}
+
+/* Helper: get the current rubric (driven by writing type) */
 function getCurrentRubric() {
-  var lvl = LEVEL_RUBRICS[state.level];
+  return RUBRIC_BY_TYPE[state.rubricType] || null;
+}
+/* Map a level to its default writing type (used when the Level dropdown changes) */
+function defaultTypeForLevel(level) {
+  var lvl = LEVEL_RUBRICS[level];
   if (!lvl) return null;
-  return lvl[state.unitNum] || null;
+  var r = lvl[1] || lvl[state.unitNum];
+  var i;
+  for (i = 0; i < WRITING_TYPES.length; i++) {
+    if (WRITING_TYPES[i].rubric === r) return WRITING_TYPES[i].key;
+  }
+  return null;
 }
 
 /* ============================================================
@@ -2129,6 +2220,8 @@ function getCurrentRubric() {
 var state = {
   docType: 'unit',
   level: '4',
+  rubricType: 'descriptive_para',
+  showBands: true,
   unitNum: 1,
   scores: {},
   // example shape: { topic: 6, support: 4, etc }
@@ -2156,6 +2249,21 @@ function populateWritingType() {
   });
   sel.value = '4'; // default
 }
+function populateRubricTypes() {
+  var sel = document.getElementById('rubricType');
+  sel.innerHTML = '';
+  var groups = {}, order = [], i;
+  for (i = 0; i < WRITING_TYPES.length; i++) {
+    var g = WRITING_TYPES[i].group;
+    if (!groups[g]) { groups[g] = document.createElement('optgroup'); groups[g].label = g; order.push(g); }
+    var opt = document.createElement('option');
+    opt.value = WRITING_TYPES[i].key;
+    opt.textContent = WRITING_TYPES[i].label;
+    groups[g].appendChild(opt);
+  }
+  for (i = 0; i < order.length; i++) { sel.appendChild(groups[order[i]]); }
+  sel.value = 'descriptive_para';
+}
 
 /* ============================================================
    RUBRIC RENDERING (form side)
@@ -2164,35 +2272,60 @@ function renderRubricForm() {
   var wrap = document.getElementById('rubricGradingArea');
   var rubric = getCurrentRubric();
   if (!rubric) {
-    wrap.innerHTML = '<div style="color:var(--mist);font-style:italic;font-size:12px;padding:12px;">Rubric not yet defined for this level/unit.</div>';
+    wrap.innerHTML = '<div style="color:var(--mist);font-style:italic;font-size:12px;padding:12px;">Rubric not yet defined for this writing type.</div>';
     return;
   }
-  var html = "<div style=\"font-size:11px;color:var(--gold-deep);background:var(--gold-pale);padding:8px 12px;border-radius:6px;margin-bottom:14px;letter-spacing:0.04em;font-weight:500;\">Using: " + rubric.name + " (Max " + rubric.categories.reduce(function (a, c) {
-    return a + c.rows.length * rubric.maxPerRow;
-  }, 0) + " pts)</div>";
+  var maxTotal = rubric.categories.reduce(function (a, c) { return a + c.rows.length * rubric.maxPerRow; }, 0);
+  var html = '';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;">';
+  html += '<div style="font-size:11px;color:var(--gold-deep);background:var(--gold-pale);padding:8px 12px;border-radius:6px;letter-spacing:0.04em;font-weight:500;">Using: ' + escapeHtml(rubric.name) + ' (Max ' + maxTotal + ' pts)</div>';
+  html += '<button type="button" id="bandToggle" style="font-size:10.5px;border:1px solid var(--border);background:var(--white);color:var(--slate);padding:6px 11px;border-radius:6px;cursor:pointer;letter-spacing:0.03em;">' + (state.showBands ? 'Hide band guide' : 'Show band guide') + '</button>';
+  html += '</div>';
   rubric.categories.forEach(function (cat) {
-    html += "<div class=\"rubric-category\">" + cat.name + "</div>";
+    html += '<div class="rubric-category">' + escapeHtml(cat.name) + '</div>';
     cat.rows.forEach(function (row) {
-      var _state$scores$row$id;
-      var current = (_state$scores$row$id = state.scores[row.id]) != null ? _state$scores$row$id : null;
-      html += "\n        <div class=\"rubric-row\">\n          <div class=\"rubric-name\">\n            " + row.name + "\n            <span class=\"rubric-desc\">" + row.desc + "</span>\n          </div>\n          <div class=\"score-pills\" data-row=\"" + row.id + "\">\n            " + [0, 1, 2, 3, 4, 5, 6].map(function (pt) {
-        return "\n              <button class=\"score-pill " + (current === pt ? 'active' : '') + " " + (pt % 2 === 1 ? 'odd' : '') + "\" data-pt=\"" + pt + "\">" + pt + "</button>\n            ";
-      }).join('') + "\n          </div>\n        </div>\n      ";
+      var current = state.scores[row.id] != null ? state.scores[row.id] : null;
+      html += '<div class="rubric-row"><div class="rubric-name">' + escapeHtml(row.name) + '<span class="rubric-desc">' + escapeHtml(row.desc) + '</span></div>';
+      html += '<div class="score-pills" data-row="' + row.id + '">';
+      html += [0, 1, 2, 3, 4, 5, 6].map(function (pt) {
+        return '<button class="score-pill ' + (current === pt ? 'active' : '') + ' ' + (pt % 2 === 1 ? 'odd' : '') + '" data-pt="' + pt + '">' + pt + '</button>';
+      }).join('');
+      html += '</div></div>';
+      if (state.showBands) {
+        html += '<div class="band-guide" data-bandrow="' + row.id + '">';
+        html += [0, 2, 4, 6].map(function (pt, i) {
+          var sel = current != null && (current === pt || (current % 2 === 1 && (pt === current - 1 || pt === current + 1)));
+          return '<div class="band-cell ' + (sel ? 'sel' : '') + '" data-bandpt="' + pt + '"><span class="band-score">' + pt + '</span>' + escapeHtml(row.levels[i] || '') + '</div>';
+        }).join('');
+        html += '</div>';
+      }
     });
   });
   wrap.innerHTML = html;
-
-  // wire score buttons
   wrap.querySelectorAll('.score-pills').forEach(function (group) {
     var rowId = group.dataset.row;
     group.querySelectorAll('.score-pill').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var pt = parseInt(btn.dataset.pt, 10);
-        state.scores[rowId] = pt;
+        state.scores[rowId] = parseInt(btn.dataset.pt, 10);
         renderRubricForm();
         updatePreview();
       });
     });
+  });
+  wrap.querySelectorAll('.band-guide').forEach(function (group) {
+    var rowId = group.dataset.bandrow;
+    group.querySelectorAll('.band-cell').forEach(function (cell) {
+      cell.addEventListener('click', function () {
+        state.scores[rowId] = parseInt(cell.dataset.bandpt, 10);
+        renderRubricForm();
+        updatePreview();
+      });
+    });
+  });
+  var tg = document.getElementById('bandToggle');
+  if (tg) tg.addEventListener('click', function () {
+    state.showBands = !state.showBands;
+    renderRubricForm();
   });
   updateTotal();
 }
@@ -2455,14 +2588,25 @@ function syncDocType() {
 }
 function syncWritingType() {
   state.level = document.getElementById('writingType').value;
-  state.scores = {}; // rubric may have completely different criteria
-  renderRubricForm();
+  var k = defaultTypeForLevel(state.level);
+  if (k && k !== state.rubricType) {
+    state.rubricType = k;
+    var rt = document.getElementById('rubricType');
+    if (rt) rt.value = k;
+    state.scores = {};
+    renderRubricForm();
+  }
   renderLevelUnits();
+  updatePreview();
+}
+function syncRubricType() {
+  state.rubricType = document.getElementById('rubricType').value;
+  state.scores = {}; // different writing type means different rubric criteria
+  renderRubricForm();
   updatePreview();
 }
 function syncUnit() {
   state.unitNum = parseInt(document.getElementById('unitNumber').value, 10);
-  state.scores = {}; // unit 4 has a different rubric than units 1-3
   renderRubricForm();
   updatePreview();
 }
@@ -2472,6 +2616,7 @@ function syncUnit() {
    ============================================================ */
 function init() {
   populateWritingType();
+  populateRubricTypes();
 
   // initial defaults
   state.level = '4';
@@ -2490,6 +2635,7 @@ function init() {
 
   // Set the dropdown values to match the state
   document.getElementById('writingType').value = state.level;
+  document.getElementById('rubricType').value = state.rubricType;
   document.getElementById('unitNumber').value = state.unitNum;
   renderRubricForm();
   renderLevelUnits();
@@ -2498,6 +2644,7 @@ function init() {
   // event wiring
   document.getElementById('docType').addEventListener('change', syncDocType);
   document.getElementById('writingType').addEventListener('change', syncWritingType);
+  document.getElementById('rubricType').addEventListener('change', syncRubricType);
   document.getElementById('unitNumber').addEventListener('change', syncUnit);
   ['studentName', 'teacherName', 'projectTitle', 'completionDate', 'projectText', 'teacherComments'].forEach(function (id) {
     return document.getElementById(id).addEventListener('input', updatePreview);
@@ -2524,23 +2671,6 @@ function buildRubricSummary() {
     });
   });
   return lines.length ? lines.join('\n') : 'No rubric scores entered yet.';
-}
-function buildContextBlock() {
-  var studentName = document.getElementById('studentName').value || 'the student';
-  var levelData = CURRICULUM.levels.find(function (l) {
-    return l.level === state.level;
-  });
-  var levelLabel = levelData ? "Level " + levelData.level + ": " + levelData.writing : 'unknown level';
-  var unitNum = state.unitNum;
-  var projectTitle = document.getElementById('projectTitle').value || '(untitled)';
-  var rubricSummary = buildRubricSummary();
-  return {
-    studentName: studentName,
-    levelLabel: levelLabel,
-    unitNum: unitNum,
-    projectTitle: projectTitle,
-    rubricSummary: rubricSummary
-  };
 }
 function callClaudeForComments(prompt) {
   return fetch(HARLAND_AI_PROXY, {
@@ -2580,19 +2710,6 @@ function parseNumberedList(text) {
   }
   return items.slice(0, 3);
 }
-function renderSuggestions(containerId, items, onUseAll) {
-  var container = document.getElementById(containerId);
-  if (!items.length) {
-    container.innerHTML = '<div class="ai-placeholder">No suggestions generated. Try again.</div>';
-    return;
-  }
-  var html = items.map(function (item, i) {
-    return "\n    <div class=\"ai-suggestion-item\">\n      <div class=\"ai-suggestion-num\">" + (i + 1) + "</div>\n      <div class=\"ai-suggestion-text\">" + escapeHtml(item) + "</div>\n    </div>\n  ";
-  }).join('');
-  // Add "Use all in comment" button
-  html += "<div style=\"margin-top:10px;\">\n    <button class=\"ai-generate-btn\" style=\"font-size:10px;\" onclick=\"" + onUseAll + "\">\n      <span class=\"ai-btn-icon\">\u2193</span> Insert all into comment\n    </button>\n  </div>";
-  container.innerHTML = html;
-}
 function setLoadingState(suggestionsId, btnId, loading) {
   var btn = document.getElementById(btnId);
   var sug = document.getElementById(suggestionsId);
@@ -2603,14 +2720,81 @@ function setLoadingState(suggestionsId, btnId, loading) {
     btn.disabled = false;
   }
 }
+
+
+/* ===== AI comment helpers (reworked) ===== */
+function renderSuggestions(containerId, items) {
+  var container = document.getElementById(containerId);
+  if (!items.length) {
+    container.innerHTML = '<div class="ai-placeholder">No suggestions generated. Try again.</div>';
+    return;
+  }
+  var html = items.map(function (item, i) {
+    return "\n    <div class=\"ai-suggestion-item\">\n      <div class=\"ai-suggestion-num\">" + (i + 1) + "</div>\n      <div class=\"ai-suggestion-text\">" + escapeHtml(item) + "</div>\n    </div>\n  ";
+  }).join('');
+  container.innerHTML = html;
+}
+function pronounSet(p) {
+  if (p === 'he') return 'he, him, his';
+  if (p === 'she') return 'she, her, her';
+  return 'they, them, their (use singular they)';
+}
+function computeScoreTotals() {
+  var rubric = getCurrentRubric();
+  var total = 0, max = 0;
+  if (rubric) {
+    rubric.categories.forEach(function (cat) {
+      cat.rows.forEach(function (row) {
+        max += rubric.maxPerRow;
+        if (state.scores[row.id] != null) total += state.scores[row.id];
+      });
+    });
+  }
+  var pct = max ? Math.round(total / max * 100) : null;
+  return { total: total, max: max, pct: pct, letter: gradeLetter(pct) };
+}
+function unitGradesText() {
+  var parts = [], u;
+  for (u = 1; u <= 4; u++) {
+    var g = state.unitGrades[u];
+    if (g) parts.push('Unit ' + u + ': ' + g);
+  }
+  return parts.join(', ');
+}
+function buildContextBlock() {
+  var studentName = document.getElementById('studentName').value || 'the student';
+  var pronoun = document.getElementById('studentPronoun').value || 'they';
+  var levelData = CURRICULUM.levels.find(function (l) { return l.level === state.level; });
+  var levelLabel = levelData ? "Level " + levelData.level + ": " + levelData.writing : ('Level ' + state.level);
+  var sc = computeScoreTotals();
+  return {
+    studentName: studentName,
+    pronoun: pronoun,
+    levelLabel: levelLabel,
+    levelWriting: levelData ? levelData.writing : '',
+    writingTypeLabel: writingTypeLabel(state.rubricType),
+    unitNum: state.unitNum,
+    projectTitle: document.getElementById('projectTitle').value || '(untitled)',
+    projectText: document.getElementById('projectText').value || '',
+    rubricSummary: buildRubricSummary(),
+    total: sc.total, max: sc.max, pct: sc.pct, letter: sc.letter,
+    strengthsText: document.getElementById('strengthsText').value || '',
+    improveText: document.getElementById('improveText').value || '',
+    unitGradesText: unitGradesText()
+  };
+}
 function generateImprove() {
   setLoadingState('improveSuggestions', 'improveBtn', true);
   var ctx = buildContextBlock();
-  var prompt = 'You are an experienced EFL writing teacher at Harland Education in Taiwan.\n' + 'A student named ' + ctx.studentName + ' has just completed Unit ' + ctx.unitNum + ' at ' + ctx.levelLabel + '.\n' + 'Project title: "' + ctx.projectTitle + '"\n\n' + 'Rubric scores:\n' + ctx.rubricSummary + '\n\n' + 'Based on these rubric scores and the level content (' + ctx.levelLabel + '), identify exactly 3 specific areas this student needs to work on. Be concrete, kind, and frame each point constructively.\n\n' + 'Respond with a numbered list of exactly 3 items (1. 2. 3.), one concise sentence each, written as if advising the teacher what to highlight to the student. Do not include any preamble or extra commentary.';
+  var prompt = "";
+  prompt += "You are an experienced writing teacher at Harland Education, a premium tutoring academy in Taiwan.\n";
+  prompt += ctx.studentName + " has completed a " + ctx.writingTypeLabel + " titled '" + ctx.projectTitle + "'.\n\n";
+  prompt += "Writing sample:\n" + ctx.projectText + "\n\n";
+  prompt += "Rubric scores:\n" + ctx.rubricSummary + "\n\n";
+  prompt += "Suggest exactly 3 specific areas this student should work on next, grounded in the writing sample and the rubric. These are reference notes for the teacher, who will write their own version.\n";
+  prompt += "Respond with a numbered list of exactly 3 items, one concise sentence each. American spelling. No em dashes. No semicolons. No preamble.";
   callClaudeForComments(prompt).then(function (raw) {
-    var items = parseNumberedList(raw);
-    window._improveItems = items;
-    renderSuggestions('improveSuggestions', items, 'insertImproveToComment()');
+    renderSuggestions('improveSuggestions', parseNumberedList(raw));
   }).catch(function (e) {
     document.getElementById('improveSuggestions').innerHTML = '<div class="ai-error">' + escapeHtml(e.message) + '</div>';
   }).then(function () {
@@ -2620,39 +2804,79 @@ function generateImprove() {
 function generateStrengths() {
   setLoadingState('strengthSuggestions', 'strengthBtn', true);
   var ctx = buildContextBlock();
-  var prompt = 'You are an experienced EFL writing teacher at Harland Education in Taiwan.\n' + 'A student named ' + ctx.studentName + ' has just completed Unit ' + ctx.unitNum + ' at ' + ctx.levelLabel + '.\n' + 'Project title: "' + ctx.projectTitle + '"\n\n' + 'Rubric scores:\n' + ctx.rubricSummary + '\n\n' + 'Based on these rubric scores and the level content (' + ctx.levelLabel + '), identify exactly 3 specific things this student improved or did well. Be warm, specific, and encouraging.\n\n' + 'Respond with a numbered list of exactly 3 items (1. 2. 3.), one concise sentence each, written as if advising the teacher what positive progress to highlight to the student. Do not include any preamble or extra commentary.';
+  var prompt = "";
+  prompt += "You are an experienced writing teacher at Harland Education, a premium tutoring academy in Taiwan.\n";
+  prompt += ctx.studentName + " has completed a " + ctx.writingTypeLabel + " titled '" + ctx.projectTitle + "'.\n\n";
+  prompt += "Writing sample:\n" + ctx.projectText + "\n\n";
+  prompt += "Rubric scores:\n" + ctx.rubricSummary + "\n\n";
+  prompt += "Suggest exactly 3 specific strengths in this student's writing, grounded in the writing sample and the rubric. These are reference notes for the teacher, who will write their own version.\n";
+  prompt += "Respond with a numbered list of exactly 3 items, one concise sentence each. American spelling. No em dashes. No semicolons. No preamble.";
   callClaudeForComments(prompt).then(function (raw) {
-    var items = parseNumberedList(raw);
-    window._strengthItems = items;
-    renderSuggestions('strengthSuggestions', items, 'insertStrengthsToComment()');
+    renderSuggestions('strengthSuggestions', parseNumberedList(raw));
   }).catch(function (e) {
     document.getElementById('strengthSuggestions').innerHTML = '<div class="ai-error">' + escapeHtml(e.message) + '</div>';
   }).then(function () {
     setLoadingState('strengthSuggestions', 'strengthBtn', false);
   });
 }
-function insertImproveToComment() {
-  var items = window._improveItems || [];
-  if (!items.length) return;
-  var ta = document.getElementById('teacherComments');
-  var existing = ta.value.trim();
-  var addition = 'Areas to work on:\n' + items.map(function (t, i) {
-    return i + 1 + ". " + t;
-  }).join('\n');
-  ta.value = existing ? existing + '\n\n' + addition : addition;
-  updatePreview();
+function buildUnitCommentPrompt(ctx) {
+  var p = "";
+  p += "You are the head teacher at Harland Education, a premium tutoring academy in Taiwan, writing a warm, professional end-of-unit completion comment for a student's family.\n\n";
+  p += "Student: " + ctx.studentName + "\n";
+  p += "Pronouns to use for the student: " + pronounSet(ctx.pronoun) + "\n";
+  p += "Writing type: " + ctx.writingTypeLabel + "\n";
+  p += "Project topic: " + ctx.projectTitle + "\n";
+  if (ctx.pct != null) p += "Grade: " + ctx.total + " out of " + ctx.max + " (" + ctx.pct + " percent, " + ctx.letter + ")\n";
+  p += "Teacher notes on strengths:\n" + (ctx.strengthsText || "(none provided)") + "\n";
+  p += "Teacher notes on areas to improve:\n" + (ctx.improveText || "(none provided)") + "\n\n";
+  p += "Write ONE flowing paragraph of about 5 to 7 sentences following this Harland structure exactly:\n";
+  p += "1. Open by saying the student has done a (adjective) job writing a (adjective) (writing type) on the topic of the project title.\n";
+  p += "2. State what impressed you most, drawn from the strengths notes, with a specific detail.\n";
+  p += "3. Give a second specific positive.\n";
+  p += "4. State one area to work on, drawn from the areas notes, and add a sentence on why it matters.\n";
+  p += "5. Close with encouragement that the student can continue to improve this grade over time, then the words: Well done, " + ctx.studentName + "!\n\n";
+  p += "Rules: American spelling. No em dashes. No semicolons. Warm and specific, never generic. Use the strengths and areas notes as the substance and do not invent facts beyond them and the writing sample. Return only the paragraph, no preamble.\n\n";
+  p += "Model of the style and structure to match:\n";
+  p += "Rubio has done a fantastic job writing a comprehensive and well-structured research paper on 'The Titanic Tragedy'. What impressed me most about Rubio's latest writing project was his willingness to experiment with new styles of sentences such as a wide variety of topic sentences and hooks as well as conclusions. Rubio also researched extensively and logically arranged his information in a way that made reading his paper both enjoyable and informative, which is no easy feat. Going forward, Rubio must be careful to ensure his language remains academic and formal throughout the writing project. Using personal pronouns, especially the word I, makes an otherwise formal and informative piece sound informal and opinionated. With small adjustments to his language style and accuracy, I have no doubt that Rubio can continue to improve his grade over time. Well done, Rubio!";
+  return p;
 }
-function insertStrengthsToComment() {
-  var items = window._strengthItems || [];
-  if (!items.length) return;
-  var ta = document.getElementById('teacherComments');
-  var existing = ta.value.trim();
-  var addition = 'What improved:\n' + items.map(function (t, i) {
-    return i + 1 + ". " + t;
-  }).join('\n');
-  ta.value = existing ? existing + '\n\n' + addition : addition;
-  updatePreview();
+function buildLevelCommentPrompt(ctx) {
+  var p = "";
+  p += "You are the head teacher at Harland Education, a premium tutoring academy in Taiwan, writing a warm end-of-level completion comment for a student's family.\n\n";
+  p += "Student: " + ctx.studentName + "\n";
+  p += "Pronouns to use: " + pronounSet(ctx.pronoun) + "\n";
+  p += "Level just completed: " + ctx.levelLabel + "\n";
+  p += "Writing focus of the level: " + (ctx.levelWriting || ctx.writingTypeLabel) + "\n";
+  if (ctx.pct != null) p += "Overall grade across the level: " + ctx.pct + " percent (" + ctx.letter + ")\n";
+  if (ctx.unitGradesText) p += "Unit grades: " + ctx.unitGradesText + "\n";
+  p += "Teacher notes on strengths across the level:\n" + (ctx.strengthsText || "(none provided)") + "\n";
+  p += "Teacher notes on areas to improve:\n" + (ctx.improveText || "(none provided)") + "\n\n";
+  p += "Write TWO short paragraphs following this Harland structure:\n";
+  p += "Paragraph 1: Open by saying the student has done a (adjectival phrase) job completing the level. Then describe how they grew in the core topics of the level, naming specific topics drawn from the strengths notes.\n";
+  p += "Paragraph 2: Describe how they grew in the writing focus, naming specific writing skills, how their writing developed over time, and that their " + (ctx.letter || "current") + " grade reflects steady improvement. Close by saying it has been a pleasure to witness the student's growth and that you are excited to see it continue in the next level, then the words: Great job, " + ctx.studentName + ", and best of luck!\n\n";
+  p += "Rules: American spelling. No em dashes. No semicolons. Use the teacher notes and grades as the substance. If a specific such as an exact topic is not provided, keep the wording general rather than inventing it. Return only the two paragraphs, no preamble.\n\n";
+  p += "Model of the style to match:\n";
+  p += "Mark has done an impressive job completing Harland Level 4. Throughout the level, Mark demonstrated a solid grasp of geography, which was showcased by their understanding of key landforms, mapping skills, and weather patterns. In descriptive writing, Mark demonstrated great aptitude in using sensory details and vivid adjectives to bring their descriptive writing to life. Their paragraphs were vivid, compelling, and descriptive, highlighting their mastery of this writing style and growing command of academic writing. Their B grade is a testament to their steady improvement over the level. It has been a pleasure to witness Mark's growth and achievement during this level and I am excited to see this progress reflected in Harland Level 5. Great job, Mark!";
+  return p;
 }
+function generateFinalComment() {
+  var ctx = buildContextBlock();
+  var btn = document.getElementById('commentBtn');
+  var status = document.getElementById('commentStatus');
+  btn.disabled = true;
+  status.textContent = 'Generating...';
+  var prompt = (state.docType === 'level') ? buildLevelCommentPrompt(ctx) : buildUnitCommentPrompt(ctx);
+  callClaudeForComments(prompt).then(function (raw) {
+    var out = String(raw).replace(/^\s+|\s+$/g, '');
+    if (out) { document.getElementById('teacherComments').value = out; updatePreview(); }
+    status.textContent = out ? 'Draft ready. Edit freely.' : 'No text returned.';
+  }).catch(function (e) {
+    status.textContent = e.message;
+  }).then(function () {
+    btn.disabled = false;
+  });
+}
+
 
 </script>
 
