@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Harland — Completion Document Generator</title>
+<title>Unit Measurable Generator | Harland</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='12'%20fill='%230D0D0F'/%3E%3Ctext%20x='32'%20y='45'%20font-family='Georgia,serif'%20font-size='38'%20font-weight='700'%20text-anchor='middle'%20fill='%23C9A84C'%3EH%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -18,6 +18,7 @@
     --mist: #9A9AA8;
     --border: #ECEAE3;
     --white: #FFFFFF;
+    --hl-logo-gold: url("data:image/png;base64,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");
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,7 +60,11 @@
   }
   .brand-mark {
     display: flex; align-items: center; gap: 10px;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+  }
+  .brand-lockup {
+    width: 124px; height: 46px;
+    background: var(--hl-logo-gold) left center / contain no-repeat;
   }
   .brand-logo {
     width: 28px; height: 28px;
@@ -346,8 +351,10 @@
     color: white;
   }
   .page-header .h-mark {
-    display: flex; align-items: center; gap: 9px;
+    width: 82px; height: 30px;
+    background: var(--hl-logo-gold) center / contain no-repeat;
   }
+  .page-header .h-circle, .page-header .h-wordmark { display: none !important; }
   .page-header .h-circle {
     width: 22px; height: 22px;
     border: 1px solid var(--gold);
@@ -1101,24 +1108,37 @@
   <div class="form-panel">
     <div class="form-header">
       <div class="brand-mark">
-        <div class="brand-logo">H</div>
-        <div>
-          <div class="brand-text">HARLAND</div>
-          <div class="brand-tagline">Achieve Excellence</div>
-        </div>
+        <div class="brand-lockup"></div>
       </div>
-      <div class="form-title">Completion Document Generator</div>
-      <div class="form-sub">Generate Unit Completions &amp; Level Completions on-brand, in seconds.</div>
+      <div class="form-title">Unit Measurable Generator</div>
+      <div class="form-sub">Generate on-brand completion documents for any unit measurable, in seconds.</div>
     </div>
 
     <div class="form-body">
 
+      <div style="margin-bottom:22px;padding:14px 16px;border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;background:rgba(201,168,76,0.05);">
+        <div style="font-size:12px;font-weight:600;color:var(--obsidian);letter-spacing:0.02em;margin-bottom:6px;">About this tool</div>
+        <div style="font-size:11.5px;color:var(--slate);line-height:1.7;">Every unit at Harland ends in a measurable, the piece of work that proves a student finished the unit and shows their progress. This tool turns that measurable into a polished, on-brand completion document. Pick the measurable type, fill in the student details and the result or rubric, add any attachments, then write or generate the teacher comment. Use Download PDF to save and share the finished document.</div>
+      </div>
+
       <!-- Document Type -->
       <div class="form-section">
         <div class="section-label">Step 1</div>
-        <div class="section-title">Document Type</div>
+        <div class="section-title">Measurable Type</div>
 
         <div class="field-grid">
+          <div class="field" id="measurableField">
+            <label>Measurable <span style="font-weight:400;color:var(--mist);">(what proves the unit)</span></label>
+            <select id="measurable">
+              <option value="written">Written work (essay / paragraph)</option>
+              <option value="presentation">Presentation</option>
+              <option value="test">Test / Exam</option>
+              <option value="quiz">Quiz</option>
+              <option value="mock">Mock test (test prep)</option>
+              <option value="oral">Oral assessment</option>
+              <option value="project">Project / Portfolio</option>
+            </select>
+          </div>
           <div class="field">
             <label>Completion Type</label>
             <select id="docType">
@@ -1135,13 +1155,21 @@
               <option value="4">Unit 4</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field" id="levelSelectField">
             <label>Level</label>
             <select id="writingType">
               <!-- options injected by JS -->
             </select>
           </div>
-          <div class="field">
+          <div class="field" id="courseTitleField" style="display:none;">
+            <label>Course / Subject</label>
+            <input type="text" id="courseTitle" placeholder="e.g. Geometry, Biology, AP Literature">
+          </div>
+          <div class="field" id="levelTextField" style="display:none;">
+            <label>Level <span style="font-weight:400;color:var(--mist);">(optional)</span></label>
+            <input type="text" id="levelText" placeholder="e.g. Level 2, Grade 9, or leave blank">
+          </div>
+          <div class="field" id="rubricTypeField">
             <label>Writing Type <span style="font-weight:400;color:var(--mist);">(sets the rubric)</span></label>
             <select id="rubricType">
               <!-- options injected by JS -->
@@ -1158,7 +1186,7 @@
         <div class="field-grid">
           <div class="field">
             <label>Student Name</label>
-            <input type="text" id="studentName" value="" placeholder="e.g. Dylan Wu">
+            <input type="text" id="studentName" value="" placeholder="e.g. Alex Chen">
           </div>
           <div class="field">
             <label>Pronoun <span style="font-weight:400;color:var(--mist);">(for comments)</span></label>
@@ -1170,10 +1198,10 @@
           </div>
           <div class="field">
             <label>Teacher Name</label>
-            <input type="text" id="teacherName" value="Mr. Birk" placeholder="e.g. Mr. Birk">
+            <input type="text" id="teacherName" value="Ms. Hartley" placeholder="e.g. Ms. Hartley">
           </div>
           <div class="field">
-            <label>Project Title</label>
+            <label id="projectTitleLabel">Project Title</label>
             <input type="text" id="projectTitle" value="My Perfect Day" placeholder="e.g. My Perfect Day">
           </div>
           <div class="field">
@@ -1181,8 +1209,8 @@
             <input type="text" id="completionDate" placeholder="e.g. 22 May 2026">
           </div>
 
-          <div class="field field-full">
-            <label>Student Project (paste full text)</label>
+          <div class="field field-full" id="projectTextField">
+            <label id="projectTextLabel">Student Project (paste full text)</label>
             <textarea id="projectText" class="project-area" placeholder="Paste the student's complete writing project here. Paragraph breaks will be preserved.">The long week that I went to the ice-chilling Hokkaido was an unforgettable memory. I was happily playing stupid video games like Plants vs. Zombies on the airplane, and they were super hard but funny. As the big plane landed at the gigantic airport slowly, I saw snow, and it was white like my dog. As I played happily with the snow, I heard it crunching under my feet. I was thrown softly into the snow by my crazy coach. The snow felt cold but it was soft like my bed. Then I went to soak in the comfortable hot springs. There were many kinds of hot springs, like the milk spring, tomato spring, and warm spring. They even had a heated outdoor pool. We quickly ate a lot of yummy Japanese sushi, and it tasted saltier than the sushi in Taiwan. No matter what, the fun trip to Hokkaido will always stay in my mind.</textarea>
           </div>
         </div>
@@ -1193,6 +1221,19 @@
         <div class="section-label">Step 3</div>
         <div class="section-title">Grade the Rubric</div>
 
+        <div id="rubricGenPanel" style="display:none;margin-bottom:16px;padding:14px;border:1px dashed var(--gold);border-radius:8px;background:rgba(201,168,76,0.04);">
+          <div style="font-size:12px;font-weight:600;color:var(--obsidian);margin-bottom:4px;">AI Rubric Generator</div>
+          <div style="font-size:10.5px;color:var(--slate);line-height:1.6;margin-bottom:10px;">Generate a Harland-spec rubric for this measurable. Fill in the Course or Subject above, add any focus areas, then generate. You can grade it below and re-generate to refine.</div>
+          <div class="field">
+            <label style="font-size:10px;">Focus areas <span style="font-weight:400;color:var(--mist);">(optional, comma separated)</span></label>
+            <input type="text" id="rubricFocus" placeholder="e.g. fluency, content, organization, delivery">
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px;">
+            <button class="ai-generate-btn" id="rubricGenBtn" type="button" onclick="generateRubric()">Generate Harland rubric</button>
+            <span id="rubricGenStatus" style="font-size:11px;color:var(--mist);"></span>
+          </div>
+        </div>
+
         <!-- Rubric will be rendered by JS based on document type & unit -->
         <div id="rubricGradingArea"></div>
 
@@ -1202,6 +1243,59 @@
             <span class="total-score" id="totalScore">0/42</span>
             <span class="total-percent" id="totalPercent">0%</span>
           </span>
+        </div>
+      </div>
+
+      <!-- Results (score-based measurables) -->
+      <div class="form-section" id="resultsSection" style="display:none;">
+        <div class="section-label">Step 3</div>
+        <div class="section-title" id="resultsTitle">Record the result</div>
+
+        <div class="field-grid">
+          <div class="field" id="examPresetField" style="display:none;">
+            <label>Exam <span style="font-weight:400;color:var(--mist);">(prefills sections)</span></label>
+            <select id="examPreset">
+              <option value="">Choose an exam...</option>
+              <option value="sat">SAT</option>
+              <option value="ssat">SSAT</option>
+              <option value="toefl">TOEFL iBT</option>
+              <option value="ielts">IELTS</option>
+              <option value="generic">Other / generic</option>
+            </select>
+          </div>
+          <div class="field">
+            <label id="overallScoreLabel">Score</label>
+            <input type="text" id="overallScore" placeholder="e.g. 1340">
+          </div>
+          <div class="field">
+            <label>Out of <span style="font-weight:400;color:var(--mist);">(optional)</span></label>
+            <input type="text" id="overallTotal" placeholder="e.g. 1600">
+          </div>
+          <div class="field">
+            <label>Grade <span style="font-weight:400;color:var(--mist);">(optional)</span></label>
+            <input type="text" id="overallGrade" placeholder="e.g. A or B+">
+          </div>
+        </div>
+
+        <div class="total-display" id="resultsPercentWrap" style="display:none;">
+          <span class="total-label">Percentage</span>
+          <span><span class="total-percent" id="resultsPercent">0%</span></span>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="section-title" style="font-size:13px;" id="breakdownTitle">Section breakdown</div>
+          <div style="font-size:10px;color:var(--mist);margin-bottom:8px;">Add a section for each part, with a comment if useful. Leave empty if not needed.</div>
+          <div id="breakdownArea"></div>
+          <button class="ai-generate-btn" id="addBreakdownBtn" type="button" onclick="addBreakdownRow()" style="margin-top:4px;">+ Add section</button>
+        </div>
+
+        <div id="officialMockBlock" style="display:none;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
+          <div class="section-title" style="font-size:13px;">Official mock test <span style="font-weight:400;color:var(--mist);">(optional follow-up)</span></div>
+          <div class="field-grid">
+            <div class="field"><label>Official score</label><input type="text" id="officialScore" placeholder="e.g. 1380"></div>
+            <div class="field"><label>Date taken</label><input type="text" id="officialDate" placeholder="e.g. 14 June 2026"></div>
+            <div class="field"><label>Provider / venue</label><input type="text" id="officialProvider" placeholder="e.g. College Board"></div>
+          </div>
         </div>
       </div>
 
@@ -1217,6 +1311,24 @@
         <div class="section-label">Built In</div>
         <div class="section-title">AI Assistant</div>
         <div style="font-size:11px;color:var(--mist);line-height:1.6;">AI-guided comment suggestions are built in. No setup or key is required. Use the suggestion buttons in the Teacher Comments section below.</div>
+      </div>
+
+      <!-- Attachments (all measurables) -->
+      <div class="form-section" id="attachmentsSection">
+        <div class="section-label">Attachments</div>
+        <div class="section-title">Work &amp; Links <span style="font-weight:400;font-size:11px;color:var(--mist);">(optional)</span></div>
+
+        <div class="field">
+          <label>Upload image(s) <span style="font-weight:400;color:var(--mist);">(e.g. handwritten work, a photo of the test)</span></label>
+          <input type="file" id="imageUpload" accept="image/*" multiple>
+          <div id="imageList" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;"></div>
+        </div>
+
+        <div class="field">
+          <label>Links <span style="font-weight:400;color:var(--mist);">(video of a presentation or reading aloud, a portfolio, and so on)</span></label>
+          <div id="linksArea"></div>
+          <button class="ai-generate-btn" id="addLinkBtn" type="button" onclick="addLinkRow()" style="margin-top:4px;">+ Add link</button>
+        </div>
       </div>
 
       <!-- Teacher Comments -->
@@ -1269,7 +1381,7 @@
       </div>
 
       <div class="action-bar">
-        <button class="btn btn-secondary" onclick="window.location.reload()">Reset</button>
+        <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
         <button class="btn btn-primary" onclick="window.print()">Download PDF</button>
       </div>
 
@@ -2199,7 +2311,9 @@ function gradeLetter(pct) {
 }
 
 /* Helper: get the current rubric (driven by writing type) */
+var generatedRubric = null;
 function getCurrentRubric() {
+  if (state.measurable === 'oral' || state.measurable === 'project') return generatedRubric;
   return RUBRIC_BY_TYPE[state.rubricType] || null;
 }
 /* Map a level to its default writing type (used when the Level dropdown changes) */
@@ -2221,6 +2335,8 @@ var state = {
   docType: 'unit',
   level: '4',
   rubricType: 'descriptive_para',
+  measurable: 'written',
+  mock: { preset: '' },
   showBands: true,
   unitNum: 1,
   scores: {},
@@ -2272,7 +2388,10 @@ function renderRubricForm() {
   var wrap = document.getElementById('rubricGradingArea');
   var rubric = getCurrentRubric();
   if (!rubric) {
-    wrap.innerHTML = '<div style="color:var(--mist);font-style:italic;font-size:12px;padding:12px;">Rubric not yet defined for this writing type.</div>';
+    var nf = (state.measurable === 'oral' || state.measurable === 'project')
+      ? 'Generate a Harland rubric above to begin grading this ' + measInfo().label.toLowerCase() + '.'
+      : 'Rubric not yet defined for this writing type.';
+    wrap.innerHTML = '<div style="color:var(--mist);font-style:italic;font-size:12px;padding:12px;">' + nf + '</div>';
     return;
   }
   var maxTotal = rubric.categories.reduce(function (a, c) { return a + c.rows.length * rubric.maxPerRow; }, 0);
@@ -2393,37 +2512,41 @@ function formatProjectBody(text) {
 function renderPreview() {
   var studentName = document.getElementById('studentName').value || 'Student Name';
   var teacherName = document.getElementById('teacherName').value || 'Teacher';
-  var projectTitle = document.getElementById('projectTitle').value || 'Project Title';
+  var projectTitle = document.getElementById('projectTitle').value || measInfo().title;
   var completionDate = document.getElementById('completionDate').value || formatToday();
   var projectText = document.getElementById('projectText').value;
   var teacherComments = document.getElementById('teacherComments').value;
   var levelData = CURRICULUM.levels.find(function (l) {
     return l.level === state.level;
   });
-  var levelLabel = levelData ? "Harland Level " + levelData.level : 'Harland';
-  var writingFocus = levelData ? levelData.writing : '';
-  if (state.docType === 'unit') {
-    renderUnitCompletion({
-      studentName: studentName,
-      teacherName: teacherName,
-      projectTitle: projectTitle,
-      completionDate: completionDate,
-      projectText: projectText,
-      teacherComments: teacherComments,
-      levelLabel: levelLabel,
-      writingFocus: writingFocus,
-      levelData: levelData
-    });
+  var courseTitle = (document.getElementById('courseTitle') ? document.getElementById('courseTitle').value : '').replace(/^\s+|\s+$/g, '');
+  var levelText = (document.getElementById('levelText') ? document.getElementById('levelText').value : '').replace(/^\s+|\s+$/g, '');
+  var levelLabel, writingFocus;
+  if (state.measurable === 'written') {
+    levelLabel = levelData ? "Harland Level " + levelData.level : 'Harland';
+    writingFocus = levelData ? levelData.writing : '';
   } else {
-    renderLevelCompletion({
-      studentName: studentName,
-      teacherName: teacherName,
-      completionDate: completionDate,
-      teacherComments: teacherComments,
-      levelLabel: levelLabel,
-      writingFocus: writingFocus,
-      levelData: levelData
-    });
+    var subject = courseTitle || measInfo().label;
+    writingFocus = subject;
+    levelLabel = subject + (levelText ? " \u00B7 " + levelText : "");
+  }
+  var ctx = {
+    studentName: studentName,
+    teacherName: teacherName,
+    projectTitle: projectTitle,
+    completionDate: completionDate,
+    projectText: projectText,
+    teacherComments: teacherComments,
+    levelLabel: levelLabel,
+    writingFocus: writingFocus,
+    levelData: levelData
+  };
+  if (state.docType === 'level') {
+    renderLevelCompletion(ctx);
+  } else if (isRubricMeasurable()) {
+    renderUnitCompletion(ctx);
+  } else {
+    renderScoreCompletion(ctx);
   }
 }
 function formatToday() {
@@ -2456,10 +2579,10 @@ function renderUnitCompletion(ctx) {
   var html = '';
 
   // ============ PAGE 1: COVER ============
-  html += "\n    <div class=\"page cover-page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Unit Completion \xB7 Confidential</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"cover-top\">\n          <div class=\"cover-stamp\"><span class=\"dot\"></span> Unit " + state.unitNum + " Completion</div>\n          <div class=\"cover-meta\">" + completionDate + "</div>\n          <div class=\"cover-level\">" + levelLabel + " \xB7 " + writingFocus + "</div>\n          <div class=\"cover-unit-tag\">Unit " + state.unitNum + "</div>\n        </div>\n\n        <div class=\"cover-title-wrap\">\n          <div class=\"cover-eyebrow\">Writing Project</div>\n          <div class=\"cover-title\">" + escapeHtml(projectTitle) + "</div>\n          <div class=\"cover-divider\"></div>\n          <div class=\"cover-summary\">\n            A writing project completed by " + escapeHtml(studentName) + " as part of " + escapeHtml(writingFocus) + " at Harland.\n          </div>\n        </div>\n\n        <div class=\"cover-footer\">\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Written by</div>\n            <div class=\"value\">" + escapeHtml(studentName) + "</div>\n            <div class=\"value-sub\">Student</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Graded by</div>\n            <div class=\"value\">" + escapeHtml(teacherName) + "</div>\n            <div class=\"value-sub\">Head Teacher</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Final grade</div>\n            <div class=\"value\">" + total + "/" + max + "</div>\n            <div class=\"value-sub\">" + pct + "% \xB7 " + gradeBand(pct) + "</div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>www.harland.com.tw<span class=\"gold-dot\"></span>Achieve Excellence</span>\n      </div>\n    </div>\n  ";
+  html += "\n    <div class=\"page cover-page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">" + measInfo().cover + " \xB7 Confidential</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"cover-top\">\n          <div class=\"cover-stamp\"><span class=\"dot\"></span> Unit " + state.unitNum + " Completion</div>\n          <div class=\"cover-meta\">" + completionDate + "</div>\n          <div class=\"cover-level\">" + levelLabel + " \xB7 " + writingFocus + "</div>\n          <div class=\"cover-unit-tag\">Unit " + state.unitNum + "</div>\n        </div>\n\n        <div class=\"cover-title-wrap\">\n          <div class=\"cover-eyebrow\">" + measInfo().cover + "</div>\n          <div class=\"cover-title\">" + escapeHtml(projectTitle) + "</div>\n          <div class=\"cover-divider\"></div>\n          <div class=\"cover-summary\">\n            A " + measInfo().noun + " completed by " + escapeHtml(studentName) + " as part of " + escapeHtml(writingFocus) + " at Harland.\n          </div>\n        </div>\n\n        <div class=\"cover-footer\">\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Written by</div>\n            <div class=\"value\">" + escapeHtml(studentName) + "</div>\n            <div class=\"value-sub\">Student</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Graded by</div>\n            <div class=\"value\">" + escapeHtml(teacherName) + "</div>\n            <div class=\"value-sub\">Head Teacher</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Final grade</div>\n            <div class=\"value\">" + total + "/" + max + "</div>\n            <div class=\"value-sub\">" + pct + "% \xB7 " + gradeBand(pct) + "</div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>www.harland.com.tw<span class=\"gold-dot\"></span>Achieve Excellence</span>\n      </div>\n    </div>\n  ";
 
   // ============ PAGE 2: PROJECT TEXT ============
-  html += "\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">" + escapeHtml(projectTitle) + " \xB7 Unit " + state.unitNum + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Writing Project</div>\n        <div class=\"doc-section-title\">" + escapeHtml(projectTitle) + "</div>\n\n        <div class=\"student-byline\">\n          <span class=\"by-label\">Written by</span>\n          <span class=\"by-name\">" + escapeHtml(studentName) + "</span>\n          <span class=\"by-meta\">" + levelLabel + " \xB7 Unit " + state.unitNum + "</span>\n        </div>\n\n        <div class=\"project-body\">\n          " + formatProjectBody(projectText) + "\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Page 2 of 4<span class=\"gold-dot\"></span>Confidential</span>\n      </div>\n    </div>\n  ";
+  if (projectText && projectText.replace(/^\s+|\s+$/g, '')) html += "\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">" + escapeHtml(projectTitle) + " \xB7 Unit " + state.unitNum + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">" + measInfo().cover + "</div>\n        <div class=\"doc-section-title\">" + escapeHtml(projectTitle) + "</div>\n\n        <div class=\"student-byline\">\n          <span class=\"by-label\">Written by</span>\n          <span class=\"by-name\">" + escapeHtml(studentName) + "</span>\n          <span class=\"by-meta\">" + levelLabel + " \xB7 Unit " + state.unitNum + "</span>\n        </div>\n\n        <div class=\"project-body\">\n          " + formatProjectBody(projectText) + "\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Confidential</span>\n      </div>\n    </div>\n  ";
 
   // ============ PAGE 3: RUBRIC + COMMENTS ============
   var rubricHtml = '';
@@ -2487,7 +2610,8 @@ function renderUnitCompletion(ctx) {
       rubricHtml += "</tbody></table></div>";
     });
   }
-  html += "\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Assessment \xB7 " + escapeHtml(projectTitle) + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Assessment</div>\n        <div class=\"doc-section-title\">" + escapeHtml(rubric ? rubric.name : 'Rubric') + "</div>\n\n        <div class=\"rubric-doc\">\n          " + rubricHtml + "\n        </div>\n\n        <div class=\"grade-summary\">\n          <span class=\"g-label\">Final Grade</span>\n          <span><span class=\"g-value\">" + total + "/" + max + "</span><span class=\"g-percent\">" + pct + "%</span></span>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Page 3 of 4<span class=\"gold-dot\"></span>Assessment</span>\n      </div>\n    </div>\n\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Teacher Feedback \xB7 " + escapeHtml(projectTitle) + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Teacher Feedback</div>\n        <div class=\"doc-section-title\">Comments &amp; Reflections</div>\n\n        <div class=\"student-byline\">\n          <span class=\"by-label\">Written for</span>\n          <span class=\"by-name\">" + escapeHtml(studentName) + "</span>\n          <span class=\"by-meta\">" + levelLabel + " \xB7 Unit " + state.unitNum + "</span>\n        </div>\n\n        <div class=\"teacher-comments-block teacher-comments-large\">\n          <div class=\"tc-label\">Teacher Comments</div>\n          <div class=\"tc-teacher\">From " + escapeHtml(teacherName) + ", Head Teacher</div>\n          <div class=\"tc-body\">" + formatTeacherComment(teacherComments) + "</div>\n        </div>\n\n        <div class=\"signature-block\">\n          <div class=\"signature-line\">\n            <div class=\"sig-label\">Teacher's Signature</div>\n            <div class=\"sig-rule\"></div>\n            <div class=\"sig-sub\">" + escapeHtml(teacherName) + " \xB7 " + completionDate + "</div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Page 4 of 4<span class=\"gold-dot\"></span>www.harland.com.tw</span>\n      </div>\n    </div>\n  ";
+  html += "\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Assessment \xB7 " + escapeHtml(projectTitle) + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Assessment</div>\n        <div class=\"doc-section-title\">" + escapeHtml(rubric ? rubric.name : 'Rubric') + "</div>\n\n        <div class=\"rubric-doc\">\n          " + rubricHtml + "\n        </div>\n\n        <div class=\"grade-summary\">\n          <span class=\"g-label\">Final Grade</span>\n          <span><span class=\"g-value\">" + total + "/" + max + "</span><span class=\"g-percent\">" + pct + "%</span></span>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Assessment</span>\n      </div>\n    </div>\n\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Teacher Feedback \xB7 " + escapeHtml(projectTitle) + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Teacher Feedback</div>\n        <div class=\"doc-section-title\">Comments &amp; Reflections</div>\n\n        <div class=\"student-byline\">\n          <span class=\"by-label\">Written for</span>\n          <span class=\"by-name\">" + escapeHtml(studentName) + "</span>\n          <span class=\"by-meta\">" + levelLabel + " \xB7 Unit " + state.unitNum + "</span>\n        </div>\n\n        <div class=\"teacher-comments-block teacher-comments-large\">\n          <div class=\"tc-label\">Teacher Comments</div>\n          <div class=\"tc-teacher\">From " + escapeHtml(teacherName) + ", Head Teacher</div>\n          <div class=\"tc-body\">" + formatTeacherComment(teacherComments) + "</div>\n        </div>\n\n        <div class=\"signature-block\">\n          <div class=\"signature-line\">\n            <div class=\"sig-label\">Teacher's Signature</div>\n            <div class=\"sig-rule\"></div>\n            <div class=\"sig-sub\">" + escapeHtml(teacherName) + " \xB7 " + completionDate + "</div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>www.harland.com.tw</span>\n      </div>\n    </div>\n  ";
+  html += buildAttachmentsHtml();
   document.getElementById('documentPreview').innerHTML = html;
 }
 function formatTeacherComment(text) {
@@ -2557,6 +2681,7 @@ function nextLevelFocus(currentLevel) {
    STATE SYNC
    ============================================================ */
 function updatePreview() {
+  refreshResultsPercent();
   renderPreview();
   flashStatus();
 }
@@ -2572,18 +2697,9 @@ function flashStatus() {
 function syncDocType() {
   state.docType = document.getElementById('docType').value;
   var unitField = document.getElementById('unitNumberField');
-  var rubricSec = document.getElementById('rubricSection');
-  var levelSec = document.getElementById('levelUnitsSection');
-  if (state.docType === 'unit') {
-    unitField.style.display = '';
-    rubricSec.style.display = '';
-    levelSec.style.display = 'none';
-  } else {
-    unitField.style.display = 'none';
-    rubricSec.style.display = 'none';
-    levelSec.style.display = '';
-    renderLevelUnits();
-  }
+  if (unitField) unitField.style.display = (state.docType === 'unit') ? '' : 'none';
+  if (state.docType === 'level') renderLevelUnits();
+  applyMeasurableVisibility();
   updatePreview();
 }
 function syncWritingType() {
@@ -2639,6 +2755,10 @@ function init() {
   document.getElementById('unitNumber').value = state.unitNum;
   renderRubricForm();
   renderLevelUnits();
+  applyMeasurableVisibility();
+  addBreakdownRow();
+  addLinkRow();
+  renderImageList();
   updatePreview();
 
   // event wiring
@@ -2646,10 +2766,429 @@ function init() {
   document.getElementById('writingType').addEventListener('change', syncWritingType);
   document.getElementById('rubricType').addEventListener('change', syncRubricType);
   document.getElementById('unitNumber').addEventListener('change', syncUnit);
-  ['studentName', 'teacherName', 'projectTitle', 'completionDate', 'projectText', 'teacherComments'].forEach(function (id) {
+  ['studentName', 'teacherName', 'projectTitle', 'completionDate', 'projectText', 'teacherComments', 'courseTitle', 'levelText'].forEach(function (id) {
     return document.getElementById(id).addEventListener('input', updatePreview);
   });
+  document.getElementById('measurable').addEventListener('change', syncMeasurable);
+  document.getElementById('examPreset').addEventListener('change', applyExamPreset);
+  document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+  ['resultsSection', 'attachmentsSection'].forEach(function (id) {
+    var sec = document.getElementById(id);
+    if (sec) { sec.addEventListener('input', updatePreview); sec.addEventListener('change', updatePreview); }
+  });
 }
+/* ===== Measurable types + results form + attachments (Pass 1) ===== */
+var MEASURABLES = {
+  written:      { label: 'Written work', family: 'rubric', title: 'Project Title', cover: 'Writing Project', noun: 'writing project' },
+  presentation: { label: 'Presentation', family: 'rubric', title: 'Presentation Title', cover: 'Presentation', noun: 'presentation' },
+  test:         { label: 'Test', family: 'score', title: 'Test name / topic', scoreLabel: 'Score', cover: 'Test', noun: 'test' },
+  quiz:         { label: 'Quiz', family: 'score', title: 'Quiz name / topic', scoreLabel: 'Score', cover: 'Quiz', noun: 'quiz' },
+  mock:         { label: 'Mock test', family: 'score', title: 'Mock test name', scoreLabel: 'Overall score', cover: 'Mock Test', noun: 'mock test' },
+  oral:         { label: 'Oral assessment', family: 'rubric', title: 'Assessment topic', scoreLabel: 'Score (optional)', cover: 'Oral Assessment', noun: 'oral assessment' },
+  project:      { label: 'Project / Portfolio', family: 'rubric', title: 'Project / portfolio title', scoreLabel: 'Score (optional)', cover: 'Project', noun: 'project' }
+};
+var EXAM_PRESETS = {
+  sat:     { total: '1600', sections: [['Reading and Writing', '', '800'], ['Math', '', '800']] },
+  ssat:    { total: '', sections: [['Verbal (percentile)', '', ''], ['Quantitative (percentile)', '', ''], ['Reading (percentile)', '', '']] },
+  toefl:   { total: '120', sections: [['Reading', '', '30'], ['Listening', '', '30'], ['Speaking', '', '30'], ['Writing', '', '30']] },
+  ielts:   { total: '9', sections: [['Listening', '', '9'], ['Reading', '', '9'], ['Writing', '', '9'], ['Speaking', '', '9']] },
+  generic: { total: '', sections: [] }
+};
+function show(id, on) { var e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; }
+function measInfo() { return MEASURABLES[state.measurable] || MEASURABLES.written; }
+function isRubricMeasurable() { return measInfo().family === 'rubric'; }
+function climb(el, cls) {
+  while (el && el !== document.body) {
+    if (el.className && (' ' + el.className + ' ').indexOf(' ' + cls + ' ') > -1) return el;
+    el = el.parentNode;
+  }
+  return null;
+}
+function applyMeasurableVisibility() {
+  var info = measInfo();
+  var rubric = info.family === 'rubric';
+  var isLevel = state.docType === 'level';
+  var usesCurric = state.measurable === 'written' || state.measurable === 'presentation';
+  var usesGenRubric = state.measurable === 'oral' || state.measurable === 'project';
+  var isWritten = state.measurable === 'written';
+  show('measurableField', !isLevel);
+  show('rubricSection', rubric && !isLevel);
+  show('resultsSection', !rubric && !isLevel);
+  show('levelUnitsSection', isLevel);
+  show('rubricGenPanel', usesGenRubric && !isLevel);
+  show('rubricTypeField', usesCurric && !isLevel);
+  show('projectTextField', usesCurric && !isLevel);
+  show('examPresetField', state.measurable === 'mock' && !isLevel);
+  show('officialMockBlock', state.measurable === 'mock' && !isLevel);
+  if (isLevel) {
+    show('levelSelectField', true);
+    show('courseTitleField', false);
+    show('levelTextField', false);
+  } else {
+    show('levelSelectField', isWritten);
+    show('courseTitleField', !isWritten);
+    show('levelTextField', !isWritten);
+  }
+  var el;
+  el = document.getElementById('projectTitleLabel'); if (el) el.textContent = info.title;
+  el = document.getElementById('projectTextLabel'); if (el) el.textContent = (state.measurable === 'presentation') ? 'Speaker notes or script (optional)' : 'Student Project (paste full text)';
+  el = document.getElementById('resultsTitle'); if (el) el.textContent = 'Record the ' + info.label + ' result';
+  el = document.getElementById('overallScoreLabel'); if (el) el.textContent = info.scoreLabel || 'Score';
+  el = document.getElementById('breakdownTitle'); if (el) el.textContent = (state.measurable === 'mock') ? 'Section scores' : 'Section breakdown';
+}
+function syncMeasurable() {
+  state.measurable = document.getElementById('measurable').value;
+  applyMeasurableVisibility();
+  renderRubricForm();
+  updatePreview();
+}
+function refreshResultsPercent() {
+  var o = parseFloat(document.getElementById('overallScore') ? document.getElementById('overallScore').value : '');
+  var t = parseFloat(document.getElementById('overallTotal') ? document.getElementById('overallTotal').value : '');
+  var wrap = document.getElementById('resultsPercentWrap');
+  var pctEl = document.getElementById('resultsPercent');
+  if (!isNaN(o) && !isNaN(t) && t > 0) {
+    if (pctEl) pctEl.textContent = Math.round(o / t * 100) + '%';
+    if (wrap) wrap.style.display = '';
+  } else if (wrap) {
+    wrap.style.display = 'none';
+  }
+}
+var brkCount = 0;
+function addBreakdownRow(label, score, total, comment) {
+  brkCount++;
+  var div = document.createElement('div');
+  div.className = 'brk-row';
+  div.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;';
+  div.innerHTML =
+    '<div class="field-grid" style="margin-bottom:6px;">'
+    + '<div class="field"><label style="font-size:10px;">Section</label><input type="text" class="brk-label" placeholder="e.g. Algebra"></div>'
+    + '<div class="field"><label style="font-size:10px;">Score</label><input type="text" class="brk-score" placeholder="18"></div>'
+    + '<div class="field"><label style="font-size:10px;">Out of</label><input type="text" class="brk-total" placeholder="20"></div>'
+    + '</div>'
+    + '<label style="font-size:10px;">Comment (optional)</label>'
+    + '<input type="text" class="brk-comment" placeholder="e.g. strong on linear equations, review word problems">'
+    + '<button type="button" class="ai-generate-btn" style="margin-top:6px;" onclick="removeBreakdownRow(this)">Remove section</button>';
+  document.getElementById('breakdownArea').appendChild(div);
+  if (label != null) div.querySelector('.brk-label').value = label;
+  if (score != null) div.querySelector('.brk-score').value = score;
+  if (total != null) div.querySelector('.brk-total').value = total;
+  if (comment != null) div.querySelector('.brk-comment').value = comment;
+}
+function removeBreakdownRow(btn) { var r = climb(btn, 'brk-row'); if (r) r.parentNode.removeChild(r); updatePreview(); }
+function getBreakdown() {
+  var rows = document.querySelectorAll('#breakdownArea .brk-row');
+  var out = [], i;
+  for (i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var label = r.querySelector('.brk-label').value.replace(/^\s+|\s+$/g, '');
+    var score = r.querySelector('.brk-score').value.replace(/^\s+|\s+$/g, '');
+    var total = r.querySelector('.brk-total').value.replace(/^\s+|\s+$/g, '');
+    var comment = r.querySelector('.brk-comment').value.replace(/^\s+|\s+$/g, '');
+    if (label || score || total || comment) out.push({ label: label, score: score, total: total, comment: comment });
+  }
+  return out;
+}
+var lnkCount = 0;
+function addLinkRow(label, url) {
+  lnkCount++;
+  var div = document.createElement('div');
+  div.className = 'lnk-row';
+  div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;';
+  div.innerHTML =
+    '<input type="text" class="lnk-label" placeholder="Label, e.g. Presentation video" style="flex:1;min-width:140px;">'
+    + '<input type="text" class="lnk-url" placeholder="https://..." style="flex:2;min-width:180px;">'
+    + '<button type="button" class="ai-generate-btn" onclick="removeLinkRow(this)">Remove</button>';
+  document.getElementById('linksArea').appendChild(div);
+  if (label != null) div.querySelector('.lnk-label').value = label;
+  if (url != null) div.querySelector('.lnk-url').value = url;
+}
+function removeLinkRow(btn) { var r = climb(btn, 'lnk-row'); if (r) r.parentNode.removeChild(r); updatePreview(); }
+function getLinks() {
+  var rows = document.querySelectorAll('#linksArea .lnk-row');
+  var out = [], i;
+  for (i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var label = r.querySelector('.lnk-label').value.replace(/^\s+|\s+$/g, '');
+    var url = r.querySelector('.lnk-url').value.replace(/^\s+|\s+$/g, '');
+    if (url) out.push({ label: label || 'Link', url: url });
+  }
+  return out;
+}
+var attachImages = [];
+function pushScaledImage(dataUrl) {
+  var img = new Image();
+  img.onload = function () {
+    var maxDim = 1600, w = img.width, h = img.height;
+    if (w > maxDim || h > maxDim) {
+      if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; } else { w = Math.round(w * maxDim / h); h = maxDim; }
+    }
+    try {
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      attachImages.push(canvas.toDataURL('image/jpeg', 0.85));
+    } catch (e) { attachImages.push(dataUrl); }
+    renderImageList(); updatePreview();
+  };
+  img.onerror = function () { attachImages.push(dataUrl); renderImageList(); updatePreview(); };
+  img.src = dataUrl;
+}
+function handleImageUpload(ev) {
+  var files = ev.target.files;
+  if (!files || !files.length) return;
+  var i;
+  for (i = 0; i < files.length; i++) {
+    (function (file) {
+      var reader = new FileReader();
+      reader.onload = function (e) { pushScaledImage(e.target.result); };
+      reader.onerror = function () {};
+      reader.readAsDataURL(file);
+    })(files[i]);
+  }
+  ev.target.value = '';
+}
+function renderImageList() {
+  var wrap = document.getElementById('imageList');
+  if (!wrap) return;
+  var html = '', i;
+  for (i = 0; i < attachImages.length; i++) {
+    html += '<div style="position:relative;width:84px;height:84px;border:1px solid var(--border);border-radius:8px;overflow:hidden;">'
+      + '<img src="' + attachImages[i] + '" style="width:100%;height:100%;object-fit:cover;" alt="uploaded work">'
+      + '<button type="button" onclick="removeImage(' + i + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;line-height:1;padding:3px 5px;">x</button>'
+      + '</div>';
+  }
+  wrap.innerHTML = html;
+}
+function removeImage(i) { attachImages.splice(i, 1); renderImageList(); updatePreview(); }
+function applyExamPreset() {
+  state.mock.preset = document.getElementById('examPreset').value;
+  var p = EXAM_PRESETS[state.mock.preset];
+  if (!p) { updatePreview(); return; }
+  if (p.total) document.getElementById('overallTotal').value = p.total;
+  document.getElementById('breakdownArea').innerHTML = '';
+  brkCount = 0;
+  var i;
+  for (i = 0; i < p.sections.length; i++) {
+    addBreakdownRow(p.sections[i][0], p.sections[i][1], p.sections[i][2], '');
+  }
+  updatePreview();
+}
+
+/* ===== Score-based certificate + attachments (Pass 2) ===== */
+function getScoreContext() {
+  function v(id) { var e = document.getElementById(id); return e ? e.value.replace(/^\s+|\s+$/g, '') : ''; }
+  var overall = v('overallScore'), total = v('overallTotal'), grade = v('overallGrade');
+  var pct = '';
+  var on = parseFloat(overall), tn = parseFloat(total);
+  if (!isNaN(on) && !isNaN(tn) && tn > 0) pct = Math.round(on / tn * 100) + '%';
+  return {
+    overall: overall, total: total, grade: grade, pct: pct,
+    breakdown: getBreakdown(),
+    official: { score: v('officialScore'), date: v('officialDate'), provider: v('officialProvider') },
+    isMock: state.measurable === 'mock'
+  };
+}
+function buildAttachmentsHtml() {
+  var links = getLinks();
+  if (!attachImages.length && !links.length) return '';
+  var body = '';
+  if (attachImages.length) {
+    body += '<div class="doc-section-label">Submitted Work</div><div style="display:flex;flex-direction:column;gap:14px;margin-top:10px;">';
+    var i;
+    for (i = 0; i < attachImages.length; i++) {
+      body += '<div style="page-break-inside:avoid;break-inside:avoid;text-align:center;"><img src="' + attachImages[i] + '" style="max-width:100%;max-height:235mm;border:1px solid #e5e0d5;border-radius:6px;" alt="submitted work"></div>';
+    }
+    body += '</div>';
+  }
+  if (links.length) {
+    body += '<div class="doc-section-label" style="margin-top:18px;">Links</div><div style="margin-top:8px;font-size:13px;">';
+    var j;
+    for (j = 0; j < links.length; j++) {
+      body += '<div style="margin-bottom:6px;"><span style="font-weight:600;">' + escapeHtml(links[j].label) + ':</span> <a href="' + escapeHtml(links[j].url) + '" style="color:#1B2A4A;word-break:break-all;">' + escapeHtml(links[j].url) + '</a></div>';
+    }
+    body += '</div>';
+  }
+  return '<div class="page"><div class="gold-strip"></div>'
+    + '<div class="page-header"><div class="h-mark"><div class="h-circle">H</div><div class="h-wordmark">HARLAND</div></div><div class="h-meta">Attachments</div></div>'
+    + '<div class="page-body"><div class="doc-section-label">Attachments</div><div class="doc-section-title">Submitted Work &amp; Links</div>' + body + '</div>'
+    + '<div class="page-footer"><span>Harland Education</span><span>Attachments<span class="gold-dot"></span>Confidential</span></div></div>';
+}
+function renderScoreCompletion(ctx) {
+  var sc = getScoreContext();
+  var info = measInfo();
+  var measLabel = info.label;
+  var headline = sc.overall ? (sc.overall + (sc.total ? ' / ' + sc.total : '')) : (sc.grade || 'Completed');
+  var headSub = sc.pct ? (sc.pct + (sc.grade ? ' \u00B7 ' + sc.grade : '')) : (sc.grade ? sc.grade : measLabel);
+  var unitTag = 'Unit ' + state.unitNum;
+  var html = '';
+  html += '<div class="page cover-page"><div class="gold-strip"></div>'
+    + '<div class="page-header"><div class="h-mark"><div class="h-circle">H</div><div class="h-wordmark">HARLAND</div></div><div class="h-meta">' + info.cover + ' \u00B7 Confidential</div></div>'
+    + '<div class="page-body"><div class="cover-top">'
+    + '<div class="cover-stamp"><span class="dot"></span> ' + unitTag + ' Completion</div>'
+    + '<div class="cover-meta">' + ctx.completionDate + '</div>'
+    + '<div class="cover-level">' + ctx.levelLabel + '</div>'
+    + '<div class="cover-unit-tag">' + unitTag + '</div></div>'
+    + '<div class="cover-title-wrap"><div class="cover-eyebrow">' + info.cover + '</div>'
+    + '<div class="cover-title">' + escapeHtml(ctx.projectTitle) + '</div><div class="cover-divider"></div>'
+    + '<div class="cover-summary">A ' + info.noun + ' completed by ' + escapeHtml(ctx.studentName) + ' as part of ' + ctx.levelLabel + ' at Harland.</div></div>'
+    + '<div class="cover-footer"><div class="cover-footer-block"><div class="label">Completed by</div><div class="value">' + escapeHtml(ctx.studentName) + '</div><div class="value-sub">Student</div></div>'
+    + '<div class="cover-footer-block"><div class="label">Assessed by</div><div class="value">' + escapeHtml(ctx.teacherName) + '</div><div class="value-sub">Head Teacher</div></div>'
+    + '<div class="cover-footer-block"><div class="label">Result</div><div class="value">' + escapeHtml(headline) + '</div><div class="value-sub">' + escapeHtml(headSub) + '</div></div></div>'
+    + '</div><div class="page-footer"><span>Harland Education</span><span>www.harland.com.tw<span class="gold-dot"></span>Achieve Excellence</span></div></div>';
+  var bd = sc.breakdown, bdHtml = '';
+  if (bd.length) {
+    bdHtml += '<table class="rubric-table"><thead><tr><th>Section</th><th>Score</th><th>Comment</th></tr></thead><tbody>';
+    var i;
+    for (i = 0; i < bd.length; i++) {
+      var scoreCell = bd[i].score + (bd[i].total ? ' / ' + bd[i].total : '');
+      bdHtml += '<tr><td class="row-label">' + escapeHtml(bd[i].label || '-') + '</td><td>' + escapeHtml(scoreCell) + '</td><td>' + escapeHtml(bd[i].comment || '') + '</td></tr>';
+    }
+    bdHtml += '</tbody></table>';
+  }
+  var officialHtml = '';
+  if (sc.isMock && (sc.official.score || sc.official.date || sc.official.provider)) {
+    officialHtml = '<div style="margin-top:18px;"><div class="doc-section-label">Official Mock Test</div><div style="margin-top:6px;font-size:13px;">'
+      + (sc.official.score ? '<div><strong>Score:</strong> ' + escapeHtml(sc.official.score) + '</div>' : '')
+      + (sc.official.date ? '<div><strong>Date:</strong> ' + escapeHtml(sc.official.date) + '</div>' : '')
+      + (sc.official.provider ? '<div><strong>Provider:</strong> ' + escapeHtml(sc.official.provider) + '</div>' : '')
+      + '</div></div>';
+  }
+  html += '<div class="page"><div class="gold-strip"></div>'
+    + '<div class="page-header"><div class="h-mark"><div class="h-circle">H</div><div class="h-wordmark">HARLAND</div></div><div class="h-meta">Result \u00B7 ' + escapeHtml(ctx.projectTitle) + '</div></div>'
+    + '<div class="page-body"><div class="doc-section-label">Result</div><div class="doc-section-title">' + escapeHtml(ctx.projectTitle) + '</div>'
+    + '<div class="student-byline"><span class="by-label">Completed by</span><span class="by-name">' + escapeHtml(ctx.studentName) + '</span><span class="by-meta">' + ctx.levelLabel + ' \u00B7 ' + unitTag + '</span></div>'
+    + ((sc.overall || sc.grade) ? '<div class="grade-summary"><span class="g-label">' + escapeHtml(info.scoreLabel || 'Score') + '</span><span><span class="g-value">' + escapeHtml(headline) + '</span>' + (sc.pct ? '<span class="g-percent">' + sc.pct + '</span>' : '') + '</span></div>' : '')
+    + (sc.grade ? '<div style="margin-top:10px;font-size:13px;"><strong>Grade:</strong> ' + escapeHtml(sc.grade) + '</div>' : '')
+    + (bdHtml ? '<div style="margin-top:18px;"><div class="doc-section-label">Section Breakdown</div><div class="rubric-doc">' + bdHtml + '</div></div>' : '')
+    + officialHtml
+    + '</div><div class="page-footer"><span>Harland Education</span><span>Result<span class="gold-dot"></span>Confidential</span></div></div>';
+  html += buildAttachmentsHtml();
+  html += '<div class="page"><div class="gold-strip"></div>'
+    + '<div class="page-header"><div class="h-mark"><div class="h-circle">H</div><div class="h-wordmark">HARLAND</div></div><div class="h-meta">Teacher Feedback \u00B7 ' + escapeHtml(ctx.projectTitle) + '</div></div>'
+    + '<div class="page-body"><div class="doc-section-label">Teacher Feedback</div><div class="doc-section-title">Comments &amp; Reflections</div>'
+    + '<div class="student-byline"><span class="by-label">Written for</span><span class="by-name">' + escapeHtml(ctx.studentName) + '</span><span class="by-meta">' + ctx.levelLabel + ' \u00B7 ' + unitTag + '</span></div>'
+    + '<div class="teacher-comments-block teacher-comments-large"><div class="tc-label">Teacher Comments</div><div class="tc-teacher">From ' + escapeHtml(ctx.teacherName) + ', Head Teacher</div><div class="tc-body">' + formatTeacherComment(ctx.teacherComments) + '</div></div>'
+    + '<div class="signature-block"><div class="signature-line"><div class="sig-label">Teacher\'s Signature</div><div class="sig-rule"></div><div class="sig-sub">' + escapeHtml(ctx.teacherName) + ' \u00B7 ' + ctx.completionDate + '</div></div></div>'
+    + '</div><div class="page-footer"><span>Harland Education</span><span>www.harland.com.tw</span></div></div>';
+  document.getElementById('documentPreview').innerHTML = html;
+}
+
+/* ===== Score-type comment generation (Pass 3) ===== */
+function scoreLine(s) {
+  if (s.overall) return s.overall + (s.total ? '/' + s.total : '') + (s.pct ? ' (' + s.pct + ')' : '');
+  return s.grade || 'completed';
+}
+function breakdownText(bd) {
+  if (!bd || !bd.length) return '';
+  var lines = [], i;
+  for (i = 0; i < bd.length; i++) {
+    var t = bd[i].label || 'Section';
+    if (bd[i].score) t += ': ' + bd[i].score + (bd[i].total ? '/' + bd[i].total : '');
+    if (bd[i].comment) t += ' (' + bd[i].comment + ')';
+    lines.push(t);
+  }
+  return lines.join('\n');
+}
+function buildScoreCommentPrompt(ctx) {
+  var s = ctx.score;
+  var label = ctx.measurableLabel;
+  var p = "";
+  p += "You are the head teacher at Harland Education, a premium tutoring academy in Taiwan, writing a warm, professional end-of-unit completion comment for a student's family.\n\n";
+  p += "Student: " + ctx.studentName + "\n";
+  p += "Pronouns to use for the student: " + pronounSet(ctx.pronoun) + "\n";
+  p += "Measurable: " + label + "\n";
+  p += "Title or topic: " + ctx.projectTitle + "\n";
+  if (ctx.courseTitle) p += "Course or subject: " + ctx.courseTitle + "\n";
+  if (s.overall) p += "Result: " + s.overall + (s.total ? " out of " + s.total : "") + (s.pct ? " (" + s.pct + ")" : "") + "\n";
+  if (s.grade) p += "Grade: " + s.grade + "\n";
+  var bt = breakdownText(s.breakdown);
+  if (bt) p += "Section breakdown:\n" + bt + "\n";
+  if (s.isMock && (s.official.score || s.official.date)) {
+    p += "Official mock test follow-up: " + (s.official.score || "") + (s.official.date ? " on " + s.official.date : "") + (s.official.provider ? " with " + s.official.provider : "") + "\n";
+  }
+  p += "Teacher notes on strengths:\n" + (ctx.strengthsText || "(none provided)") + "\n";
+  p += "Teacher notes on areas to improve:\n" + (ctx.improveText || "(none provided)") + "\n\n";
+  p += "Write ONE flowing paragraph of about 5 to 7 sentences following this Harland structure:\n";
+  p += "1. Open by saying the student has done a (adjective) job on the " + label.toLowerCase() + ", naming the topic.\n";
+  p += "2. State what stood out, drawn from the result, the section breakdown, and the strengths notes, with a specific detail.\n";
+  p += "3. Give a second specific positive.\n";
+  p += "4. State one area to work on, drawn from the areas notes or the weaker sections, and add a sentence on why it matters.\n";
+  p += "5. Close with encouragement that the student can keep improving this result over time, then the words: Well done, " + ctx.studentName + "!\n\n";
+  p += "Rules: American spelling. No em dashes. No semicolons. Warm and specific, never generic. Use the result, breakdown, and notes as the substance and do not invent facts beyond them. If no score is provided, focus on the qualitative notes instead. Return only the paragraph, no preamble.\n\n";
+  p += "Model of the style and tone to match:\n";
+  p += "Marcus has done an excellent job on the Unit 3 algebra test, scoring 88 percent overall. What stood out most was Marcus's accuracy with linear equations, where he answered every question correctly and showed clear, well-organized working. He also handled word problems with growing confidence, turning the wording into equations without losing track of the question. Going forward, Marcus should keep practicing factoring, as a few small slips there cost marks his understanding had already earned. These errors disappear quickly with steady review, and they matter because factoring underpins much of the work ahead. With continued practice, I have no doubt that Marcus can keep improving this result over time. Well done, Marcus!";
+  return p;
+}
+
+/* ===== AI Rubric Generator + reset confirm (deep-pass batch) ===== */
+function buildRubricGenPrompt() {
+  var info = measInfo();
+  function v(id) { var e = document.getElementById(id); return e ? e.value.replace(/^\s+|\s+$/g, '') : ''; }
+  var course = v('courseTitle'), focus = v('rubricFocus'), title = v('projectTitle'), lvl = v('levelText');
+  var p = '';
+  p += 'You are a curriculum designer at Harland Education, a premium tutoring academy in Taiwan. ';
+  p += 'Create an assessment rubric for a ' + info.label.toLowerCase() + '.\n';
+  if (course) p += 'Course or subject: ' + course + '\n';
+  if (lvl) p += 'Level: ' + lvl + '\n';
+  if (title) p += 'Task or topic: ' + title + '\n';
+  if (focus) p += 'The teacher wants to assess these areas: ' + focus + '\n';
+  p += '\nProduce 4 to 5 criteria suited to this measurable. Each criterion has a short name, a one sentence description of what it measures, and four band descriptors for 0, 2, 4, and 6 points, where 0 is not yet evident and 6 is excellent. ';
+  p += 'Descriptors must be specific, observable, and appropriate for the measurable and the student level. ';
+  p += 'American spelling. No em dashes. No semicolons.\n\n';
+  p += 'Return ONLY valid JSON, with no preamble and no code fences, in exactly this shape:\n';
+  p += '{"name":"<short rubric name>","criteria":[{"name":"<criterion name>","desc":"<one sentence>","bands":["<0 point descriptor>","<2 point descriptor>","<4 point descriptor>","<6 point descriptor>"]}]}';
+  return p;
+}
+function parseRubricJson(raw) {
+  var t = String(raw).replace(/^\s+|\s+$/g, '');
+  t = t.replace(/^\x60{3}[a-zA-Z]*\s*/, '').replace(/\s*\x60{3}$/, '');
+  var first = t.indexOf('{'), last = t.lastIndexOf('}');
+  if (first > -1 && last > -1) t = t.slice(first, last + 1);
+  var obj = JSON.parse(t);
+  if (!obj.criteria || !obj.criteria.length) return null;
+  var rows = [], i;
+  for (i = 0; i < obj.criteria.length; i++) {
+    var c = obj.criteria[i] || {};
+    var b = c.bands || [];
+    rows.push({
+      id: 'gen_' + i,
+      name: String(c.name || ('Criterion ' + (i + 1))),
+      desc: String(c.desc || ''),
+      levels: [String(b[0] || ''), String(b[1] || ''), String(b[2] || ''), String(b[3] || '')]
+    });
+  }
+  return { name: String(obj.name || (measInfo().label + ' Rubric')), maxPerRow: 6, categories: [{ name: 'Assessment Criteria', rows: rows }] };
+}
+function generateRubric() {
+  var btn = document.getElementById('rubricGenBtn');
+  var status = document.getElementById('rubricGenStatus');
+  if (btn) btn.disabled = true;
+  if (status) status.textContent = 'Generating...';
+  callClaudeForComments(buildRubricGenPrompt()).then(function (raw) {
+    var rub = null;
+    try { rub = parseRubricJson(raw); } catch (e) { rub = null; }
+    if (rub && rub.categories[0].rows.length) {
+      generatedRubric = rub;
+      state.scores = {};
+      renderRubricForm();
+      updatePreview();
+      if (status) status.textContent = 'Rubric ready. Grade it below, or generate again to refine.';
+    } else {
+      if (status) status.textContent = 'Could not read the rubric. Please try generating again.';
+    }
+  }).catch(function (e) {
+    if (status) status.textContent = e.message;
+  }).then(function () {
+    if (btn) btn.disabled = false;
+  });
+}
+function resetForm() {
+  if (window.confirm('Reset everything? This clears all fields, uploaded images, and the comment.')) {
+    window.location.reload();
+  }
+}
+
 init();
 
 /* ============================================================
@@ -2780,6 +3319,10 @@ function buildContextBlock() {
     total: sc.total, max: sc.max, pct: sc.pct, letter: sc.letter,
     strengthsText: document.getElementById('strengthsText').value || '',
     improveText: document.getElementById('improveText').value || '',
+    measurable: state.measurable,
+    measurableLabel: measInfo().label,
+    score: getScoreContext(),
+    courseTitle: (document.getElementById('courseTitle') ? document.getElementById('courseTitle').value : ''),
     unitGradesText: unitGradesText()
   };
 }
@@ -2788,10 +3331,19 @@ function generateImprove() {
   var ctx = buildContextBlock();
   var prompt = "";
   prompt += "You are an experienced writing teacher at Harland Education, a premium tutoring academy in Taiwan.\n";
-  prompt += ctx.studentName + " has completed a " + ctx.writingTypeLabel + " titled '" + ctx.projectTitle + "'.\n\n";
-  prompt += "Writing sample:\n" + ctx.projectText + "\n\n";
-  prompt += "Rubric scores:\n" + ctx.rubricSummary + "\n\n";
-  prompt += "Suggest exactly 3 specific areas this student should work on next, grounded in the writing sample and the rubric. These are reference notes for the teacher, who will write their own version.\n";
+  if (isRubricMeasurable()) {
+    var kindI = (ctx.measurable === 'oral' || ctx.measurable === 'project') ? ctx.measurableLabel : ctx.writingTypeLabel;
+    prompt += ctx.studentName + " has completed a " + kindI + " titled '" + ctx.projectTitle + "'.\n\n";
+    if (ctx.projectText) prompt += "Work sample:\n" + ctx.projectText + "\n\n";
+    prompt += "Rubric scores:\n" + ctx.rubricSummary + "\n\n";
+    prompt += "Suggest exactly 3 specific areas this student should work on next, grounded in the rubric" + (ctx.projectText ? " and the work sample" : "") + ". These are reference notes for the teacher, who will write their own version.\n";
+  } else {
+    prompt += ctx.studentName + " has completed a " + ctx.measurableLabel + " on '" + ctx.projectTitle + "'.\n\n";
+    prompt += "Result: " + scoreLine(ctx.score) + "\n";
+    var bt = breakdownText(ctx.score.breakdown);
+    if (bt) prompt += "Section breakdown:\n" + bt + "\n";
+    prompt += "\nSuggest exactly 3 specific areas this student should work on next, grounded in the result and the section breakdown. These are reference notes for the teacher, who will write their own version.\n";
+  }
   prompt += "Respond with a numbered list of exactly 3 items, one concise sentence each. American spelling. No em dashes. No semicolons. No preamble.";
   callClaudeForComments(prompt).then(function (raw) {
     renderSuggestions('improveSuggestions', parseNumberedList(raw));
@@ -2806,10 +3358,19 @@ function generateStrengths() {
   var ctx = buildContextBlock();
   var prompt = "";
   prompt += "You are an experienced writing teacher at Harland Education, a premium tutoring academy in Taiwan.\n";
-  prompt += ctx.studentName + " has completed a " + ctx.writingTypeLabel + " titled '" + ctx.projectTitle + "'.\n\n";
-  prompt += "Writing sample:\n" + ctx.projectText + "\n\n";
-  prompt += "Rubric scores:\n" + ctx.rubricSummary + "\n\n";
-  prompt += "Suggest exactly 3 specific strengths in this student's writing, grounded in the writing sample and the rubric. These are reference notes for the teacher, who will write their own version.\n";
+  if (isRubricMeasurable()) {
+    var kindS = (ctx.measurable === 'oral' || ctx.measurable === 'project') ? ctx.measurableLabel : ctx.writingTypeLabel;
+    prompt += ctx.studentName + " has completed a " + kindS + " titled '" + ctx.projectTitle + "'.\n\n";
+    if (ctx.projectText) prompt += "Work sample:\n" + ctx.projectText + "\n\n";
+    prompt += "Rubric scores:\n" + ctx.rubricSummary + "\n\n";
+    prompt += "Suggest exactly 3 specific strengths this student showed, grounded in the rubric" + (ctx.projectText ? " and the work sample" : "") + ". These are reference notes for the teacher, who will write their own version.\n";
+  } else {
+    prompt += ctx.studentName + " has completed a " + ctx.measurableLabel + " on '" + ctx.projectTitle + "'.\n\n";
+    prompt += "Result: " + scoreLine(ctx.score) + "\n";
+    var bt = breakdownText(ctx.score.breakdown);
+    if (bt) prompt += "Section breakdown:\n" + bt + "\n";
+    prompt += "\nSuggest exactly 3 specific strengths this student showed, grounded in the result and the section breakdown. These are reference notes for the teacher, who will write their own version.\n";
+  }
   prompt += "Respond with a numbered list of exactly 3 items, one concise sentence each. American spelling. No em dashes. No semicolons. No preamble.";
   callClaudeForComments(prompt).then(function (raw) {
     renderSuggestions('strengthSuggestions', parseNumberedList(raw));
@@ -2824,20 +3385,27 @@ function buildUnitCommentPrompt(ctx) {
   p += "You are the head teacher at Harland Education, a premium tutoring academy in Taiwan, writing a warm, professional end-of-unit completion comment for a student's family.\n\n";
   p += "Student: " + ctx.studentName + "\n";
   p += "Pronouns to use for the student: " + pronounSet(ctx.pronoun) + "\n";
-  p += "Writing type: " + ctx.writingTypeLabel + "\n";
-  p += "Project topic: " + ctx.projectTitle + "\n";
+  var isGen = (ctx.measurable === 'oral' || ctx.measurable === 'project');
+  var kind = isGen ? ctx.measurableLabel.toLowerCase() : ctx.writingTypeLabel;
+  if (isGen) { p += "Measurable: " + ctx.measurableLabel + "\n"; } else { p += "Writing type: " + ctx.writingTypeLabel + "\n"; }
+  if (ctx.courseTitle) p += "Course or subject: " + ctx.courseTitle + "\n";
+  p += "Topic: " + ctx.projectTitle + "\n";
   if (ctx.pct != null) p += "Grade: " + ctx.total + " out of " + ctx.max + " (" + ctx.pct + " percent, " + ctx.letter + ")\n";
   p += "Teacher notes on strengths:\n" + (ctx.strengthsText || "(none provided)") + "\n";
   p += "Teacher notes on areas to improve:\n" + (ctx.improveText || "(none provided)") + "\n\n";
   p += "Write ONE flowing paragraph of about 5 to 7 sentences following this Harland structure exactly:\n";
-  p += "1. Open by saying the student has done a (adjective) job writing a (adjective) (writing type) on the topic of the project title.\n";
+  p += "1. Open by saying the student has done a (adjective) job on their " + kind + ", naming the topic.\n";
   p += "2. State what impressed you most, drawn from the strengths notes, with a specific detail.\n";
   p += "3. Give a second specific positive.\n";
   p += "4. State one area to work on, drawn from the areas notes, and add a sentence on why it matters.\n";
   p += "5. Close with encouragement that the student can continue to improve this grade over time, then the words: Well done, " + ctx.studentName + "!\n\n";
   p += "Rules: American spelling. No em dashes. No semicolons. Warm and specific, never generic. Use the strengths and areas notes as the substance and do not invent facts beyond them and the writing sample. Return only the paragraph, no preamble.\n\n";
   p += "Model of the style and structure to match:\n";
-  p += "Rubio has done a fantastic job writing a comprehensive and well-structured research paper on 'The Titanic Tragedy'. What impressed me most about Rubio's latest writing project was his willingness to experiment with new styles of sentences such as a wide variety of topic sentences and hooks as well as conclusions. Rubio also researched extensively and logically arranged his information in a way that made reading his paper both enjoyable and informative, which is no easy feat. Going forward, Rubio must be careful to ensure his language remains academic and formal throughout the writing project. Using personal pronouns, especially the word I, makes an otherwise formal and informative piece sound informal and opinionated. With small adjustments to his language style and accuracy, I have no doubt that Rubio can continue to improve his grade over time. Well done, Rubio!";
+  if (isGen) {
+    p += "Marcus has done a wonderful job on his oral assessment about his summer travels. What impressed me most was the confidence in Marcus's delivery, as he spoke clearly and held natural eye contact throughout. He also organized his ideas in a logical order, which made each point easy to follow from start to finish. Going forward, Marcus should work on varying his intonation, as a flatter delivery can make strong ideas sound less engaging than they are. This matters because expressive delivery is what holds an audience. With continued practice, I have no doubt that Marcus can keep improving over time. Well done, Marcus!";
+  } else {
+    p += "Rubio has done a fantastic job writing a comprehensive and well-structured research paper on 'The Titanic Tragedy'. What impressed me most about Rubio's latest writing project was his willingness to experiment with new styles of sentences such as a wide variety of topic sentences and hooks as well as conclusions. Rubio also researched extensively and logically arranged his information in a way that made reading his paper both enjoyable and informative, which is no easy feat. Going forward, Rubio must be careful to ensure his language remains academic and formal throughout the writing project. Using personal pronouns, especially the word I, makes an otherwise formal and informative piece sound informal and opinionated. With small adjustments to his language style and accuracy, I have no doubt that Rubio can continue to improve his grade over time. Well done, Rubio!";
+  }
   return p;
 }
 function buildLevelCommentPrompt(ctx) {
@@ -2865,7 +3433,7 @@ function generateFinalComment() {
   var status = document.getElementById('commentStatus');
   btn.disabled = true;
   status.textContent = 'Generating...';
-  var prompt = (state.docType === 'level') ? buildLevelCommentPrompt(ctx) : buildUnitCommentPrompt(ctx);
+  var prompt = (state.docType === 'level') ? buildLevelCommentPrompt(ctx) : (isRubricMeasurable() ? buildUnitCommentPrompt(ctx) : buildScoreCommentPrompt(ctx));
   callClaudeForComments(prompt).then(function (raw) {
     var out = String(raw).replace(/^\s+|\s+$/g, '');
     if (out) { document.getElementById('teacherComments').value = out; updatePreview(); }
