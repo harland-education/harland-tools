@@ -1,0 +1,2659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Harland — Completion Document Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --obsidian: #0D0D0F;
+    --obsidian-deep: #0C0804;
+    --gold: #C9A84C;
+    --gold-pale: #F5EDDA;
+    --gold-deep: #7A5010;
+    --gold-bright: #F0D878;
+    --cream: #F8F5EF;
+    --slate: #4A4A56;
+    --mist: #9A9AA8;
+    --border: #ECEAE3;
+    --white: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--obsidian);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ====================== APP SHELL ====================== */
+  .app-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+
+  /* ====================== FORM PANEL ====================== */
+  .form-panel {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    max-height: 100vh;
+  }
+
+  .form-header {
+    background: linear-gradient(150deg, var(--obsidian-deep) 0%, #1C1408 40%, #100C06 100%);
+    color: white;
+    padding: 28px 36px 24px;
+    position: relative;
+  }
+  .form-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #7A5010, #C9A84C 30%, #F0D878 50%, #C9A84C 70%, #7A5010);
+  }
+  .brand-mark {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 4px;
+  }
+  .brand-logo {
+    width: 28px; height: 28px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; font-weight: 500;
+    color: var(--gold);
+  }
+  .brand-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    letter-spacing: 0.18em;
+    color: white;
+  }
+  .brand-tagline {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 2px;
+  }
+  .form-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    color: white;
+    margin-top: 18px;
+    line-height: 1.1;
+  }
+  .form-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+  }
+
+  .form-body { padding: 28px 36px 60px; }
+
+  .form-section {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--obsidian);
+    margin-bottom: 16px;
+    border-left: 3px solid var(--gold);
+    padding-left: 12px;
+    line-height: 1;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .field-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .field-full { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; }
+  .field label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .field input, .field select, .field textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--obsidian);
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--gold);
+    background: white;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.55;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .field textarea.project-area { min-height: 220px; }
+  .field select { cursor: pointer; }
+
+  /* ====================== RUBRIC ====================== */
+  .rubric-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .rubric-row:last-of-type { border-bottom: none; }
+  .rubric-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--obsidian);
+  }
+  .rubric-name .rubric-desc {
+    display: block;
+    font-size: 10.5px;
+    color: var(--mist);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+  .score-pills {
+    display: flex; gap: 3px;
+  }
+  .score-pill {
+    width: 28px; height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--cream);
+    cursor: pointer;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--slate);
+    transition: all 0.15s;
+  }
+  .score-pill:hover { border-color: var(--gold); }
+  /* Odd-value pills (1, 3, 5) are visually distinct — they highlight TWO rubric columns */
+  .score-pill.odd { color: var(--mist); font-style: italic; }
+  .score-pill.active {
+    background: var(--gold);
+    color: white;
+    border-color: var(--gold-deep);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .rubric-category {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    font-weight: 500;
+    margin: 14px 0 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--gold-pale);
+  }
+  .rubric-category:first-of-type { margin-top: 0; }
+
+  .total-display {
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: var(--gold-pale);
+    border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .total-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    font-weight: 500;
+  }
+  .total-score {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    color: var(--obsidian);
+    font-weight: 500;
+  }
+  .total-percent {
+    font-size: 13px;
+    color: var(--gold-deep);
+    margin-left: 6px;
+    font-weight: 500;
+  }
+
+  /* ====================== ACTION BAR ====================== */
+  .action-bar {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(to top, var(--cream) 60%, transparent);
+    padding: 20px 36px 24px;
+    margin: 0 -36px -60px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 12px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-secondary {
+    background: white;
+    color: var(--obsidian);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--gold); }
+  .btn-primary {
+    background: var(--obsidian);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--obsidian-deep); }
+  .btn-primary::before {
+    content: '↓ ';
+    color: var(--gold);
+  }
+
+  /* ====================== PREVIEW PANEL ====================== */
+  .preview-panel {
+    background: #E5E2DA;
+    overflow-y: auto;
+    max-height: 100vh;
+    padding: 40px 30px;
+  }
+  .preview-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 210mm;
+    margin: 0 auto 16px;
+    padding: 0 4px;
+  }
+  .preview-label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+  .preview-status {
+    font-size: 10px;
+    color: var(--gold-deep);
+    background: var(--gold-pale);
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ====================== DOCUMENT (PAGES) ====================== */
+  .document { max-width: 210mm; margin: 0 auto; }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    margin: 0 auto 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(13,13,15,0.08), 0 2px 6px rgba(13,13,15,0.04);
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  .gold-strip {
+    height: 4px;
+    background: linear-gradient(90deg, #7A5010, #C9A84C 30%, #F0D878 50%, #C9A84C 70%, #7A5010);
+  }
+  .page-header {
+    background: linear-gradient(150deg, var(--obsidian-deep) 0%, #1C1408 40%, #100C06 100%);
+    padding: 14px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: white;
+  }
+  .page-header .h-mark {
+    display: flex; align-items: center; gap: 9px;
+  }
+  .page-header .h-circle {
+    width: 22px; height: 22px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .page-header .h-wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.22em;
+    color: white;
+  }
+  .page-header .h-meta {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .page-body {
+    padding: 36px 52px 36px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-footer {
+    background: var(--obsidian-deep);
+    padding: 14px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .page-footer .gold-dot {
+    width: 4px; height: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+    margin: 0 8px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* ====================== COVER PAGE ====================== */
+  .cover-page .page-body {
+    padding: 48px 52px 48px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 24px;
+  }
+  .cover-top {
+    text-align: center;
+  }
+  .cover-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--gold-pale);
+    border: 1px solid var(--gold);
+    border-radius: 18px;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    font-weight: 500;
+  }
+  .cover-stamp .dot {
+    width: 5px; height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .cover-meta {
+    margin-top: 16px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+  .cover-level {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    color: var(--obsidian);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .cover-unit-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  /* Center title block — flex column, perfectly centered */
+  .cover-title-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px 0;
+  }
+  .cover-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 22px;
+    font-weight: 500;
+  }
+  .cover-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 58px;
+    line-height: 1.05;
+    color: var(--obsidian);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    max-width: 92%;
+    margin: 0 auto;
+  }
+  .cover-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+    margin: 28px auto 22px;
+    width: 60%;
+  }
+  .cover-summary {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--slate);
+    max-width: 78%;
+    margin: 0 auto;
+  }
+
+  .cover-footer {
+    border-top: 1px solid var(--border);
+    padding-top: 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    text-align: center;
+  }
+  .cover-footer-block .label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 6px;
+  }
+  .cover-footer-block .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--obsidian);
+    font-weight: 500;
+  }
+  .cover-footer-block .value-sub {
+    font-size: 11px;
+    color: var(--slate);
+    margin-top: 2px;
+  }
+
+  /* ====================== CONTENT PAGE ====================== */
+  .doc-section-label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .doc-section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: var(--obsidian);
+    margin-bottom: 18px;
+    border-left: 3px solid var(--gold);
+    padding-left: 14px;
+    line-height: 1.1;
+    font-weight: 400;
+  }
+
+  .student-byline {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .student-byline .by-label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+  .student-byline .by-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--obsidian);
+  }
+  .student-byline .by-meta {
+    font-size: 10.5px;
+    color: var(--slate);
+    margin-left: auto;
+  }
+
+  .project-body {
+    font-size: 13px;
+    line-height: 1.85;
+    color: var(--slate);
+    text-align: justify;
+    hyphens: auto;
+  }
+  .project-body p { margin-bottom: 14px; }
+  .project-body p:first-of-type::first-letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 500;
+    color: var(--gold);
+    float: left;
+    line-height: 0.9;
+    margin-right: 8px;
+    margin-top: 4px;
+  }
+
+  /* ====================== RUBRIC TABLE (Document) ====================== */
+  .rubric-doc {
+    margin-top: 4px;
+  }
+  .rubric-doc-group {
+    margin-bottom: 18px;
+  }
+  .rubric-doc-cat {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    font-weight: 500;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--gold-pale);
+  }
+  .rubric-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 10px;
+  }
+  .rubric-table th, .rubric-table td {
+    text-align: left;
+    padding: 8px 10px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  .rubric-table th {
+    background: var(--obsidian);
+    color: white;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 9px 10px;
+  }
+  .rubric-table th:first-child { border-top-left-radius: 6px; }
+  .rubric-table th:last-child { border-top-right-radius: 6px; }
+  .rubric-table .row-label {
+    font-weight: 500;
+    color: var(--obsidian);
+    font-size: 10.5px;
+    width: 110px;
+    background: var(--cream);
+  }
+  .rubric-table .score-cell {
+    width: 22%;
+    color: var(--slate);
+    line-height: 1.45;
+    font-size: 9.5px;
+  }
+  /* Full selected: even grade (0, 2, 4, 6) — single column, strong gold */
+  .rubric-table .score-cell.selected {
+    background: #FAEFD3;
+    color: var(--obsidian);
+    font-weight: 500;
+    box-shadow: inset 3px 0 0 var(--gold);
+  }
+  .rubric-table .score-cell.selected .pt {
+    color: var(--gold-deep);
+    font-weight: 600;
+  }
+  /* Between: odd grade (1, 3, 5) — TWO adjacent columns, lighter cream highlight */
+  .rubric-table .score-cell.between {
+    background: #FDF7E5;
+    color: var(--obsidian);
+    font-weight: 500;
+    box-shadow: inset 0 -3px 0 var(--gold);
+  }
+  .rubric-table .score-cell.between .pt {
+    color: var(--gold-deep);
+    font-weight: 600;
+  }
+  .rubric-table .pt {
+    display: block;
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 3px;
+    font-weight: 500;
+  }
+
+  .grade-summary {
+    background: var(--obsidian);
+    color: white;
+    padding: 18px 22px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+  }
+  .grade-summary .g-label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .grade-summary .g-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: white;
+    font-weight: 500;
+  }
+  .grade-summary .g-percent {
+    font-size: 16px;
+    color: var(--gold);
+    margin-left: 4px;
+  }
+
+  .teacher-comments-block {
+    margin-top: 22px;
+    background: var(--gold-pale);
+    border-left: 3px solid var(--gold);
+    padding: 18px 22px;
+    border-radius: 0 8px 8px 0;
+  }
+  .tc-label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .tc-teacher {
+    font-size: 10px;
+    color: var(--gold-deep);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+  .tc-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--obsidian);
+  }
+
+  /* Level completion specific */
+  .level-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin: 18px 0 22px;
+  }
+  .level-stat {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .level-stat .ls-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 6px;
+  }
+  .level-stat .ls-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--obsidian);
+    font-weight: 500;
+  }
+  .level-stat .ls-sub {
+    font-size: 10px;
+    color: var(--slate);
+    margin-top: 2px;
+  }
+
+  .unit-list {
+    margin-top: 6px;
+  }
+  .unit-list-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .unit-list-item:last-child { border-bottom: none; }
+  .unit-num {
+    width: 32px; height: 32px;
+    flex-shrink: 0;
+    background: var(--gold);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .unit-text { flex: 1; }
+  .unit-title {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--obsidian);
+    margin-bottom: 2px;
+  }
+  .unit-sub {
+    font-size: 10.5px;
+    color: var(--slate);
+  }
+  .unit-grade {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--gold-deep);
+    font-weight: 500;
+    align-self: center;
+  }
+
+  .empty-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--mist);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+  }
+
+  /* ====================== PRINT ====================== */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Strong page-break enforcement — every .page is its own A4 page */
+  .page {
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+  }
+  .page:last-child {
+    break-after: auto;
+    page-break-after: avoid;
+  }
+
+  /* Keep critical blocks from breaking awkwardly across pages */
+  .rubric-doc-group,
+  .rubric-table tr,
+  .grade-summary,
+  .teacher-comments-block,
+  .cover-title-wrap,
+  .signature-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Larger teacher comments block — dedicated full-page version */
+  .teacher-comments-large {
+    padding: 28px 32px;
+    margin-top: 4px;
+  }
+  .teacher-comments-large .tc-body {
+    font-size: 14.5px;
+    line-height: 1.85;
+  }
+  .teacher-comments-large .tc-label {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
+  .teacher-comments-large .tc-teacher {
+    font-size: 11px;
+    margin-bottom: 14px;
+  }
+
+  /* Signature block on the comments page */
+  .signature-block {
+    margin-top: auto;
+    padding-top: 32px;
+  }
+  .signature-line {
+    max-width: 320px;
+  }
+  .sig-label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 30px;
+    font-weight: 500;
+  }
+  .sig-rule {
+    height: 1px;
+    background: var(--obsidian);
+    margin-bottom: 8px;
+  }
+  .sig-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--slate);
+  }
+
+  @media print {
+    body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .form-panel, .preview-meta, .action-bar { display: none !important; }
+    .app-shell { display: block; }
+    .preview-panel {
+      background: white;
+      padding: 0;
+      max-height: none;
+      overflow: visible;
+    }
+    .page {
+      margin: 0;
+      box-shadow: none;
+      width: 210mm;
+      min-height: 297mm;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child {
+      page-break-after: avoid;
+      break-after: auto;
+    }
+    .document { max-width: none; }
+  }
+
+  /* ====================== AI GUIDANCE BLOCKS ====================== */
+  .ai-guidance-block {
+    background: linear-gradient(135deg, #F8F5EF 0%, #FDF7E5 100%);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+  }
+  .ai-block-header { margin-bottom: 12px; }
+  .ai-block-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--obsidian);
+    margin-bottom: 4px;
+  }
+  .ai-icon {
+    color: var(--gold);
+    font-size: 14px;
+    line-height: 1;
+  }
+  .ai-block-sub {
+    font-size: 10.5px;
+    color: var(--mist);
+    line-height: 1.5;
+    padding-left: 21px;
+  }
+  .ai-suggestions {
+    min-height: 54px;
+    margin-bottom: 12px;
+  }
+  .ai-placeholder {
+    font-size: 11.5px;
+    color: var(--mist);
+    font-style: italic;
+    padding: 10px 0 4px;
+  }
+  .ai-suggestion-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 9px 12px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    margin-bottom: 7px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .ai-suggestion-item:hover { border-color: var(--gold); background: var(--gold-pale); }
+  .ai-suggestion-item:last-child { margin-bottom: 0; }
+  .ai-suggestion-num {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    background: var(--gold);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+  .ai-suggestion-text {
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--obsidian);
+    flex: 1;
+  }
+  .ai-suggestion-use {
+    font-size: 9.5px;
+    color: var(--gold-deep);
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .ai-generate-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid var(--gold-deep);
+    background: white;
+    color: var(--gold-deep);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .ai-generate-btn:hover { background: var(--gold-pale); }
+  .ai-generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .ai-btn-icon { font-size: 14px; line-height: 1; }
+  .ai-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    color: var(--gold-deep);
+    font-style: italic;
+    padding: 8px 0;
+  }
+  .ai-spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--gold-pale);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .ai-error {
+    font-size: 11px;
+    color: #c0392b;
+    background: #fdf2f0;
+    border: 1px solid #f5c6c0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    line-height: 1.5;
+  }
+
+  /* ====================== SAVED RECORDS ====================== */
+  .saved-record-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  .saved-record-item:last-child { border-bottom: none; }
+  .saved-record-item:hover { background: var(--cream); }
+  .saved-record-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--obsidian);
+    flex: 1;
+  }
+  .saved-record-meta {
+    font-size: 10px;
+    color: var(--mist);
+    line-height: 1.4;
+  }
+  .saved-record-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .saved-record-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--slate);
+    transition: all 0.12s;
+  }
+  .saved-record-btn:hover { border-color: var(--gold); color: var(--gold-deep); }
+  .saved-record-btn.danger:hover { border-color: #e74c3c; color: #e74c3c; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .preview-panel { max-height: none; }
+    .form-panel { max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============== FORM PANEL ============== -->
+  <div class="form-panel">
+    <div class="form-header">
+      <div class="brand-mark">
+        <div class="brand-logo">H</div>
+        <div>
+          <div class="brand-text">HARLAND</div>
+          <div class="brand-tagline">Achieve Excellence</div>
+        </div>
+      </div>
+      <div class="form-title">Completion Document Generator</div>
+      <div class="form-sub">Generate Unit Completions &amp; Level Completions on-brand, in seconds.</div>
+    </div>
+
+    <div class="form-body">
+
+      <!-- Document Type -->
+      <div class="form-section">
+        <div class="section-label">Step 1</div>
+        <div class="section-title">Document Type</div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label>Completion Type</label>
+            <select id="docType">
+              <option value="unit">Unit Completion</option>
+              <option value="level">Level Completion</option>
+            </select>
+          </div>
+          <div class="field" id="unitNumberField">
+            <label>Unit Number</label>
+            <select id="unitNumber">
+              <option value="1">Unit 1</option>
+              <option value="2">Unit 2</option>
+              <option value="3">Unit 3</option>
+              <option value="4">Unit 4</option>
+            </select>
+          </div>
+          <div class="field field-full">
+            <label>Writing Focus (Level)</label>
+            <select id="writingType">
+              <!-- options injected by JS -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Info -->
+      <div class="form-section">
+        <div class="section-label">Step 2</div>
+        <div class="section-title">Student &amp; Project</div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label>Student Name</label>
+            <input type="text" id="studentName" value="" placeholder="e.g. Dylan Wu">
+          </div>
+          <div class="field">
+            <label>Teacher Name</label>
+            <input type="text" id="teacherName" value="Mr. Birk" placeholder="e.g. Mr. Birk">
+          </div>
+          <div class="field">
+            <label>Project Title</label>
+            <input type="text" id="projectTitle" value="My Perfect Day" placeholder="e.g. My Perfect Day">
+          </div>
+          <div class="field">
+            <label>Completion Date</label>
+            <input type="text" id="completionDate" placeholder="e.g. 22 May 2026">
+          </div>
+
+          <div class="field field-full">
+            <label>Student Project (paste full text)</label>
+            <textarea id="projectText" class="project-area" placeholder="Paste the student's complete writing project here. Paragraph breaks will be preserved.">The long week that I went to the ice-chilling Hokkaido was an unforgettable memory. I was happily playing stupid video games like Plants vs. Zombies on the airplane, and they were super hard but funny. As the big plane landed at the gigantic airport slowly, I saw snow, and it was white like my dog. As I played happily with the snow, I heard it crunching under my feet. I was thrown softly into the snow by my crazy coach. The snow felt cold but it was soft like my bed. Then I went to soak in the comfortable hot springs. There were many kinds of hot springs, like the milk spring, tomato spring, and warm spring. They even had a heated outdoor pool. We quickly ate a lot of yummy Japanese sushi, and it tasted saltier than the sushi in Taiwan. No matter what, the fun trip to Hokkaido will always stay in my mind.</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rubric -->
+      <div class="form-section" id="rubricSection">
+        <div class="section-label">Step 3</div>
+        <div class="section-title">Grade the Rubric</div>
+
+        <!-- Rubric will be rendered by JS based on document type & unit -->
+        <div id="rubricGradingArea"></div>
+
+        <div class="total-display">
+          <span class="total-label">Total Score</span>
+          <span>
+            <span class="total-score" id="totalScore">0/42</span>
+            <span class="total-percent" id="totalPercent">0%</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Level Completion only: per-unit grades -->
+      <div class="form-section" id="levelUnitsSection" style="display:none;">
+        <div class="section-label">Step 3a</div>
+        <div class="section-title">Unit Grades Summary</div>
+        <div id="levelUnitsArea"></div>
+      </div>
+
+      <!-- AI status -->
+      <div class="form-section" id="aiInfoSection">
+        <div class="section-label">Built In</div>
+        <div class="section-title">AI Assistant</div>
+        <div style="font-size:11px;color:var(--mist);line-height:1.6;">AI-guided comment suggestions are built in. No setup or key is required. Use the suggestion buttons in the Teacher Comments section below.</div>
+      </div>
+
+      <!-- Teacher Comments -->
+      <div class="form-section">
+        <div class="section-label">Step 4</div>
+        <div class="section-title">Teacher Comments</div>
+
+        <!-- AI Guidance Panels -->
+        <div id="aiGuidanceArea" style="margin-bottom:18px;">
+
+          <!-- Areas to Improve -->
+          <div class="ai-guidance-block" id="improveBlock">
+            <div class="ai-block-header">
+              <div class="ai-block-title">
+                <span class="ai-icon">✦</span>
+                <span>3 Areas to Work On</span>
+              </div>
+              <div class="ai-block-sub">AI will suggest areas for improvement based on the rubric scores and level content</div>
+            </div>
+            <div class="ai-suggestions" id="improveSuggestions">
+              <div class="ai-placeholder">Click "Generate" to get AI-guided suggestions based on this student's rubric scores and level.</div>
+            </div>
+            <button class="ai-generate-btn" id="improveBtn" onclick="generateImprove()">
+              <span class="ai-btn-icon">⟳</span> Generate Suggestions
+            </button>
+          </div>
+
+          <!-- Things Improved -->
+          <div class="ai-guidance-block" id="strengthBlock" style="margin-top:12px;">
+            <div class="ai-block-header">
+              <div class="ai-block-title">
+                <span class="ai-icon">✦</span>
+                <span>3 Things the Student Improved</span>
+              </div>
+              <div class="ai-block-sub">AI will highlight growth areas based on rubric performance and level expectations</div>
+            </div>
+            <div class="ai-suggestions" id="strengthSuggestions">
+              <div class="ai-placeholder">Click "Generate" to get AI-guided strengths based on this student's rubric scores and level.</div>
+            </div>
+            <button class="ai-generate-btn" id="strengthBtn" onclick="generateStrengths()">
+              <span class="ai-btn-icon">⟳</span> Generate Suggestions
+            </button>
+          </div>
+
+        </div>
+
+        <div class="field">
+          <label>Final Comments for the family</label>
+          <div style="font-size:10px;color:var(--mist);margin-bottom:8px;letter-spacing:0.02em;">Use the AI suggestions above as a guide, then write your personalised comment below.</div>
+          <textarea id="teacherComments" placeholder="Write your end-of-unit comments here. Address the student directly, note strengths, and identify areas for continued growth." style="min-height:140px;"></textarea>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn btn-secondary" onclick="window.location.reload()">Reset</button>
+        <button class="btn btn-primary" onclick="window.print()">Download PDF</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============== PREVIEW PANEL ============== -->
+  <div class="preview-panel" id="previewPanel">
+    <div class="preview-meta">
+      <span class="preview-label">Live Preview · A4</span>
+      <span class="preview-status" id="previewStatus">Auto-updating</span>
+    </div>
+    <div class="document" id="documentPreview">
+      <!-- Pages rendered here -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   AI PROXY ENDPOINT
+   Set this to your deployed Netlify proxy once it is live.
+   The key is held server-side; nothing secret lives here.
+   ============================================================ */
+var HARLAND_AI_PROXY = 'https://harland-proxy.netlify.app/api/claude';
+/* ============================================================
+   HARLAND CURRICULUM DATA
+   ============================================================ */
+var CURRICULUM = {
+  // Levels are used for the dropdown labels.
+  // The actual rubric for each (level, unit) lives in LEVEL_RUBRICS below.
+  levels: [{
+    level: 'K',
+    writing: 'Letter & Word Formation'
+  }, {
+    level: '1',
+    writing: 'Sentences'
+  }, {
+    level: '2',
+    writing: 'Combining Sentences'
+  }, {
+    level: '3',
+    writing: 'Persuasive & Comparative Paragraphs'
+  }, {
+    level: '4',
+    writing: 'Descriptive & Narrative Paragraphs'
+  }, {
+    level: '5',
+    writing: 'Expository & Analytical Paragraphs'
+  }, {
+    level: '6',
+    writing: 'Persuasive Essays'
+  }, {
+    level: '7',
+    writing: 'Descriptive Essays'
+  }, {
+    level: '8',
+    writing: 'Expository Essays'
+  }, {
+    level: '9',
+    writing: 'Narrative Essays'
+  }, {
+    level: '10',
+    writing: 'Advanced Persuasive Essays'
+  }, {
+    level: '11',
+    writing: 'Research Essays'
+  }, {
+    level: '12',
+    writing: 'Analytical Essays'
+  }, {
+    level: '13',
+    writing: 'Public Presentations'
+  }]
+};
+
+/* ============================================================
+   RUBRIC LIBRARY
+   ============================================================
+   LEVEL_RUBRICS[level][unit] returns the rubric to use.
+   - Units 1, 2, 3 = writing project (7 criteria, /42 max)
+   - Unit 4 = presentation rubric (10 criteria, /60 max)
+   - Many levels share the SAME rubric for Units 1\u20133 within that level
+     (only the writing topic changes). Those reuse a single rubric object.
+   ============================================================ */
+
+/* ---------- Standard category labels ---------- */
+var VOCAB_STANDARD = {
+  id: 'vocab',
+  name: 'Vocabulary',
+  desc: 'Variety, precision and grade-level appropriateness',
+  levels: ['Vocabulary is well below grade level.', 'Vocabulary is at or a little below grade-level expectations.', 'Vocabulary is above grade-level expectations.', 'Vocabulary is vivid and helps the reader to accurately visualize key concepts. It is well above grade level.']
+};
+var GRAMMAR_STANDARD = {
+  id: 'grammar',
+  name: 'Grammar',
+  desc: 'Accuracy of grammar usage',
+  levels: ['The majority of the grammar is incorrect.', 'The grammar is at or a little below grade-level expectations.', 'The grammar is at or slightly above grade-level expectations.', 'Consistent and accurate application of grammar principles well above grade-level expectations.']
+};
+var ACADEMIC_CONV = {
+  id: 'conv',
+  name: 'Academic Conventions',
+  desc: 'Adherence to academic conventions',
+  levels: ['Poor or no adherence to academic conventions.', 'Decent adherence to academic writing conventions like indenting paragraphs and using mostly formal language.', 'Consistent adherence to academic writing conventions such as formal language and the avoidance of personal pronouns.', 'Perfect adherence to academic writing conventions such as formal language and the avoidance of personal pronouns.']
+};
+var DESCRIPTIVE_CONV = {
+  id: 'conv',
+  name: 'Descriptive Writing Conventions',
+  desc: 'Adherence to descriptive paragraph conventions',
+  levels: ['Poor or no adherence to descriptive paragraph conventions.', 'Decent adherence to descriptive paragraph conventions.', 'Consistent adherence to descriptive paragraph conventions.', 'Perfect adherence to descriptive paragraph conventions.']
+};
+
+/* ---------- Building blocks ---------- */
+
+/* DESCRIPTIVE PARAGRAPH (used by Level 4 Units 1\u20133 and Level 7 Units 1\u20133) */
+var DESCRIPTIVE_PARA_RUBRIC = {
+  name: 'Descriptive Paragraph Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentences',
+      desc: 'How well the topic sentence introduces the subject',
+      levels: ['No clear topic sentence or off-topic.', 'Vague or limited topic sentences.', 'A clear topic sentence introduces the subject.', 'An engaging and descriptive topic sentence that grabs the reader\'s attention.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Quality and quantity of supporting sentences',
+      levels: ['Insufficient or irrelevant supporting sentences.', 'Some supporting sentences are provided but lacking detail.', 'Adequate supporting sentences with basic descriptions.', 'Strong supporting sentences with vivid details enhance the description.']
+    }, {
+      id: 'details',
+      name: 'Details',
+      desc: 'Use of descriptive and sensory details',
+      levels: ['Lack of descriptive language and sensory details.', 'Limited use of descriptive language and sensory details.', 'Some descriptive language and sensory details used effectively.', 'Rich and vivid descriptive language with sensory details that bring the subject to life.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentences',
+      desc: 'How well the conclusion wraps up the description',
+      levels: ['No concluding sentence or unrelated to the description.', 'Weak or abrupt concluding sentence.', 'Adequate concluding sentence that summarizes main points.', 'Strong concluding sentences that effectively reinforce the description and leave a lasting impression.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, DESCRIPTIVE_CONV]
+  }]
+};
+
+/* PERSUASIVE PARAGRAPH \u2014 Level 3 Units 1\u20133 (also Comparative \u2014 they use the same metrics) */
+var PERSUASIVE_PARA_RUBRIC = {
+  name: 'Persuasive Paragraph Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentence',
+      desc: 'Quality of topic sentence',
+      levels: ['No clear topic sentence or off-topic.', 'Vague or limited topic sentence.', 'A clear topic sentence introduces the subject.', 'An engaging and descriptive topic sentence that grabs the reader\'s attention.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Quality of supporting sentences',
+      levels: ['Insufficient or irrelevant supporting sentences.', 'Some supporting sentences are provided but lacking detail.', 'Adequate supporting sentences with basic descriptions.', 'Strong supporting sentences with vivid details enhance the description.']
+    }, {
+      id: 'details',
+      name: 'Details and Examples',
+      desc: 'Depth through details and examples',
+      levels: ['No details or examples.', 'A few details and/or examples are included.', 'Several details and/or examples are included to add depth to each paragraph.', 'A perfect amount of details and/or examples are included to give each paragraph depth and to clarify key ideas.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentence',
+      desc: 'Quality of concluding sentence',
+      levels: ['No concluding sentence or unrelated to the description.', 'Weak or abrupt concluding sentence.', 'Adequate concluding sentence that summarizes main points.', 'Strong concluding sentences that effectively reinforce the description and leave a lasting impression.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, DESCRIPTIVE_CONV]
+  }]
+};
+
+/* EXPOSITORY PARAGRAPH \u2014 Level 5 Units 1, 2 */
+var EXPOSITORY_PARA_RUBRIC = {
+  name: 'Expository Paragraph Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentence',
+      desc: 'Clarity of topic sentence',
+      levels: ['No clear topic sentence or off-topic.', 'Vague or unclear topic sentence that does not introduce the main idea effectively.', 'A clear topic sentence that introduces the subject and focuses the reader\'s attention.', 'An engaging and precise topic sentence that introduces the subject and sets the tone for the paragraph.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Clarity of factual explanations',
+      levels: ['No supporting sentences or irrelevant ones.', 'Some supporting sentences but lacking enough explanation or detail.', 'Adequate supporting sentences with clear factual explanations.', 'Strong, detailed supporting sentences that provide clear factual explanations with specific examples.']
+    }, {
+      id: 'details',
+      name: 'Details and Examples',
+      desc: 'Use of specific details and examples',
+      levels: ['No specific details or examples provided.', 'Few or vague details and examples are given.', 'Adequate use of details and examples to support the main points.', 'Specific, clear, and detailed examples are provided to enhance understanding and support the topic.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentence',
+      desc: 'Strength of concluding sentence',
+      levels: ['No concluding sentence or off-topic.', 'Weak or abrupt concluding sentence that doesn\'t summarize effectively.', 'Adequate concluding sentence that summarizes the main idea and wraps up the paragraph.', 'Strong, clear concluding sentence that effectively reinforces the main idea of the paragraph.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'vocab',
+      name: 'Vocabulary',
+      desc: 'Precision and clarity for expository writing',
+      levels: ['Vocabulary is well below grade level.', 'Vocabulary is at or a little below grade-level expectations.', 'Vocabulary is above grade-level expectations.', 'Vocabulary is vivid, precise, and enhances the clarity of the expository writing.']
+    }, {
+      id: 'grammar',
+      name: 'Grammar',
+      desc: 'Grammatical accuracy',
+      levels: ['Major grammatical issues that hinder understanding.', 'Some grammatical errors that slightly affect clarity.', 'Grammar is generally correct, with minor errors that do not affect meaning.', 'Grammar is flawless, enhancing the professionalism and clarity of the writing.']
+    }, {
+      id: 'conv',
+      name: 'Expository Writing Conventions',
+      desc: 'Adherence to expository paragraph structure',
+      levels: ['No adherence to expository paragraph structure or conventions.', 'Some adherence to conventions but lacks clarity or organization.', 'Consistent adherence to expository writing structure, with clear organization.', 'Perfect adherence to expository writing conventions, with well-structured and logically organized content.']
+    }]
+  }]
+};
+
+/* ANALYTICAL PARAGRAPH \u2014 Level 5 Unit 3 */
+var ANALYTICAL_PARA_RUBRIC = {
+  name: 'Analytical Paragraph Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentence',
+      desc: 'Quality and analytical focus',
+      levels: ['No clear topic sentence or off-topic.', 'Vague or limited topic sentence.', 'A clear topic sentence introduces the subject.', 'An engaging and analytical topic sentence that captures the reader\'s attention.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Depth of analytical support',
+      levels: ['Insufficient or irrelevant supporting sentences.', 'Some supporting sentences but lacking depth or analysis.', 'Adequate supporting sentences with basic analysis.', 'Strong supporting sentences with in-depth analysis that clearly explain the topic.']
+    }, {
+      id: 'details',
+      name: 'Details and Examples',
+      desc: 'Analytical depth through examples',
+      levels: ['No analysis or evidence.', 'A few details or examples included, but lack depth.', 'Several analytical details or examples that clarify the paragraph.', 'A perfect amount of examples that deepen understanding and clarify key ideas through analysis.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentence',
+      desc: 'Strength of analytical conclusion',
+      levels: ['No concluding sentence or unrelated to the analysis.', 'Weak or abrupt concluding sentence.', 'Adequate concluding sentence that summarizes main points.', 'Strong concluding sentence that reinforces the analysis and leaves a lasting impression.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'vocab',
+      name: 'Vocabulary',
+      desc: 'Vocabulary aligned to analysis',
+      levels: ['Vocabulary is well below grade level.', 'Vocabulary is at or a little below grade-level expectations.', 'Vocabulary is above grade-level expectations.', 'Vocabulary is vivid and helps the reader understand key concepts.']
+    }, GRAMMAR_STANDARD, {
+      id: 'conv',
+      name: 'Analytical Writing Conventions',
+      desc: 'Adherence to analytical writing conventions',
+      levels: ['Poor or no adherence to analytical writing conventions.', 'Decent adherence to analytical writing conventions.', 'Consistent adherence to analytical writing conventions.', 'Perfect adherence to analytical writing conventions, with clear analysis and logical flow.']
+    }]
+  }]
+};
+
+/* PERSUASIVE ESSAY \u2014 Level 6 Units 1\u20133, Level 10 Units 1\u20133 */
+var PERSUASIVE_ESSAY_RUBRIC = {
+  name: 'Persuasive Essay Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentence',
+      desc: 'Clarity of topic sentence with controlling idea',
+      levels: ['No topic sentence for any of the paragraphs.', 'At least one clear topic sentence with a controlling idea and the main idea.', 'A number of clear topic sentences including a controlling idea and the main idea.', 'Consistent usage of clear topic sentences throughout. Topic sentences are perfectly formed and may include a numerical expression.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Quality of supporting sentences',
+      levels: ['Very few sentences that support the topic.', 'A number of clear supporting sentences that support the topic of each paragraph.', 'A sufficient number of supporting sentences that are effective at supporting the topic.', 'A perfect amount of supporting sentences that are clear and effective at supporting.']
+    }, {
+      id: 'details',
+      name: 'Details and Examples',
+      desc: 'Depth through details and examples',
+      levels: ['No details or examples.', 'A few details and/or examples are included.', 'A number of details and/or examples are included to add depth to each paragraph.', 'A perfect amount of details and/or examples are included to give each paragraph depth and to clarify key ideas.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentence',
+      desc: 'Quality of concluding sentences',
+      levels: ['No concluding sentences.', 'A few concluding sentences.', 'A sufficient number of concluding sentences.', 'Perfect number of concluding sentences that appropriately summarize the main point of the paragraph.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, ACADEMIC_CONV]
+  }]
+};
+
+/* DESCRIPTIVE ESSAY \u2014 Level 7 Units 1\u20133 */
+var DESCRIPTIVE_ESSAY_RUBRIC = DESCRIPTIVE_PARA_RUBRIC; // identical structure per source documents
+
+/* EXPOSITORY ESSAY \u2014 Level 8 Units 1\u20133 (Honors variant uses richer 6-point descriptors) */
+var EXPOSITORY_ESSAY_RUBRIC = {
+  name: 'Expository Essay Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentence',
+      desc: 'Clarity of topic sentence with controlling idea',
+      levels: ['No topic sentence for any of the paragraphs.', 'At least one clear topic sentence with a controlling idea and the main idea.', 'A number of clear topic sentences including a controlling idea and the main idea.', 'Consistent usage of clear topic sentences throughout the essay. Topic sentences are perfectly formed and may include a numerical expression to guide the paragraph\'s structure.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Effectiveness of supporting sentences',
+      levels: ['Very few sentences that support the topic.', 'A number of clear supporting sentences that support the topic of each paragraph.', 'A sufficient number of supporting sentences that are effective at supporting the topic.', 'A perfect amount of supporting sentences that are clear and effective at supporting the main topic and enhancing the reader\'s understanding.']
+    }, {
+      id: 'details',
+      name: 'Details and Examples',
+      desc: 'Depth of evidence and analysis',
+      levels: ['No details or examples.', 'A few details and/or examples are included.', 'A number of details and/or examples are included to add depth to each paragraph.', 'Comprehensive and compelling evidence is included, with detailed analysis that significantly enhances understanding and persuasively supports the thesis.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentence',
+      desc: 'Strength of concluding sentence',
+      levels: ['No concluding sentences.', 'A few concluding sentences.', 'A sufficient number of concluding sentences.', 'Perfect number of concluding sentences that appropriately summarize the main point of the paragraph and reinforce the essay\'s central thesis without introducing new information.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [VOCAB_STANDARD, GRAMMAR_STANDARD, {
+      id: 'conv',
+      name: 'Academic Conventions',
+      desc: 'Adherence to academic conventions',
+      levels: ['Poor or no adherence to academic conventions.', 'Decent adherence to academic writing conventions like indenting paragraphs and using mostly formal language.', 'Consistent adherence to academic writing conventions such as formal language and the avoidance of personal pronouns.', 'Perfect adherence to academic writing conventions such as formal language and the avoidance of personal pronouns, maintaining a professional and objective tone throughout the essay.']
+    }]
+  }]
+};
+
+/* NARRATIVE ESSAY \u2014 Level 9 Units 1\u20133 */
+var NARRATIVE_ESSAY_RUBRIC = {
+  name: 'Narrative Essay Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentence',
+      desc: 'Quality of topic sentences introducing the narrative',
+      levels: ['No topic sentence for any of the paragraphs.', 'At least one clear topic sentence introducing the main event or moment in the story.', 'Several clear topic sentences that effectively introduce key events or moments in the narrative.', 'Consistent use of well-crafted topic sentences throughout, each effectively introducing the main event and engaging the reader.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Development of the narrative',
+      levels: ['Very few sentences that develop the narrative or support the main event.', 'Several supporting sentences that contribute to the development of the narrative, including context, actions, and character responses.', 'A sufficient number of supporting sentences that effectively develop the narrative, including context, actions, character responses, and reflections.', 'A perfect amount of supporting sentences that clearly and effectively develop the narrative, seamlessly integrating context, actions, character responses, and reflections.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentence',
+      desc: 'Quality of concluding sentences',
+      levels: ['No concluding sentences.', 'A few concluding sentences are present, providing some closure to the paragraphs.', 'A sufficient number of concluding sentences that effectively summarize the main points, reflect on the narrative, or transition to the next part of the story.', 'Perfect use of concluding sentences that appropriately summarize the main event, offer a meaningful reflection, or create a smooth transition to the next part of the narrative.']
+    }, {
+      id: 'flow',
+      name: 'Narrative Flow',
+      desc: 'Logical connection between sentences and ideas',
+      levels: ['The narrative is disjointed and lacks logical flow between sentences and ideas.', 'The narrative flow is somewhat choppy, with occasional gaps in logic or abrupt transitions.', 'The narrative flows logically, with clear connections between sentences and ideas, maintaining the reader\'s interest throughout.', 'The narrative flows seamlessly, with smooth transitions between sentences and ideas, creating a cohesive and engaging story.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'vocab',
+      name: 'Vocabulary',
+      desc: 'Expressiveness for narrative writing',
+      levels: ['Vocabulary is well below grade level, making the narrative difficult to follow.', 'Vocabulary is at or slightly below grade level expectations, with basic language used to convey the story.', 'Vocabulary is above grade level expectations, effectively enhancing the narrative and engaging the reader.', 'Vocabulary is vivid and expressive, helping the reader to fully visualize and connect with the narrative, well above grade level expectations.']
+    }, {
+      id: 'grammar',
+      name: 'Grammar',
+      desc: 'Grammatical clarity and flow',
+      levels: ['The majority of the grammar is incorrect, affecting the readability of the narrative.', 'Grammar is at or slightly below grade level expectations, with occasional errors that do not significantly hinder understanding.', 'Grammar is at or slightly above grade level expectations, with few errors that do not distract from the narrative.', 'Consistent and accurate use of grammar, enhancing the clarity, flow, and professionalism of the narrative, well above grade level expectations.']
+    }, {
+      id: 'conv',
+      name: 'Academic Conventions',
+      desc: 'Adherence to narrative writing conventions',
+      levels: ['Poor or no adherence to academic conventions.', 'Decent adherence to academic writing conventions, such as indenting paragraphs and using mostly formal language.', 'Consistent adherence to academic writing conventions, including formal language and proper narrative structure.', 'Perfect adherence to academic writing conventions, including formal language, proper formatting, and a well-structured narrative.']
+    }]
+  }]
+};
+
+/* ADVANCED PERSUASIVE ESSAY \u2014 Level 10 Units 1\u20133 (same shape as Level 6 in source) */
+var ADVANCED_PERSUASIVE_RUBRIC = PERSUASIVE_ESSAY_RUBRIC;
+
+/* RESEARCH ESSAY \u2014 Level 11 Units 1\u20133 (same shape as Persuasive Essay in source) */
+var RESEARCH_ESSAY_RUBRIC = {
+  name: 'Research Essay Rubric',
+  maxPerRow: 6,
+  categories: PERSUASIVE_ESSAY_RUBRIC.categories
+};
+
+/* ANALYTICAL ESSAY \u2014 Level 12 Units 1\u20133 (sharpened "Details" criterion is analysis-specific) */
+var ANALYTICAL_ESSAY_RUBRIC = {
+  name: 'Analytical Essay Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [{
+      id: 'topic',
+      name: 'Topic Sentence',
+      desc: 'Analytical clarity of topic sentence',
+      levels: ['No topic sentence for any of the paragraphs.', 'At least one clear topic sentence with a controlling idea and a specific analytical focus.', 'Multiple paragraphs have clear topic sentences that include a controlling idea and focus on a specific aspect of the analysis.', 'Consistent use of well-crafted topic sentences throughout. Topic sentences are precise, analytical, and may include a numerical expression to guide the structure of the paragraph.']
+    }, {
+      id: 'support',
+      name: 'Supporting Sentences',
+      desc: 'Analytical depth of supporting sentences',
+      levels: ['Very few sentences that support the topic statement.', 'Some clear supporting sentences contribute to the analysis in each paragraph.', 'A sufficient number of supporting sentences effectively develop and support the analytical focus of the paragraph, with relevant facts and evidence.', 'A perfect amount of supporting sentences that are well-structured and deeply analyze the topic statement with strong evidence and clear explanations.']
+    }, {
+      id: 'details',
+      name: 'Analysis & Explanation',
+      desc: 'Quality of analysis and interpretation',
+      levels: ['No analysis or explanation is provided.', 'Some analysis is provided, but it may be vague or not fully developed.', 'Clear analysis and explanation that interpret the evidence and connect it back to the topic statement in a meaningful way.', 'Thorough and insightful analysis that not only explains the evidence but also deepens the reader\'s understanding of the topic, showing strong connections to the overall thesis.']
+    }, {
+      id: 'closing',
+      name: 'Concluding Sentence',
+      desc: 'Strength of analytical conclusion',
+      levels: ['No concluding sentences.', 'Some concluding sentences are present but may not fully summarize the paragraph\'s analysis.', 'Concluding sentences effectively summarize the main analytical point of the paragraph and reinforce the topic statement.', 'Concluding sentences are consistently used to effectively summarize the analysis, reinforce the paragraph\'s main point, and provide a clear transition or reflection as needed.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'vocab',
+      name: 'Vocabulary',
+      desc: 'Sophistication and analytical precision',
+      levels: ['Vocabulary is well below grade level.', 'Vocabulary is at or slightly below grade level expectations, but may lack precision.', 'Vocabulary is above grade level expectations, appropriately conveying the analysis.', 'Vocabulary is precise, sophisticated, and well above grade level, enhancing the clarity and depth of the analysis.']
+    }, GRAMMAR_STANDARD, {
+      id: 'conv',
+      name: 'Academic Conventions',
+      desc: 'Adherence to academic conventions',
+      levels: ['Poor or no adherence to academic conventions.', 'Some adherence to academic writing conventions, such as indenting paragraphs and using formal language, but with inconsistencies.', 'Consistent adherence to academic writing conventions, including the use of formal language and avoidance of personal pronouns.', 'Perfect adherence to academic writing conventions, with flawless use of formal language, proper paragraph structure, and strict avoidance of personal pronouns.']
+    }]
+  }]
+};
+
+/* ---------- PRESENTATION RUBRICS (Unit 4 for every level) \u2014 /60 max ---------- */
+
+/* Shared delivery + grammar sections (identical across all presentation rubrics in source) */
+var PRESENTATION_SHARED_TAIL = [{
+  name: 'Delivery',
+  rows: [{
+    id: 'clarity',
+    name: 'Clarity and Engagement',
+    desc: 'Overall presentation clarity and engagement',
+    levels: ['The presentation is unclear, difficult to follow, and not engaging.', 'The presentation is somewhat clear but lacks engagement.', 'The presentation is clear and maintains a moderate level of engagement.', 'The presentation is exceptionally clear, engaging, and holds the audience\'s attention throughout.']
+  }, {
+    id: 'bodylang',
+    name: 'Body Language, Eye Contact, and Pauses',
+    desc: 'Physical delivery skills',
+    levels: ['Poor body language, no eye contact, and no use of pauses.', 'Inconsistent body language and eye contact, minimal use of pauses.', 'Good body language, consistent eye contact, and effective use of pauses.', 'Confident body language, strong eye contact, and masterful use of pauses enhance the presentation.']
+  }]
+}, {
+  name: 'Grammar and Vocabulary',
+  rows: [{
+    id: 'pgrammar',
+    name: 'Grammar',
+    desc: 'Grammatical accuracy in speech',
+    levels: ['The presentation is riddled with grammatical errors.', 'The presentation has several grammatical errors.', 'The presentation has minor grammatical errors.', 'The presentation is grammatically flawless.']
+  }, {
+    id: 'pvocab',
+    name: 'Vocabulary',
+    desc: 'Vocabulary precision and grade-level',
+    levels: ['Vocabulary is basic and below grade level.', 'Vocabulary is at or slightly below grade level.', 'Vocabulary is appropriate and slightly above grade level.', 'Vocabulary is vivid, precise, and well above grade level, effectively enhancing the descriptive content.']
+  }]
+}];
+
+/* Generic slide-organization row (same across all presentation rubrics) */
+var SLIDE_ORG_ROW = {
+  id: 'slides',
+  name: 'Slide Organization',
+  desc: 'Logical flow of presentation slides',
+  levels: ['Slides are disorganized, lacking a clear structure.', 'Slides are somewhat organized but lack logical flow.', 'Slides are organized with a clear and logical flow.', 'Slides are exceptionally well-organized, enhancing the overall presentation.']
+};
+
+/* NARRATIVE PRESENTATION \u2014 Level 4, Level 9 Unit 4 */
+var NARRATIVE_PRESENTATION_RUBRIC = {
+  name: 'Narrative Presentation Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [SLIDE_ORG_ROW, {
+      id: 'intro',
+      name: 'Introduction (Slides 1-3)',
+      desc: 'Hook, setting, character introduction',
+      levels: ['Introduction lacks a hook, setting, and character introduction; the central narrative is unclear.', 'Introduction is weak, with a vague hook or insufficient character and setting details; the central narrative is somewhat clear.', 'Introduction includes a clear hook, relevant setting, and character introduction, with a clear narrative direction.', 'Introduction is engaging, with a strong hook, vivid setting, and compelling character introduction that effectively sets the tone for the narrative.']
+    }]
+  }, {
+    name: 'Content',
+    rows: [{
+      id: 'plot',
+      name: 'Plot Development',
+      desc: 'Development of the story arc',
+      levels: ['The plot is unclear, underdeveloped, or disjointed.', 'The plot is somewhat clear but lacks sufficient development or coherence.', 'The plot is well-developed, with a clear structure and coherent progression.', 'The plot is highly engaging, with rich development, a clear climax, and smooth progression, keeping the audience captivated.']
+    }, {
+      id: 'conflict',
+      name: 'Conflict and Resolution',
+      desc: 'Narrative arc through conflict and resolution',
+      levels: ['No clear conflict or resolution is presented.', 'Conflict and resolution are present but weak or underdeveloped.', 'A clear conflict and resolution are presented, contributing to the narrative\'s overall structure.', 'Conflict and resolution are highly engaging, well-developed, and enhance the emotional and narrative arc of the story.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'narlang',
+      name: 'Narrative Language',
+      desc: 'Use of vivid narrative language',
+      levels: ['Language is plain and lacks narrative quality.', 'Narrative language is minimal or inconsistent.', 'Narrative language is present and adds some engagement to the presentation.', 'Language is vivid and engaging, effectively bringing the story to life for the audience.']
+    }, {
+      id: 'tone',
+      name: 'Tone and Appeal',
+      desc: 'Mood and tone establishment',
+      levels: ['The tone is inappropriate or fails to establish a mood.', 'The tone is somewhat appropriate but lacks consistency in establishing a mood.', 'The tone is appropriate, and the mood is clearly established, enhancing the narrative.', 'The tone is highly effective, and the mood is vividly conveyed, creating a deeply immersive experience for the audience.']
+    }]
+  }].concat(PRESENTATION_SHARED_TAIL)
+};
+
+/* PERSUASIVE PRESENTATION \u2014 Level 3, Level 6 Unit 4 */
+var PERSUASIVE_PRESENTATION_RUBRIC = {
+  name: 'Persuasive Presentation Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [SLIDE_ORG_ROW, {
+      id: 'intro',
+      name: 'Introduction (Slides 1-3)',
+      desc: 'Hook and background information',
+      levels: ['Introduction lacks a hook and background information; the central theme is unclear.', 'Introduction is weak with a vague hook or insufficient background information; the central theme is somewhat clear.', 'Introduction includes a clear hook, relevant background information, and a clear central theme.', 'Introduction is engaging, with a strong hook, rich background information, and a central theme that effectively sets the tone.']
+    }]
+  }, {
+    name: 'Content',
+    rows: [{
+      id: 'argument',
+      name: 'Argument Clarity',
+      desc: 'Clarity and support of the argument',
+      levels: ['The argument is unclear and unsupported.', 'The argument is somewhat clear but lacks sufficient support.', 'The argument is clear and supported by adequate evidence.', 'The argument is highly persuasive, with strong evidence and clear reasoning.']
+    }, {
+      id: 'evidence',
+      name: 'Use of Evidence',
+      desc: 'Relevance and strength of evidence',
+      levels: ['No evidence is provided, or the evidence is irrelevant.', 'Some evidence is provided, but it is weak or inconsistently relevant.', 'Relevant evidence is provided, supporting the argument effectively.', 'Strong and varied evidence is provided throughout, greatly enhancing the persuasiveness of the presentation.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'perslang',
+      name: 'Persuasive Language',
+      desc: 'Use of persuasive language',
+      levels: ['Language lacks persuasiveness and is too plain.', 'Persuasive language is minimal or inconsistent.', 'Persuasive language is present and adds some conviction to the presentation.', 'Language is highly persuasive, engaging, and effectively convinces the audience.']
+    }, {
+      id: 'tone',
+      name: 'Tone and Appeal',
+      desc: 'Audience-appropriate appeal',
+      levels: ['The tone is inappropriate or fails to connect with the audience.', 'The tone is somewhat appropriate but lacks consistent appeal to logic or emotion.', 'The tone is appropriate, and the appeal to logic or emotion is moderately effective.', 'The tone is well-matched to the audience, with strong appeals to logic, emotion, or ethics, making the argument highly compelling.']
+    }]
+  }].concat(PRESENTATION_SHARED_TAIL)
+};
+
+/* DESCRIPTIVE PRESENTATION \u2014 Level 7 Unit 4 */
+var DESCRIPTIVE_PRESENTATION_RUBRIC = {
+  name: 'Descriptive Presentation Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [SLIDE_ORG_ROW, {
+      id: 'intro',
+      name: 'Introduction (Slides 1-3)',
+      desc: 'Hook and central theme',
+      levels: ['Introduction lacks a hook and background information; the central theme is unclear.', 'Introduction is weak with a vague hook or insufficient background information; the central theme is somewhat clear.', 'Introduction includes a clear hook, relevant background information, and a clear central theme.', 'Introduction is engaging, with a strong hook, rich background information, and a central theme that effectively sets the tone.']
+    }]
+  }, {
+    name: 'Content',
+    rows: [{
+      id: 'sensory',
+      name: 'Sensory Details',
+      desc: 'Depth of sensory description',
+      levels: ['No sensory details are provided.', 'Limited sensory details are provided, lacking depth or vividness.', 'Adequate sensory details are used, contributing to a fairly vivid description.', 'Rich and varied sensory details are used throughout, creating an immersive experience.']
+    }, {
+      id: 'imagery',
+      name: 'Visual Imagery (Slides 4-6)',
+      desc: 'Effectiveness of visual imagery',
+      levels: ['No visual imagery is included, or imagery does not relate to the content.', 'Basic visual imagery is included but is not impactful or fully relevant.', 'Effective visual imagery is included, enhancing the descriptive content.', 'Highly effective visual imagery is included, greatly enhancing the overall descriptive impact of the presentation.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'desclang',
+      name: 'Descriptive Language',
+      desc: 'Use of descriptive language',
+      levels: ['Language is plain and lacks descriptive quality.', 'Descriptive language is minimal or inconsistent.', 'Descriptive language is present and adds some vividness to the presentation.', 'Language is highly descriptive, engaging, and effectively paints a picture for the audience.']
+    }, {
+      id: 'mood',
+      name: 'Mood and Atmosphere (Slide 7)',
+      desc: 'Establishment of mood and atmosphere',
+      levels: ['The slide fails to create any mood or atmosphere.', 'The mood or atmosphere is weak or inconsistent.', 'The slide creates a clear mood or atmosphere that enhances the scene.', 'The mood and atmosphere are vividly and consistently conveyed, deeply engaging the audience.']
+    }]
+  }].concat(PRESENTATION_SHARED_TAIL)
+};
+
+/* ANALYTICAL PRESENTATION \u2014 Level 5, Level 12 Unit 4 */
+var ANALYTICAL_PRESENTATION_RUBRIC = {
+  name: 'Analytical Presentation Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [SLIDE_ORG_ROW, {
+      id: 'intro',
+      name: 'Introduction (Slides 1-3)',
+      desc: 'Thesis and background information',
+      levels: ['Introduction lacks a clear thesis statement or background; the central analytical focus is unclear.', 'Introduction includes a thesis but lacks sufficient background information; the central analytical focus is somewhat clear.', 'Introduction includes a clear thesis and relevant background information, establishing a clear analytical direction.', 'Introduction is engaging, with a compelling thesis, strong background information, and a well-defined analytical focus.']
+    }]
+  }, {
+    name: 'Content',
+    rows: [{
+      id: 'thesis',
+      name: 'Thesis and Supporting Points',
+      desc: 'Thesis clarity and supporting strength',
+      levels: ['The thesis is unclear, with minimal supporting points.', 'The thesis is somewhat clear but lacks strong, relevant supporting points.', 'The thesis is clear and supported by well-chosen points that strengthen the analysis.', 'The thesis is well-developed, with diverse, well-structured points that offer a thorough, insightful analysis.']
+    }, {
+      id: 'evidence',
+      name: 'Evidence and Analysis',
+      desc: 'Relevance and depth of evidence',
+      levels: ['No evidence or analysis is provided, or it is irrelevant.', 'Some evidence is provided, but it is weak or lacks clear analysis.', 'Relevant evidence is provided with thoughtful analysis that explains its connection to the thesis.', 'Evidence is varied, highly relevant, and supported by in-depth analysis, enhancing the overall strength of the thesis.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'analang',
+      name: 'Analytical Language',
+      desc: 'Use of analytical language',
+      levels: ['Language is unclear or lacks analytical quality.', 'Analytical language is minimal or inconsistent.', 'Analytical language is present and contributes to clarity and engagement.', 'Language is precise, analytical, and enhances the depth of the argument, making the analysis engaging and convincing.']
+    }, {
+      id: 'objective',
+      name: 'Objective Tone and Clarity',
+      desc: 'Maintaining objectivity',
+      levels: ['Tone is inappropriate or biased, affecting credibility.', 'Tone is somewhat appropriate but lacks full objectivity or formality.', 'Tone is appropriate, maintaining clarity and objectivity.', 'Tone is professional, highly objective, and adds credibility, making the analysis more persuasive.']
+    }]
+  }].concat(PRESENTATION_SHARED_TAIL)
+};
+
+/* EXPOSITORY PRESENTATION \u2014 Level 8 Unit 4 */
+var EXPOSITORY_PRESENTATION_RUBRIC = {
+  name: 'Expository Presentation Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [SLIDE_ORG_ROW, {
+      id: 'intro',
+      name: 'Introduction (Slides 1-3)',
+      desc: 'Hook, background, main idea',
+      levels: ['Introduction lacks a hook, background information, or a clear main idea.', 'Introduction is weak, with a vague hook or insufficient background information; the main idea is somewhat clear.', 'Introduction includes a clear hook, relevant background information, and a main idea that is clearly explained.', 'Introduction is engaging, with a strong hook, rich background information, and a central theme that effectively sets the tone.']
+    }]
+  }, {
+    name: 'Content',
+    rows: [{
+      id: 'mainidea',
+      name: 'Main Idea and Supporting Details',
+      desc: 'Depth of main idea development',
+      levels: ['The main idea is unclear, with minimal supporting details.', 'The main idea is somewhat clear, but supporting details lack depth or relevance.', 'The main idea is clear and supported by relevant details.', 'The main idea is well-developed, with strong and varied supporting details that enhance understanding.']
+    }, {
+      id: 'analysis',
+      name: 'Explanations and Analysis',
+      desc: 'Quality of explanations and analysis',
+      levels: ['No explanations or analysis are provided, or they are irrelevant.', 'Explanations and analysis are minimal and do not fully clarify the main idea.', 'Explanations and analysis are relevant and add clarity to the main idea.', 'Explanations and analysis are thorough, insightful, and deepen the audience\'s understanding of the topic.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'language',
+      name: 'Language',
+      desc: 'Clarity and precision of language',
+      levels: ['Language is unclear or overly complex, making the content difficult to understand.', 'Language is somewhat clear but may be overly simple or complex in places.', 'Language is clear and accessible, effectively conveying the information.', 'Language is precise, clear, and highly informative, making the presentation engaging and easy to follow.']
+    }, {
+      id: 'tone',
+      name: 'Tone and Appeal',
+      desc: 'Tone appropriateness and objectivity',
+      levels: ['Tone is inappropriate or overly biased, affecting credibility.', 'Tone is somewhat appropriate but may show slight bias or lack formality.', 'Tone is appropriate, and the presentation remains objective.', 'Tone is well-suited to the topic and audience, and objectivity is maintained throughout, enhancing credibility.']
+    }]
+  }].concat(PRESENTATION_SHARED_TAIL)
+};
+
+/* ADVANCED PERSUASIVE PRESENTATION \u2014 Level 10 Unit 4 */
+var ADV_PERSUASIVE_PRESENTATION_RUBRIC = {
+  name: 'Advanced Persuasive Presentation Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [SLIDE_ORG_ROW, {
+      id: 'intro',
+      name: 'Introduction (Slides 1-3)',
+      desc: 'Hook and stance establishment',
+      levels: ['Introduction lacks a compelling hook, clear stance, or relevance to the audience.', 'Introduction includes a stance but lacks a compelling hook or full relevance to the audience.', 'Introduction includes a clear stance with a relevant hook, setting up the argument effectively.', 'Introduction is highly engaging, with a powerful hook, clear stance, and a compelling connection to the audience\'s interests or concerns.']
+    }]
+  }, {
+    name: 'Content',
+    rows: [{
+      id: 'argument',
+      name: 'Argument and Supporting Points',
+      desc: 'Strength and relevance of supporting points',
+      levels: ['The argument is unclear, with weak or irrelevant supporting points.', 'The argument is somewhat clear, but supporting points lack strength or relevance.', 'The argument is clear and supported by strong, relevant points.', 'The argument is highly persuasive, with a well-developed stance and robust, varied supporting points that deepen the impact.']
+    }, {
+      id: 'evidence',
+      name: 'Evidence and Reasoning',
+      desc: 'Quality of evidence and reasoning',
+      levels: ['No evidence is provided, or it is irrelevant.', 'Some evidence is provided, but it is weak or lacks clear reasoning.', 'Relevant evidence and reasoning are provided, supporting the argument effectively.', 'Evidence is strong, highly relevant, and paired with sophisticated reasoning, adding significant depth to the argument.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'rhetoric',
+      name: 'Persuasive Language and Rhetoric',
+      desc: 'Rhetorical sophistication',
+      levels: ['Language lacks persuasiveness and is ineffective.', 'Persuasive language is minimal or inconsistent.', 'Persuasive language is present and adds clarity to the argument.', 'Language is highly persuasive, with sophisticated rhetorical techniques that fully engage and convince the audience.']
+    }, {
+      id: 'appeal',
+      name: 'Audience Appeal and Tone',
+      desc: 'Audience-appropriate appeals',
+      levels: ['Tone is inappropriate or fails to appeal to the audience.', 'Tone is somewhat appropriate but lacks full appeal to the audience.', 'Tone is suitable and effectively appeals to the audience\'s logic or emotion.', 'Tone is perfectly suited to the audience, with well-crafted appeals to logic, emotion, or ethics, making the argument compelling and relatable.']
+    }]
+  }].concat(PRESENTATION_SHARED_TAIL)
+};
+
+/* RESEARCH PRESENTATION \u2014 Level 11 Unit 4 */
+var RESEARCH_PRESENTATION_RUBRIC = {
+  name: 'Research Presentation Rubric',
+  maxPerRow: 6,
+  categories: [{
+    name: 'Structure',
+    rows: [SLIDE_ORG_ROW, {
+      id: 'intro',
+      name: 'Introduction (Slides 1-3)',
+      desc: 'Research question, thesis, background',
+      levels: ['Introduction lacks a research question, thesis statement, or background; central focus is unclear.', 'Introduction includes a thesis but lacks a strong research question or full background information.', 'Introduction includes a clear research question, thesis, and relevant background information, establishing a strong research focus.', 'Introduction is highly engaging, with a compelling research question, thesis, and thorough background, effectively setting up the research context.']
+    }]
+  }, {
+    name: 'Content',
+    rows: [{
+      id: 'evidence',
+      name: 'Evidence, Data, and Analysis',
+      desc: 'Depth of evidence and analysis',
+      levels: ['No evidence or data is provided, or it is irrelevant.', 'Some evidence or data is provided but lacks depth or clear analysis.', 'Relevant evidence and data are provided with thoughtful analysis that supports the thesis.', 'Evidence and data are thorough, varied, and supported by in-depth analysis, offering strong support for the thesis and insights into the research topic.']
+    }, {
+      id: 'conclusion',
+      name: 'Conclusion and Implications (Slides 7-8)',
+      desc: 'Strength of conclusions and implications',
+      levels: ['No clear conclusion or implications are presented.', 'Conclusion is present but lacks clarity or relevance; implications are weak.', 'Conclusion is clear, with relevant implications that summarize the research effectively.', 'Conclusion is strong and thought-provoking, with significant implications and insights that deepen the research impact.']
+    }]
+  }, {
+    name: 'Style',
+    rows: [{
+      id: 'academic',
+      name: 'Academic Language and Precision',
+      desc: 'Academic language quality',
+      levels: ['Language is unclear or lacks academic quality.', 'Academic language is minimal or inconsistent.', 'Academic language is present, adding clarity to the presentation.', 'Language is highly precise, formal, and professional, enhancing the research\'s credibility.']
+    }, {
+      id: 'objective',
+      name: 'Objectivity and Tone',
+      desc: 'Maintaining objective tone',
+      levels: ['Tone is inappropriate, biased, or unprofessional.', 'Tone is somewhat appropriate but lacks full objectivity.', 'Tone is appropriate and maintains objectivity.', 'Tone is highly professional, objective, and adds significant credibility to the presentation.']
+    }]
+  }].concat(PRESENTATION_SHARED_TAIL)
+};
+
+/* ============================================================
+   LEVEL_RUBRICS \u2014 the master lookup
+   Key: [level][unit] -> rubric object
+   ============================================================ */
+var LEVEL_RUBRICS = {
+  'K': {
+    1: DESCRIPTIVE_PARA_RUBRIC,
+    2: DESCRIPTIVE_PARA_RUBRIC,
+    3: DESCRIPTIVE_PARA_RUBRIC,
+    4: NARRATIVE_PRESENTATION_RUBRIC
+  },
+  '1': {
+    1: DESCRIPTIVE_PARA_RUBRIC,
+    2: DESCRIPTIVE_PARA_RUBRIC,
+    3: DESCRIPTIVE_PARA_RUBRIC,
+    4: NARRATIVE_PRESENTATION_RUBRIC
+  },
+  '2': {
+    1: DESCRIPTIVE_PARA_RUBRIC,
+    2: DESCRIPTIVE_PARA_RUBRIC,
+    3: DESCRIPTIVE_PARA_RUBRIC,
+    4: NARRATIVE_PRESENTATION_RUBRIC
+  },
+  '3': {
+    1: PERSUASIVE_PARA_RUBRIC,
+    2: PERSUASIVE_PARA_RUBRIC,
+    3: PERSUASIVE_PARA_RUBRIC,
+    // comparative \u2014 same shape
+    4: PERSUASIVE_PRESENTATION_RUBRIC
+  },
+  '4': {
+    1: DESCRIPTIVE_PARA_RUBRIC,
+    2: DESCRIPTIVE_PARA_RUBRIC,
+    3: DESCRIPTIVE_PARA_RUBRIC,
+    // narrative \u2014 same shape per source
+    4: NARRATIVE_PRESENTATION_RUBRIC
+  },
+  '5': {
+    1: EXPOSITORY_PARA_RUBRIC,
+    2: EXPOSITORY_PARA_RUBRIC,
+    3: ANALYTICAL_PARA_RUBRIC,
+    4: ANALYTICAL_PRESENTATION_RUBRIC
+  },
+  '6': {
+    1: PERSUASIVE_ESSAY_RUBRIC,
+    2: PERSUASIVE_ESSAY_RUBRIC,
+    3: PERSUASIVE_ESSAY_RUBRIC,
+    4: PERSUASIVE_PRESENTATION_RUBRIC
+  },
+  '7': {
+    1: DESCRIPTIVE_ESSAY_RUBRIC,
+    2: DESCRIPTIVE_ESSAY_RUBRIC,
+    3: DESCRIPTIVE_ESSAY_RUBRIC,
+    4: DESCRIPTIVE_PRESENTATION_RUBRIC
+  },
+  '8': {
+    1: EXPOSITORY_ESSAY_RUBRIC,
+    2: EXPOSITORY_ESSAY_RUBRIC,
+    3: EXPOSITORY_ESSAY_RUBRIC,
+    4: EXPOSITORY_PRESENTATION_RUBRIC
+  },
+  '9': {
+    1: NARRATIVE_ESSAY_RUBRIC,
+    2: NARRATIVE_ESSAY_RUBRIC,
+    3: NARRATIVE_ESSAY_RUBRIC,
+    4: NARRATIVE_PRESENTATION_RUBRIC
+  },
+  '10': {
+    1: ADVANCED_PERSUASIVE_RUBRIC,
+    2: ADVANCED_PERSUASIVE_RUBRIC,
+    3: ADVANCED_PERSUASIVE_RUBRIC,
+    4: ADV_PERSUASIVE_PRESENTATION_RUBRIC
+  },
+  '11': {
+    1: RESEARCH_ESSAY_RUBRIC,
+    2: RESEARCH_ESSAY_RUBRIC,
+    3: RESEARCH_ESSAY_RUBRIC,
+    4: RESEARCH_PRESENTATION_RUBRIC
+  },
+  '12': {
+    1: ANALYTICAL_ESSAY_RUBRIC,
+    2: ANALYTICAL_ESSAY_RUBRIC,
+    3: ANALYTICAL_ESSAY_RUBRIC,
+    4: ANALYTICAL_PRESENTATION_RUBRIC
+  },
+  '13': {
+    1: ANALYTICAL_ESSAY_RUBRIC,
+    2: ANALYTICAL_ESSAY_RUBRIC,
+    3: ANALYTICAL_ESSAY_RUBRIC,
+    4: ANALYTICAL_PRESENTATION_RUBRIC
+  }
+};
+
+/* Helper: get the current rubric */
+function getCurrentRubric() {
+  var lvl = LEVEL_RUBRICS[state.level];
+  if (!lvl) return null;
+  return lvl[state.unitNum] || null;
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var state = {
+  docType: 'unit',
+  level: '4',
+  unitNum: 1,
+  scores: {},
+  // example shape: { topic: 6, support: 4, etc }
+  unitGrades: {
+    1: '',
+    2: '',
+    3: '',
+    4: ''
+  },
+  // for level completion
+  unitTitles: {}
+};
+
+/* ============================================================
+   INIT \u2014 populate writing focus dropdown
+   ============================================================ */
+function populateWritingType() {
+  var sel = document.getElementById('writingType');
+  sel.innerHTML = '';
+  CURRICULUM.levels.forEach(function (l) {
+    var opt = document.createElement('option');
+    opt.value = l.level;
+    opt.textContent = "Level " + l.level + " \xB7 " + l.writing;
+    sel.appendChild(opt);
+  });
+  sel.value = '4'; // default
+}
+
+/* ============================================================
+   RUBRIC RENDERING (form side)
+   ============================================================ */
+function renderRubricForm() {
+  var wrap = document.getElementById('rubricGradingArea');
+  var rubric = getCurrentRubric();
+  if (!rubric) {
+    wrap.innerHTML = '<div style="color:var(--mist);font-style:italic;font-size:12px;padding:12px;">Rubric not yet defined for this level/unit.</div>';
+    return;
+  }
+  var html = "<div style=\"font-size:11px;color:var(--gold-deep);background:var(--gold-pale);padding:8px 12px;border-radius:6px;margin-bottom:14px;letter-spacing:0.04em;font-weight:500;\">Using: " + rubric.name + " (Max " + rubric.categories.reduce(function (a, c) {
+    return a + c.rows.length * rubric.maxPerRow;
+  }, 0) + " pts)</div>";
+  rubric.categories.forEach(function (cat) {
+    html += "<div class=\"rubric-category\">" + cat.name + "</div>";
+    cat.rows.forEach(function (row) {
+      var _state$scores$row$id;
+      var current = (_state$scores$row$id = state.scores[row.id]) != null ? _state$scores$row$id : null;
+      html += "\n        <div class=\"rubric-row\">\n          <div class=\"rubric-name\">\n            " + row.name + "\n            <span class=\"rubric-desc\">" + row.desc + "</span>\n          </div>\n          <div class=\"score-pills\" data-row=\"" + row.id + "\">\n            " + [0, 1, 2, 3, 4, 5, 6].map(function (pt) {
+        return "\n              <button class=\"score-pill " + (current === pt ? 'active' : '') + " " + (pt % 2 === 1 ? 'odd' : '') + "\" data-pt=\"" + pt + "\">" + pt + "</button>\n            ";
+      }).join('') + "\n          </div>\n        </div>\n      ";
+    });
+  });
+  wrap.innerHTML = html;
+
+  // wire score buttons
+  wrap.querySelectorAll('.score-pills').forEach(function (group) {
+    var rowId = group.dataset.row;
+    group.querySelectorAll('.score-pill').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var pt = parseInt(btn.dataset.pt, 10);
+        state.scores[rowId] = pt;
+        renderRubricForm();
+        updatePreview();
+      });
+    });
+  });
+  updateTotal();
+}
+function updateTotal() {
+  var rubric = getCurrentRubric();
+  if (!rubric) return;
+  var total = 0,
+    max = 0;
+  rubric.categories.forEach(function (cat) {
+    return cat.rows.forEach(function (row) {
+      max += rubric.maxPerRow;
+      if (state.scores[row.id] != null) total += state.scores[row.id];
+    });
+  });
+  var pct = max ? Math.round(total / max * 100) : 0;
+  document.getElementById('totalScore').textContent = total + "/" + max;
+  document.getElementById('totalPercent').textContent = pct + "%";
+}
+
+/* ============================================================
+   LEVEL COMPLETION \u2014 unit grades input
+   ============================================================ */
+function renderLevelUnits() {
+  var wrap = document.getElementById('levelUnitsArea');
+  if (!wrap) return;
+  var html = '<div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6;">Enter the project title and final grade for each of the four units in this level. These will appear on the Level Completion certificate.</div>';
+  [1, 2, 3, 4].forEach(function (n) {
+    var grade = state.unitGrades[n] || '';
+    var title = state.unitTitles[n] || '';
+    html += "\n      <div class=\"field\" style=\"margin-bottom:12px;\">\n        <label>Unit " + n + "</label>\n        <div style=\"display:grid;grid-template-columns:2fr 1fr;gap:10px;\">\n          <input type=\"text\" data-unit-title=\"" + n + "\" value=\"" + escapeAttr(title) + "\" placeholder=\"Project title (e.g. My Perfect Day)\">\n          <input type=\"text\" data-unit-grade=\"" + n + "\" value=\"" + escapeAttr(grade) + "\" placeholder=\"e.g. 86%\">\n        </div>\n      </div>\n    ";
+  });
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('[data-unit-grade]').forEach(function (inp) {
+    inp.addEventListener('input', function () {
+      state.unitGrades[inp.dataset.unitGrade] = inp.value;
+      updatePreview();
+    });
+  });
+  wrap.querySelectorAll('[data-unit-title]').forEach(function (inp) {
+    inp.addEventListener('input', function () {
+      state.unitTitles[inp.dataset.unitTitle] = inp.value;
+      updatePreview();
+    });
+  });
+}
+function escapeAttr(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+/* ============================================================
+   PREVIEW RENDERING
+   ============================================================ */
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function formatProjectBody(text) {
+  if (!text) return '<p style="color:var(--mist);font-style:italic;">Paste the student\'s project on the left to see it formatted here.</p>';
+  var paras = text.trim().split(/\n\s*\n/);
+  return paras.map(function (p) {
+    return "<p>" + escapeHtml(p).replace(/\n/g, '<br>') + "</p>";
+  }).join('');
+}
+function renderPreview() {
+  var studentName = document.getElementById('studentName').value || 'Student Name';
+  var teacherName = document.getElementById('teacherName').value || 'Teacher';
+  var projectTitle = document.getElementById('projectTitle').value || 'Project Title';
+  var completionDate = document.getElementById('completionDate').value || formatToday();
+  var projectText = document.getElementById('projectText').value;
+  var teacherComments = document.getElementById('teacherComments').value;
+  var levelData = CURRICULUM.levels.find(function (l) {
+    return l.level === state.level;
+  });
+  var levelLabel = levelData ? "Harland Level " + levelData.level : 'Harland';
+  var writingFocus = levelData ? levelData.writing : '';
+  if (state.docType === 'unit') {
+    renderUnitCompletion({
+      studentName: studentName,
+      teacherName: teacherName,
+      projectTitle: projectTitle,
+      completionDate: completionDate,
+      projectText: projectText,
+      teacherComments: teacherComments,
+      levelLabel: levelLabel,
+      writingFocus: writingFocus,
+      levelData: levelData
+    });
+  } else {
+    renderLevelCompletion({
+      studentName: studentName,
+      teacherName: teacherName,
+      completionDate: completionDate,
+      teacherComments: teacherComments,
+      levelLabel: levelLabel,
+      writingFocus: writingFocus,
+      levelData: levelData
+    });
+  }
+}
+function formatToday() {
+  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var d = new Date();
+  return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
+}
+function renderUnitCompletion(ctx) {
+  var studentName = ctx.studentName,
+    teacherName = ctx.teacherName,
+    projectTitle = ctx.projectTitle,
+    completionDate = ctx.completionDate,
+    projectText = ctx.projectText,
+    teacherComments = ctx.teacherComments,
+    levelLabel = ctx.levelLabel,
+    writingFocus = ctx.writingFocus,
+    levelData = ctx.levelData;
+  var rubric = getCurrentRubric();
+
+  // total
+  var total = 0,
+    max = 0;
+  if (rubric) rubric.categories.forEach(function (cat) {
+    return cat.rows.forEach(function (row) {
+      max += rubric.maxPerRow;
+      if (state.scores[row.id] != null) total += state.scores[row.id];
+    });
+  });
+  var pct = max ? Math.round(total / max * 100) : 0;
+  var html = '';
+
+  // ============ PAGE 1: COVER ============
+  html += "\n    <div class=\"page cover-page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Unit Completion \xB7 Confidential</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"cover-top\">\n          <div class=\"cover-stamp\"><span class=\"dot\"></span> Unit " + state.unitNum + " Completion</div>\n          <div class=\"cover-meta\">" + completionDate + "</div>\n          <div class=\"cover-level\">" + levelLabel + " \xB7 " + writingFocus + "</div>\n          <div class=\"cover-unit-tag\">Unit " + state.unitNum + "</div>\n        </div>\n\n        <div class=\"cover-title-wrap\">\n          <div class=\"cover-eyebrow\">Writing Project</div>\n          <div class=\"cover-title\">" + escapeHtml(projectTitle) + "</div>\n          <div class=\"cover-divider\"></div>\n          <div class=\"cover-summary\">\n            A writing project completed by " + escapeHtml(studentName) + " as part of " + escapeHtml(writingFocus) + " at Harland.\n          </div>\n        </div>\n\n        <div class=\"cover-footer\">\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Written by</div>\n            <div class=\"value\">" + escapeHtml(studentName) + "</div>\n            <div class=\"value-sub\">Student</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Graded by</div>\n            <div class=\"value\">" + escapeHtml(teacherName) + "</div>\n            <div class=\"value-sub\">Head Teacher</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Final grade</div>\n            <div class=\"value\">" + total + "/" + max + "</div>\n            <div class=\"value-sub\">" + pct + "% \xB7 " + gradeBand(pct) + "</div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>www.harland.com.tw<span class=\"gold-dot\"></span>Achieve Excellence</span>\n      </div>\n    </div>\n  ";
+
+  // ============ PAGE 2: PROJECT TEXT ============
+  html += "\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">" + escapeHtml(projectTitle) + " \xB7 Unit " + state.unitNum + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Writing Project</div>\n        <div class=\"doc-section-title\">" + escapeHtml(projectTitle) + "</div>\n\n        <div class=\"student-byline\">\n          <span class=\"by-label\">Written by</span>\n          <span class=\"by-name\">" + escapeHtml(studentName) + "</span>\n          <span class=\"by-meta\">" + levelLabel + " \xB7 Unit " + state.unitNum + "</span>\n        </div>\n\n        <div class=\"project-body\">\n          " + formatProjectBody(projectText) + "\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Page 2 of 4<span class=\"gold-dot\"></span>Confidential</span>\n      </div>\n    </div>\n  ";
+
+  // ============ PAGE 3: RUBRIC + COMMENTS ============
+  var rubricHtml = '';
+  if (rubric) {
+    rubric.categories.forEach(function (cat) {
+      rubricHtml += "<div class=\"rubric-doc-group\">\n        <div class=\"rubric-doc-cat\">" + cat.name + "</div>\n        <table class=\"rubric-table\">\n          <thead>\n            <tr>\n              <th>Criterion</th>\n              <th>0 Points</th>\n              <th>2 Points</th>\n              <th>4 Points</th>\n              <th>6 Points</th>\n            </tr>\n          </thead>\n          <tbody>";
+      cat.rows.forEach(function (row) {
+        var sel = state.scores[row.id];
+        rubricHtml += "<tr>\n          <td class=\"row-label\">" + row.name + "</td>";
+        [0, 2, 4, 6].forEach(function (pt, i) {
+          var cls = '';
+          if (sel != null) {
+            if (sel === pt) {
+              // Exact even-value match \u2014 single strong highlight
+              cls = 'selected';
+            } else if (sel % 2 === 1) {
+              // Odd value \u2014 highlight the two adjacent columns (e.g. 5 \u2192 highlight 4 AND 6)
+              if (pt === sel - 1 || pt === sel + 1) cls = 'between';
+            }
+          }
+          rubricHtml += "<td class=\"score-cell " + cls + "\"><span class=\"pt\">" + pt + " pts</span>" + row.levels[i] + "</td>";
+        });
+        rubricHtml += "</tr>";
+      });
+      rubricHtml += "</tbody></table></div>";
+    });
+  }
+  html += "\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Assessment \xB7 " + escapeHtml(projectTitle) + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Assessment</div>\n        <div class=\"doc-section-title\">" + escapeHtml(rubric ? rubric.name : 'Rubric') + "</div>\n\n        <div class=\"rubric-doc\">\n          " + rubricHtml + "\n        </div>\n\n        <div class=\"grade-summary\">\n          <span class=\"g-label\">Final Grade</span>\n          <span><span class=\"g-value\">" + total + "/" + max + "</span><span class=\"g-percent\">" + pct + "%</span></span>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Page 3 of 4<span class=\"gold-dot\"></span>Assessment</span>\n      </div>\n    </div>\n\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Teacher Feedback \xB7 " + escapeHtml(projectTitle) + "</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Teacher Feedback</div>\n        <div class=\"doc-section-title\">Comments &amp; Reflections</div>\n\n        <div class=\"student-byline\">\n          <span class=\"by-label\">Written for</span>\n          <span class=\"by-name\">" + escapeHtml(studentName) + "</span>\n          <span class=\"by-meta\">" + levelLabel + " \xB7 Unit " + state.unitNum + "</span>\n        </div>\n\n        <div class=\"teacher-comments-block teacher-comments-large\">\n          <div class=\"tc-label\">Teacher Comments</div>\n          <div class=\"tc-teacher\">From " + escapeHtml(teacherName) + ", Head Teacher</div>\n          <div class=\"tc-body\">" + formatTeacherComment(teacherComments) + "</div>\n        </div>\n\n        <div class=\"signature-block\">\n          <div class=\"signature-line\">\n            <div class=\"sig-label\">Teacher's Signature</div>\n            <div class=\"sig-rule\"></div>\n            <div class=\"sig-sub\">" + escapeHtml(teacherName) + " \xB7 " + completionDate + "</div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>Page 4 of 4<span class=\"gold-dot\"></span>www.harland.com.tw</span>\n      </div>\n    </div>\n  ";
+  document.getElementById('documentPreview').innerHTML = html;
+}
+function formatTeacherComment(text) {
+  if (!text) return '<span style="color:var(--mist);">No comment provided.</span>';
+  return escapeHtml(text).split(/\n\s*\n/).map(function (p) {
+    return "<p style=\"margin-bottom:10px;\">" + p.replace(/\n/g, '<br>') + "</p>";
+  }).join('');
+}
+function gradeBand(pct) {
+  if (pct >= 90) return 'Excellent';
+  if (pct >= 80) return 'Strong';
+  if (pct >= 70) return 'Developing';
+  if (pct >= 60) return 'Emerging';
+  return 'Needs work';
+}
+function renderLevelCompletion(ctx) {
+  var studentName = ctx.studentName,
+    teacherName = ctx.teacherName,
+    completionDate = ctx.completionDate,
+    teacherComments = ctx.teacherComments,
+    levelLabel = ctx.levelLabel,
+    writingFocus = ctx.writingFocus,
+    levelData = ctx.levelData;
+
+  // compute overall avg from unit grade inputs
+  var gradeNums = [1, 2, 3, 4].map(function (n) {
+    var g = (state.unitGrades[n] || '').match(/(\d+(?:\.\d+)?)/);
+    return g ? parseFloat(g[1]) : null;
+  }).filter(function (n) {
+    return n != null;
+  });
+  var avg = gradeNums.length ? Math.round(gradeNums.reduce(function (a, b) {
+    return a + b;
+  }, 0) / gradeNums.length) : null;
+  var html = '';
+
+  // COVER
+  html += "\n    <div class=\"page cover-page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">Level Completion \xB7 Confidential</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"cover-top\">\n          <div class=\"cover-stamp\"><span class=\"dot\"></span> Level " + (levelData ? levelData.level : '') + " Completion</div>\n          <div class=\"cover-meta\">" + completionDate + "</div>\n          <div class=\"cover-level\">" + levelLabel + "</div>\n          <div class=\"cover-unit-tag\">" + escapeHtml(writingFocus) + "</div>\n        </div>\n\n        <div class=\"cover-title-wrap\">\n          <div class=\"cover-eyebrow\">Certificate of Completion</div>\n          <div class=\"cover-title\">" + escapeHtml(studentName) + "</div>\n          <div class=\"cover-divider\"></div>\n          <div class=\"cover-summary\">\n            has successfully completed all four units of " + escapeHtml(writingFocus) + " at " + levelLabel + ", demonstrating sustained effort and clear growth as a writer.\n          </div>\n        </div>\n\n        <div class=\"cover-footer\">\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Awarded to</div>\n            <div class=\"value\">" + escapeHtml(studentName) + "</div>\n            <div class=\"value-sub\">Student</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Awarded by</div>\n            <div class=\"value\">" + escapeHtml(teacherName) + "</div>\n            <div class=\"value-sub\">Head Teacher</div>\n          </div>\n          <div class=\"cover-footer-block\">\n            <div class=\"label\">Overall</div>\n            <div class=\"value\">" + (avg != null ? avg + '%' : '-') + "</div>\n            <div class=\"value-sub\">" + (avg != null ? gradeBand(avg) : 'Pending') + "</div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>www.harland.com.tw<span class=\"gold-dot\"></span>Achieve Excellence</span>\n      </div>\n    </div>\n  ";
+
+  // SUMMARY PAGE \u2014 units arc + comments
+  var unitListHtml = '';
+  [1, 2, 3, 4].forEach(function (n) {
+    var grade = state.unitGrades[n] || '';
+    var projectName = state.unitTitles[n] || '';
+    unitListHtml += "\n      <div class=\"unit-list-item\">\n        <div class=\"unit-num\">" + n + "</div>\n        <div class=\"unit-text\">\n          <div class=\"unit-title\">Unit " + n + "</div>\n          <div class=\"unit-sub\">" + (projectName ? 'Project: ' + escapeHtml(projectName) : '-') + "</div>\n        </div>\n        <div class=\"unit-grade\">" + (escapeHtml(grade) || '-') + "</div>\n      </div>\n    ";
+  });
+  html += "\n    <div class=\"page\">\n      <div class=\"gold-strip\"></div>\n      <div class=\"page-header\">\n        <div class=\"h-mark\">\n          <div class=\"h-circle\">H</div>\n          <div class=\"h-wordmark\">HARLAND</div>\n        </div>\n        <div class=\"h-meta\">" + levelLabel + " \xB7 Summary</div>\n      </div>\n\n      <div class=\"page-body\">\n        <div class=\"doc-section-label\">Level Summary</div>\n        <div class=\"doc-section-title\">" + escapeHtml(writingFocus) + "</div>\n\n        <div class=\"student-byline\">\n          <span class=\"by-label\">Completed by</span>\n          <span class=\"by-name\">" + escapeHtml(studentName) + "</span>\n          <span class=\"by-meta\">" + completionDate + "</span>\n        </div>\n\n        <div class=\"level-stat-grid\">\n          <div class=\"level-stat\">\n            <div class=\"ls-label\">Units</div>\n            <div class=\"ls-value\">4</div>\n            <div class=\"ls-sub\">All units completed</div>\n          </div>\n          <div class=\"level-stat\">\n            <div class=\"ls-label\">Overall</div>\n            <div class=\"ls-value\">" + (avg != null ? avg + '%' : '-') + "</div>\n            <div class=\"ls-sub\">" + (avg != null ? gradeBand(avg) : 'Pending') + "</div>\n          </div>\n          <div class=\"level-stat\">\n            <div class=\"ls-label\">Next Level</div>\n            <div class=\"ls-value\">Level " + nextLevel(levelData ? levelData.level : '') + "</div>\n            <div class=\"ls-sub\">" + nextLevelFocus(levelData ? levelData.level : '') + "</div>\n          </div>\n        </div>\n\n        <div style=\"font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold-deep);font-weight:500;margin:6px 0 8px;border-bottom:1px solid var(--gold-pale);padding-bottom:6px;\">Unit Grades</div>\n        <div class=\"unit-list\">" + (unitListHtml || '<div style="font-style:italic;color:var(--mist);font-size:11px;padding:20px 0;">No unit data yet.</div>') + "</div>\n\n        <div class=\"teacher-comments-block\">\n          <div class=\"tc-label\">Level Completion Comments</div>\n          <div class=\"tc-teacher\">From " + escapeHtml(teacherName) + ", Head Teacher</div>\n          <div class=\"tc-body\">" + formatTeacherComment(teacherComments) + "</div>\n        </div>\n      </div>\n\n      <div class=\"page-footer\">\n        <span>Harland Education</span>\n        <span>www.harland.com.tw<span class=\"gold-dot\"></span>Confidential</span>\n      </div>\n    </div>\n  ";
+  document.getElementById('documentPreview').innerHTML = html;
+}
+function nextLevel(currentLevel) {
+  if (!currentLevel) return '-';
+  if (currentLevel === 'K') return '1';
+  var n = parseInt(currentLevel, 10);
+  if (isNaN(n) || n >= 13) return '-';
+  return String(n + 1);
+}
+function nextLevelFocus(currentLevel) {
+  var nxt = nextLevel(currentLevel);
+  if (nxt === '-') return 'Programme complete';
+  var found = CURRICULUM.levels.find(function (l) {
+    return l.level === nxt;
+  });
+  return found ? found.writing : '-';
+}
+
+/* ============================================================
+   STATE SYNC
+   ============================================================ */
+function updatePreview() {
+  renderPreview();
+  flashStatus();
+}
+var statusTimer;
+function flashStatus() {
+  var el = document.getElementById('previewStatus');
+  el.textContent = 'Updated';
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(function () {
+    el.textContent = 'Auto-updating';
+  }, 900);
+}
+function syncDocType() {
+  state.docType = document.getElementById('docType').value;
+  var unitField = document.getElementById('unitNumberField');
+  var rubricSec = document.getElementById('rubricSection');
+  var levelSec = document.getElementById('levelUnitsSection');
+  if (state.docType === 'unit') {
+    unitField.style.display = '';
+    rubricSec.style.display = '';
+    levelSec.style.display = 'none';
+  } else {
+    unitField.style.display = 'none';
+    rubricSec.style.display = 'none';
+    levelSec.style.display = '';
+    renderLevelUnits();
+  }
+  updatePreview();
+}
+function syncWritingType() {
+  state.level = document.getElementById('writingType').value;
+  state.scores = {}; // rubric may have completely different criteria
+  renderRubricForm();
+  renderLevelUnits();
+  updatePreview();
+}
+function syncUnit() {
+  state.unitNum = parseInt(document.getElementById('unitNumber').value, 10);
+  state.scores = {}; // unit 4 has a different rubric than units 1-3
+  renderRubricForm();
+  updatePreview();
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function init() {
+  populateWritingType();
+
+  // initial defaults
+  state.level = '4';
+  state.unitNum = 1;
+  // rubric scores start empty
+  state.scores = {};
+
+  // unit grades start empty
+  state.unitGrades = {
+    1: '',
+    2: '',
+    3: '',
+    4: ''
+  };
+  document.getElementById('completionDate').value = formatToday();
+
+  // Set the dropdown values to match the state
+  document.getElementById('writingType').value = state.level;
+  document.getElementById('unitNumber').value = state.unitNum;
+  renderRubricForm();
+  renderLevelUnits();
+  updatePreview();
+
+  // event wiring
+  document.getElementById('docType').addEventListener('change', syncDocType);
+  document.getElementById('writingType').addEventListener('change', syncWritingType);
+  document.getElementById('unitNumber').addEventListener('change', syncUnit);
+  ['studentName', 'teacherName', 'projectTitle', 'completionDate', 'projectText', 'teacherComments'].forEach(function (id) {
+    return document.getElementById(id).addEventListener('input', updatePreview);
+  });
+}
+init();
+
+/* ============================================================
+   AI COMMENT HELPERS
+   ============================================================ */
+function buildRubricSummary() {
+  var rubric = getCurrentRubric();
+  if (!rubric) return 'No rubric scores available.';
+  var lines = [];
+  rubric.categories.forEach(function (cat) {
+    cat.rows.forEach(function (row) {
+      var score = state.scores[row.id];
+      if (score != null) {
+        var max = rubric.maxPerRow;
+        var levelIdx = Math.floor(score / 2);
+        var desc = row.levels[Math.min(levelIdx, row.levels.length - 1)] || '';
+        lines.push("- " + row.name + " (" + score + "/" + max + "): " + desc);
+      }
+    });
+  });
+  return lines.length ? lines.join('\n') : 'No rubric scores entered yet.';
+}
+function buildContextBlock() {
+  var studentName = document.getElementById('studentName').value || 'the student';
+  var levelData = CURRICULUM.levels.find(function (l) {
+    return l.level === state.level;
+  });
+  var levelLabel = levelData ? "Level " + levelData.level + ": " + levelData.writing : 'unknown level';
+  var unitNum = state.unitNum;
+  var projectTitle = document.getElementById('projectTitle').value || '(untitled)';
+  var rubricSummary = buildRubricSummary();
+  return {
+    studentName: studentName,
+    levelLabel: levelLabel,
+    unitNum: unitNum,
+    projectTitle: projectTitle,
+    rubricSummary: rubricSummary
+  };
+}
+function callClaudeForComments(prompt) {
+  return fetch(HARLAND_AI_PROXY, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prompt: prompt
+    })
+  }).then(function (resp) {
+    return resp.json().catch(function () {
+      return {};
+    }).then(function (data) {
+      if (!resp.ok) {
+        throw new Error(data && data.error || 'AI service error ' + resp.status);
+      }
+      return data.text || '';
+    });
+  });
+}
+function parseNumberedList(text) {
+  // Extract 1. / 2. / 3. style items
+  var lines = text.split('\n').map(function (l) {
+    return l.trim();
+  }).filter(Boolean);
+  var items = [];
+  lines.forEach(function (line) {
+    var m = line.match(/^[1-9][0-9]?[.)]\s*(.+)/);
+    if (m) items.push(m[1].trim());
+  });
+  // fallback: split on double newlines
+  if (items.length === 0) {
+    return text.split(/\n\n+/).map(function (s) {
+      return s.trim();
+    }).filter(Boolean).slice(0, 3);
+  }
+  return items.slice(0, 3);
+}
+function renderSuggestions(containerId, items, onUseAll) {
+  var container = document.getElementById(containerId);
+  if (!items.length) {
+    container.innerHTML = '<div class="ai-placeholder">No suggestions generated. Try again.</div>';
+    return;
+  }
+  var html = items.map(function (item, i) {
+    return "\n    <div class=\"ai-suggestion-item\">\n      <div class=\"ai-suggestion-num\">" + (i + 1) + "</div>\n      <div class=\"ai-suggestion-text\">" + escapeHtml(item) + "</div>\n    </div>\n  ";
+  }).join('');
+  // Add "Use all in comment" button
+  html += "<div style=\"margin-top:10px;\">\n    <button class=\"ai-generate-btn\" style=\"font-size:10px;\" onclick=\"" + onUseAll + "\">\n      <span class=\"ai-btn-icon\">\u2193</span> Insert all into comment\n    </button>\n  </div>";
+  container.innerHTML = html;
+}
+function setLoadingState(suggestionsId, btnId, loading) {
+  var btn = document.getElementById(btnId);
+  var sug = document.getElementById(suggestionsId);
+  if (loading) {
+    btn.disabled = true;
+    sug.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>Generating suggestions\u2026</div>';
+  } else {
+    btn.disabled = false;
+  }
+}
+function generateImprove() {
+  setLoadingState('improveSuggestions', 'improveBtn', true);
+  var ctx = buildContextBlock();
+  var prompt = 'You are an experienced EFL writing teacher at Harland Education in Taiwan.\n' + 'A student named ' + ctx.studentName + ' has just completed Unit ' + ctx.unitNum + ' at ' + ctx.levelLabel + '.\n' + 'Project title: "' + ctx.projectTitle + '"\n\n' + 'Rubric scores:\n' + ctx.rubricSummary + '\n\n' + 'Based on these rubric scores and the level content (' + ctx.levelLabel + '), identify exactly 3 specific areas this student needs to work on. Be concrete, kind, and frame each point constructively.\n\n' + 'Respond with a numbered list of exactly 3 items (1. 2. 3.), one concise sentence each, written as if advising the teacher what to highlight to the student. Do not include any preamble or extra commentary.';
+  callClaudeForComments(prompt).then(function (raw) {
+    var items = parseNumberedList(raw);
+    window._improveItems = items;
+    renderSuggestions('improveSuggestions', items, 'insertImproveToComment()');
+  }).catch(function (e) {
+    document.getElementById('improveSuggestions').innerHTML = '<div class="ai-error">' + escapeHtml(e.message) + '</div>';
+  }).then(function () {
+    setLoadingState('improveSuggestions', 'improveBtn', false);
+  });
+}
+function generateStrengths() {
+  setLoadingState('strengthSuggestions', 'strengthBtn', true);
+  var ctx = buildContextBlock();
+  var prompt = 'You are an experienced EFL writing teacher at Harland Education in Taiwan.\n' + 'A student named ' + ctx.studentName + ' has just completed Unit ' + ctx.unitNum + ' at ' + ctx.levelLabel + '.\n' + 'Project title: "' + ctx.projectTitle + '"\n\n' + 'Rubric scores:\n' + ctx.rubricSummary + '\n\n' + 'Based on these rubric scores and the level content (' + ctx.levelLabel + '), identify exactly 3 specific things this student improved or did well. Be warm, specific, and encouraging.\n\n' + 'Respond with a numbered list of exactly 3 items (1. 2. 3.), one concise sentence each, written as if advising the teacher what positive progress to highlight to the student. Do not include any preamble or extra commentary.';
+  callClaudeForComments(prompt).then(function (raw) {
+    var items = parseNumberedList(raw);
+    window._strengthItems = items;
+    renderSuggestions('strengthSuggestions', items, 'insertStrengthsToComment()');
+  }).catch(function (e) {
+    document.getElementById('strengthSuggestions').innerHTML = '<div class="ai-error">' + escapeHtml(e.message) + '</div>';
+  }).then(function () {
+    setLoadingState('strengthSuggestions', 'strengthBtn', false);
+  });
+}
+function insertImproveToComment() {
+  var items = window._improveItems || [];
+  if (!items.length) return;
+  var ta = document.getElementById('teacherComments');
+  var existing = ta.value.trim();
+  var addition = 'Areas to work on:\n' + items.map(function (t, i) {
+    return i + 1 + ". " + t;
+  }).join('\n');
+  ta.value = existing ? existing + '\n\n' + addition : addition;
+  updatePreview();
+}
+function insertStrengthsToComment() {
+  var items = window._strengthItems || [];
+  if (!items.length) return;
+  var ta = document.getElementById('teacherComments');
+  var existing = ta.value.trim();
+  var addition = 'What improved:\n' + items.map(function (t, i) {
+    return i + 1 + ". " + t;
+  }).join('\n');
+  ta.value = existing ? existing + '\n\n' + addition : addition;
+  updatePreview();
+}
+
+</script>
+
+</body>
+</html>
