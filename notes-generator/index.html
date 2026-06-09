@@ -201,6 +201,14 @@ pre.out{
 .first-row input[type=checkbox]{width:15px; height:15px; accent-color:var(--obsidian);}
 .first-row span{font-size:13px; color:var(--ink);}
 .line-dot{width:7px; height:7px; border-radius:50%; background:#06C755; display:inline-block;}
+.ai-status{ font-size:12px; color:var(--stone); line-height:1.4; }
+.ai-status.err{ color:#B23A2E; }
+.ai-status.ok{ color:var(--gold-deep); }
+.ai-panel{ margin-top:12px; border:1px solid var(--gold-wash); background:rgba(201,168,76,0.06); border-radius:10px; padding:12px 14px; }
+.ai-sug-h{ font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold-deep); font-weight:700; margin-bottom:4px; }
+.ai-sug{ font-size:13px; color:var(--ink); padding:5px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+.ai-sug:last-child{ border-bottom:none; }
+.ai-ins{ margin-top:8px; }
 </style>
 </head>
 <body>
@@ -218,6 +226,19 @@ pre.out{
     <div class="toolbar">
       <button class="btn btn-gold btn-sm" id="btnNext" type="button">Next student, same lesson &rarr;</button>
       <button class="btn btn-ghost btn-sm" id="btnClear" type="button">Clear all</button>
+    </div>
+
+    <!-- AI: GENERATE FROM CURRICULUM -->
+    <div class="card">
+      <div class="card-h"><div class="num" style="font-size:13px;font-weight:700;letter-spacing:0.04em;">AI</div><h2>Generate from Curriculum</h2></div>
+      <div class="card-b">
+        <label>Paste the lesson content from your curriculum <span class="opt">(AI fills the fields below for you to review)</span></label>
+        <textarea id="fCurriculum" rows="5" placeholder="Paste the curriculum lesson text here, then click Generate fields."></textarea>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-navy btn-sm" id="btnAiCurriculum" type="button">Generate fields with AI</button>
+          <span class="ai-status" id="aiCurriculumStatus"></span>
+        </div>
+      </div>
     </div>
 
     <!-- SETUP -->
@@ -312,6 +333,11 @@ pre.out{
         <div style="margin-top:12px;">
           <button class="btn btn-ghost btn-sm" id="btnAddHw" type="button">+ Add homework item</button>
         </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-navy btn-sm" id="btnAiHw" type="button">Suggest homework + next focus</button>
+          <span class="ai-status" id="aiHwStatus"></span>
+        </div>
+        <div id="aiHwPanel" class="ai-panel" style="display:none;"></div>
         <div class="points-pill" id="pointsPill">This week&rsquo;s possible: 6&#20998;</div>
         <div class="hint">Next lesson&rsquo;s &ldquo;out of&rdquo; should match this number.</div>
       </div>
@@ -352,6 +378,10 @@ pre.out{
           <label>Generated comment <span class="opt">(editable &mdash; edits are kept)</span></label>
           <button class="regen" id="btnRegen" type="button" style="display:none;">&#8635; regenerate</button>
           <textarea id="fPerf" rows="6"></textarea>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-navy btn-sm" id="btnAiPerf" type="button">Polish with AI</button>
+            <span class="ai-status" id="aiPerfStatus"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -378,6 +408,7 @@ pre.out{
         <div>
           <button class="btn btn-navy btn-sm" id="btnCopyApp" type="button">Copy App notes &rarr;</button>
           <button class="btn btn-line btn-sm" id="btnCopyLine" type="button" style="display:none;"><span class="line-dot"></span>&nbsp;Copy LINE notes &rarr;</button>
+          <button class="btn btn-navy btn-sm" id="btnShareLine" type="button" style="display:none;">Share notes &rarr;</button>
         </div>
       </div>
       <div class="pv-body">
@@ -439,6 +470,111 @@ var BULLET = '\u2022';
 var perfDirty = false;
 var contentCount = 0;
 var hwCount = 0;
+
+// ---------- AI (via Harland proxy) ----------
+// Set this to the deployed Netlify proxy URL. The Anthropic key is
+// held server-side; nothing secret lives in this file.
+var HARLAND_AI_PROXY = 'https://harland-proxy.netlify.app/api/claude';
+
+function aiConfigured(){ return HARLAND_AI_PROXY.indexOf('YOUR-NETLIFY-SITE') === -1; }
+
+function callClaude(prompt, onText, onErr){
+  if (!aiConfigured()){ onErr('AI is not set up yet. Add the proxy URL to enable this.'); return; }
+  var settled = false;
+  var timer = setTimeout(function(){
+    if (settled) return;
+    settled = true;
+    onErr('The AI request timed out. Please try again.');
+  }, 30000);
+  function done(fn, arg){ if (settled) return; settled = true; clearTimeout(timer); fn(arg); }
+  fetch(HARLAND_AI_PROXY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: prompt })
+  }).then(function(resp){
+    return resp.json().then(
+      function(data){ return { ok: resp.ok, status: resp.status, data: data }; },
+      function(){ return { ok: resp.ok, status: resp.status, data: {} }; }
+    );
+  }).then(function(r){
+    if (!r.ok){ done(onErr, (r.data && r.data.error) || ('AI service error ' + r.status)); return; }
+    done(onText, (r.data && r.data.text) || '');
+  }, function(e){ done(onErr, (e && e.message) || 'Network error'); });
+}
+
+function extractJson(text){
+  var t = String(text).replace(/\x60{3}json/gi, '').replace(/\x60{3}/g, '');
+  var a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a === -1 || b === -1 || b < a) return null;
+  try { return JSON.parse(t.slice(a, b + 1)); } catch (e) { return null; }
+}
+
+function escapeHtmlNotes(str){
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function setAiStatus(id, msg, kind){
+  var el = $(id);
+  if (!el) return;
+  el.textContent = msg || '';
+  el.className = 'ai-status' + (kind ? ' ' + kind : '');
+}
+
+var CURRICULUM_PROMPT_HEAD =
+  'You are a teaching assistant at Harland Education, a premium tutoring academy in Taipei. A teacher will paste raw lesson content from a curriculum document. Convert it into structured class-notes fields.\n\n'
++ 'Return ONLY a JSON object, with no preamble and no markdown fences, in exactly this shape:\n'
++ '{"topic":"one short line naming the lesson focus","content":[{"heading":"Strand: short topic","acts":"past-tense activity line\\nanother past-tense activity line"}],"worked":"one lowercase phrase naming the main skill practiced","improvements":["optional area to work on next"]}\n\n'
++ 'Rules:\n'
++ '- American spelling (organize, color, analyze).\n'
++ '- No em dashes anywhere. No semicolons.\n'
++ '- 2 to 4 content blocks. Each heading is a noun phrase in the form "Strand: topic", for example "Vocabulary: Colonial America".\n'
++ '- Each activity line starts with a past-tense verb (Evaluated, Practiced, Analyzed, Wrote). One activity per line, 1 to 4 lines per block.\n'
++ '- "topic" is a single line. "worked" is a short lowercase phrase with no trailing period.\n'
++ '- Be concise and concrete. Do not invent student names, scores, or dates.\n\n'
++ 'Example\n'
++ 'Curriculum input:\n'
++ '"Lesson 3.2: Students review tier-two vocabulary related to colonial settlements (settlement, charter, dispute). They then study the structure of an expository paragraph, focusing on writing a clear topic sentence, and draft one topic sentence of their own."\n'
++ 'JSON output:\n'
++ '{"topic":"Colonial settlement vocabulary and expository topic sentences","content":[{"heading":"Vocabulary: Colonial Settlements","acts":"Reviewed tier-two vocabulary: settlement, charter, dispute\\nMatched each term to an example in context"},{"heading":"Writing: Expository Topic Sentences","acts":"Studied the structure of an expository paragraph\\nDrafted an original topic sentence"}],"worked":"writing clear expository topic sentences","improvements":["adding supporting detail after the topic sentence"]}\n\n'
++ 'Now convert this curriculum input:\n"""\n';
+var CURRICULUM_PROMPT_TAIL = '\n"""';
+
+function buildPerfPrompt(s){
+  var v1 = (s.v1 !== '') ? VALUE_PHRASES[parseInt(s.v1, 10)] : '';
+  var v2 = (s.v2 !== '') ? VALUE_PHRASES[parseInt(s.v2, 10)] : '';
+  var imp = [s.imp1, s.imp2].join(', ').replace(/^, |, $/g, '');
+  var p = '';
+  p += 'You are an experienced teacher at Harland Education, a premium tutoring academy in Taipei, writing a short performance comment for a parent-facing class note.\n\n';
+  p += 'Student: ' + (s.name || 'the student') + '\n';
+  p += 'Lesson topic: ' + (s.topic || '(not given)') + '\n';
+  p += 'Main skill practiced: ' + (s.worked || '(not given)') + '\n';
+  if (v1) p += 'Value shown: ' + v1 + (s.ex1 ? ' (example: ' + s.ex1 + ')' : '') + '\n';
+  if (v2) p += 'Another value shown: ' + v2 + (s.ex2 ? ' (example: ' + s.ex2 + ')' : '') + '\n';
+  if (imp) p += 'To work on next: ' + imp + '\n';
+  if (!s.firstLesson && s.score) p += 'Last homework score: ' + s.score + ' out of ' + (s.outOf || '6') + '\n';
+  p += '\nWrite one warm, professional paragraph of 3 to 5 sentences describing what the student did and the value they showed this lesson, then a brief encouraging forward-looking line.\n';
+  p += 'Rules: American spelling. No em dashes. No semicolons. Refer to the student by name in the third person. Be specific and genuine, not generic praise. Do not invent facts beyond those given. Return only the paragraph text, with no preamble.';
+  return p;
+}
+
+function buildHwPrompt(s){
+  var c = '', i;
+  for (i = 0; i < s.content.length; i++){
+    if (s.content[i].heading || s.content[i].acts){
+      c += '- ' + (s.content[i].heading || '') + (s.content[i].acts ? ': ' + s.content[i].acts.replace(/\n/g, '; ') : '') + '\n';
+    }
+  }
+  var imp = [s.imp1, s.imp2].join(', ').replace(/^, |, $/g, '');
+  var p = '';
+  p += 'You are a teacher at Harland Education planning follow-up work after a lesson.\n\n';
+  p += 'Lesson topic: ' + (s.topic || '(not given)') + '\n';
+  p += 'Content covered:\n' + (c || '- (not given)\n');
+  if (imp) p += 'Areas to work on: ' + imp + '\n';
+  p += '\nReturn ONLY a JSON object, with no preamble and no markdown fences, in exactly this shape:\n';
+  p += '{"homework":["short task line","short task line"],"nextFocus":"one short line"}\n';
+  p += 'Rules: American spelling. No em dashes. No semicolons. Provide 1 to 3 homework tasks, each a concise actionable line a tutoring student could do at home. Do not name specific paid platforms unless implied by the content. nextFocus is a single short line.';
+  return p;
+}
 
 // ---------- helpers ----------
 function $(id){ return document.getElementById(id); }
@@ -940,6 +1076,133 @@ function clearAll(){
   window.location.reload();
 }
 
+// ---------- AI feature handlers ----------
+function clearContentRows(){
+  var blocks = document.querySelectorAll('.content-block'), i;
+  for (i = 0; i < blocks.length; i++){ blocks[i].parentNode.removeChild(blocks[i]); }
+  contentCount = 0;
+}
+
+function aiBusy(btnId, busy){
+  var b = $(btnId);
+  if (b) b.disabled = busy;
+}
+
+function aiGenerateFromCurriculum(){
+  var raw = trimv('fCurriculum');
+  if (!raw){ setAiStatus('aiCurriculumStatus', 'Paste some curriculum text first.', 'err'); return; }
+  aiBusy('btnAiCurriculum', true);
+  setAiStatus('aiCurriculumStatus', 'Generating fields...', '');
+  var prompt = CURRICULUM_PROMPT_HEAD + raw + CURRICULUM_PROMPT_TAIL;
+  callClaude(prompt, function(text){
+    var obj = extractJson(text);
+    aiBusy('btnAiCurriculum', false);
+    if (!obj){ setAiStatus('aiCurriculumStatus', 'Could not read the AI response. Try again.', 'err'); return; }
+    if (obj.topic){ $('fTopic').value = obj.topic; }
+    if (obj.content && obj.content.length){
+      clearContentRows();
+      var i;
+      for (i = 0; i < obj.content.length && i < 5; i++){
+        addContentRow(obj.content[i].heading || '', obj.content[i].acts || '');
+      }
+    }
+    if (obj.worked){ $('fWorked').value = obj.worked; $('fWorked').setAttribute('data-touched', '1'); }
+    if (obj.improvements && obj.improvements.length){
+      $('fImp1').value = obj.improvements[0] || '';
+      if (obj.improvements.length > 1) $('fImp2').value = obj.improvements[1] || '';
+    }
+    setAiStatus('aiCurriculumStatus', 'Fields filled. Review and edit below.', 'ok');
+    render();
+  }, function(err){
+    aiBusy('btnAiCurriculum', false);
+    setAiStatus('aiCurriculumStatus', err, 'err');
+  });
+}
+
+function aiPolishPerf(){
+  var s = gather();
+  aiBusy('btnAiPerf', true);
+  setAiStatus('aiPerfStatus', 'Polishing...', '');
+  callClaude(buildPerfPrompt(s), function(text){
+    var out = String(text).replace(/^\s+|\s+$/g, '');
+    aiBusy('btnAiPerf', false);
+    if (out){ $('fPerf').value = out; perfDirty = true; }
+    setAiStatus('aiPerfStatus', out ? 'Updated. Edit freely.' : 'No text returned.', out ? 'ok' : 'err');
+    render();
+  }, function(err){
+    aiBusy('btnAiPerf', false);
+    setAiStatus('aiPerfStatus', err, 'err');
+  });
+}
+
+function aiSuggestHw(){
+  var s = gather();
+  aiBusy('btnAiHw', true);
+  setAiStatus('aiHwStatus', 'Thinking...', '');
+  callClaude(buildHwPrompt(s), function(text){
+    var obj = extractJson(text);
+    aiBusy('btnAiHw', false);
+    if (!obj){ setAiStatus('aiHwStatus', 'Could not read the AI response.', 'err'); return; }
+    window._aiHw = obj.homework || [];
+    window._aiFocus = obj.nextFocus || '';
+    var html = '', i;
+    if (window._aiHw.length){
+      html += '<div class="ai-sug-h">Suggested homework</div>';
+      for (i = 0; i < window._aiHw.length; i++){
+        html += '<div class="ai-sug">' + escapeHtmlNotes(window._aiHw[i]) + '</div>';
+      }
+      html += '<div class="ai-ins"><button class="btn btn-ghost btn-sm" type="button" id="btnInsHw">Add these as homework items</button></div>';
+    }
+    if (window._aiFocus){
+      html += '<div class="ai-sug-h" style="margin-top:10px;">Next-lesson focus</div>';
+      html += '<div class="ai-sug">' + escapeHtmlNotes(window._aiFocus) + '</div>';
+      html += '<div class="ai-ins"><button class="btn btn-ghost btn-sm" type="button" id="btnInsFocus">Use as the next improvement</button></div>';
+    }
+    $('aiHwPanel').innerHTML = html;
+    $('aiHwPanel').style.display = html ? 'block' : 'none';
+    setAiStatus('aiHwStatus', '', '');
+  }, function(err){
+    aiBusy('btnAiHw', false);
+    setAiStatus('aiHwStatus', err, 'err');
+  });
+}
+
+function insertAiHw(){
+  var arr = window._aiHw || [], i;
+  for (i = 0; i < arr.length; i++){
+    if (document.querySelectorAll('.hw-block').length >= 5) break;
+    addHwRow('custom');
+    $('hText' + hwCount).value = arr[i];
+  }
+  render();
+  showToast('Homework added');
+}
+
+function insertAiFocus(){
+  if (window._aiFocus){
+    if (!trimv('fImp1')) $('fImp1').value = window._aiFocus;
+    else $('fImp2').value = window._aiFocus;
+    render();
+    showToast('Added to next week');
+  }
+}
+
+function shareLine(){
+  var text = $('outLine').textContent;
+  if (!text){ showToast('Nothing to share yet'); return; }
+  if (navigator.share){
+    navigator.share({ title: 'Harland class notes', text: text }).then(
+      function(){ showToast('Shared'); },
+      function(err){
+        if (err && err.name === 'AbortError') return;
+        copyText(text);
+      }
+    );
+    return;
+  }
+  copyText(text);
+}
+
 // ---------- init ----------
 function init(){
   buildValuesGrid();
@@ -979,6 +1242,8 @@ function init(){
 
   document.body.addEventListener('click', function(ev){
     var t = ev.target;
+    if (t.id === 'btnInsHw'){ insertAiHw(); return; }
+    if (t.id === 'btnInsFocus'){ insertAiFocus(); return; }
     var v = t.getAttribute('data-v');
     if (v !== null && t.tagName === 'BUTTON'){
       setValueScore(parseInt(v, 10), parseInt(t.getAttribute('data-s'), 10));
@@ -1001,17 +1266,24 @@ function init(){
     $('tabApp').className = 'tab on'; $('tabLine').className = 'tab';
     $('outApp').style.display = 'block'; $('outLine').style.display = 'none';
     $('btnCopyApp').style.display = 'inline-flex'; $('btnCopyLine').style.display = 'none';
+    $('btnShareLine').style.display = 'none';
     $('pvTitle').textContent = 'App / Document format';
   });
   $('tabLine').addEventListener('click', function(){
     $('tabLine').className = 'tab on'; $('tabApp').className = 'tab';
     $('outLine').style.display = 'block'; $('outApp').style.display = 'none';
     $('btnCopyLine').style.display = 'inline-flex'; $('btnCopyApp').style.display = 'none';
+    $('btnShareLine').style.display = 'inline-flex';
     $('pvTitle').textContent = 'LINE message format';
   });
 
   $('btnCopyApp').addEventListener('click', function(){ copyText($('outApp').textContent); });
   $('btnCopyLine').addEventListener('click', function(){ copyText($('outLine').textContent); });
+  $('btnShareLine').addEventListener('click', shareLine);
+
+  $('btnAiCurriculum').addEventListener('click', aiGenerateFromCurriculum);
+  $('btnAiPerf').addEventListener('click', aiPolishPerf);
+  $('btnAiHw').addEventListener('click', aiSuggestHw);
 
   render();
 }
