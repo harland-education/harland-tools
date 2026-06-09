@@ -251,6 +251,8 @@ pre.out{
             <input type="text" id="fSubject" list="subjects" placeholder="Harland English">
             <datalist id="subjects">
               <option value="Harland English"></option>
+              <option value="Harland Academic Coach"></option>
+              <option value="Harland IB Economics"></option>
               <option value="Harland Math"></option>
               <option value="Harland Geometry"></option>
               <option value="Harland Algebra I"></option>
@@ -301,6 +303,8 @@ pre.out{
         <div style="margin-top:12px;">
           <button class="btn btn-ghost btn-sm" id="btnAddContent" type="button">+ Add content block</button>
         </div>
+        <div class="points-pill" id="contentWords">0 / 100 words</div>
+        <div class="hint">Keep class notes to 100 words or fewer. AI stays within this when generating.</div>
       </div>
     </div>
 
@@ -523,19 +527,22 @@ function setAiStatus(id, msg, kind){
 var CURRICULUM_PROMPT_HEAD =
   'You are a teaching assistant at Harland Education, a premium tutoring academy in Taipei. A teacher will paste raw lesson content from a curriculum document. Convert it into structured class-notes fields.\n\n'
 + 'Return ONLY a JSON object, with no preamble and no markdown fences, in exactly this shape:\n'
-+ '{"topic":"one short line naming the lesson focus","content":[{"heading":"Strand: short topic","acts":"past-tense activity line\\nanother past-tense activity line"}],"worked":"one lowercase phrase naming the main skill practiced","improvements":["optional area to work on next"]}\n\n'
++ '{"unit":2,"lesson":11,"topic":"one short line naming the lesson focus","content":[{"heading":"Strand: short topic","acts":"past-tense activity line\\nanother past-tense activity line"}],"worked":"one lowercase phrase naming the main skill practiced","value":"one of Respect, Resilience, Attitude, Adaptability, Diligence","valueExample":"short phrase completing the sentence when they ___","improvements":["optional area to work on next"]}\n\n'
 + 'Rules:\n'
 + '- American spelling (organize, color, analyze).\n'
 + '- No em dashes anywhere. No semicolons.\n'
++ '- If the content references a lesson number written as X.Y (for example 2.11), set unit to X and lesson to Y. So 2.11 means unit 2 and lesson 11. If no such number is present, omit unit and lesson.\n'
 + '- 2 to 4 content blocks. Each heading is a noun phrase in the form "Strand: topic", for example "Vocabulary: Colonial America".\n'
 + '- Each activity line starts with a past-tense verb (Evaluated, Practiced, Analyzed, Wrote). One activity per line, 1 to 4 lines per block.\n'
++ '- Keep the combined content (all headings and activity lines together) to 100 words or fewer. Be concise.\n'
 + '- "topic" is a single line. "worked" is a short lowercase phrase with no trailing period.\n'
-+ '- Be concise and concrete. Do not invent student names, scores, or dates.\n\n'
++ '- "value" is the single Harland value a student is most likely to demonstrate in this lesson. "valueExample" is a short specific phrase completing "when they ___" and must not include the words "when they". Treat value and valueExample as a best attempt for the teacher to review and edit.\n'
++ '- Do not invent student names, scores, or dates.\n\n'
 + 'Example\n'
 + 'Curriculum input:\n'
 + '"Lesson 3.2: Students review tier-two vocabulary related to colonial settlements (settlement, charter, dispute). They then study the structure of an expository paragraph, focusing on writing a clear topic sentence, and draft one topic sentence of their own."\n'
 + 'JSON output:\n'
-+ '{"topic":"Colonial settlement vocabulary and expository topic sentences","content":[{"heading":"Vocabulary: Colonial Settlements","acts":"Reviewed tier-two vocabulary: settlement, charter, dispute\\nMatched each term to an example in context"},{"heading":"Writing: Expository Topic Sentences","acts":"Studied the structure of an expository paragraph\\nDrafted an original topic sentence"}],"worked":"writing clear expository topic sentences","improvements":["adding supporting detail after the topic sentence"]}\n\n'
++ '{"unit":3,"lesson":2,"topic":"Colonial settlement vocabulary and expository topic sentences","content":[{"heading":"Vocabulary: Colonial Settlements","acts":"Reviewed tier-two vocabulary: settlement, charter, dispute\\nMatched each term to an example in context"},{"heading":"Writing: Expository Topic Sentences","acts":"Studied the structure of an expository paragraph\\nDrafted an original topic sentence"}],"worked":"writing clear expository topic sentences","value":"Diligence","valueExample":"carefully revised a topic sentence until it was clear and precise","improvements":["adding supporting detail after the topic sentence"]}\n\n'
 + 'Now convert this curriculum input:\n"""\n';
 var CURRICULUM_PROMPT_TAIL = '\n"""';
 
@@ -851,8 +858,8 @@ function stars(n){
 
 function buildLine(s){
   var out = [];
-  out.push(EMOJI.school + ' ' + headerLine(s));
-  out.push(EMOJI.person + ' ' + s.name);
+  out.push(headerLine(s));
+  out.push(s.name);
   out.push(LINE_DIV);
   out.push(EMOJI.k1 + ' CLASS CONTENT ' + ZH.content);
   var i, j;
@@ -878,7 +885,7 @@ function buildLine(s){
   out.push(EMOJI.k3 + ' HOMEWORK ' + ZH.homework + ' ' + ZH.vip);
   for (i = 0; i < s.hw.length; i++){
     if (!s.hw[i].text) continue;
-    out.push(hwEmoji(s.hw[i].type) + ' ' + s.hw[i].text);
+    out.push(BULLET + ' ' + s.hw[i].text);
     if (s.hw[i].link) out.push(s.hw[i].link);
   }
   out.push(LINE_DIV);
@@ -893,6 +900,33 @@ function buildLine(s){
 }
 
 // ---------- quality checks ----------
+function contentWordCount(s){
+  var txt = '', i;
+  for (i = 0; i < s.content.length; i++){ txt += ' ' + (s.content[i].heading || '') + ' ' + (s.content[i].acts || ''); }
+  txt = txt.replace(/^\s+|\s+$/g, '');
+  if (!txt) return 0;
+  return txt.split(/\s+/).length;
+}
+function valueIndex(name){
+  var n = String(name).replace(/^\s+|\s+$/g, '').toLowerCase(), i;
+  for (i = 0; i < VALUES.length; i++){ if (VALUES[i].en.toLowerCase() === n) return i; }
+  return -1;
+}
+function incompleteItems(){
+  var checks = buildChecks(gather());
+  var fails = [], i;
+  for (i = 0; i < checks.length; i++){ if (!checks[i].ok) fails.push(checks[i].label); }
+  return fails;
+}
+function confirmIfIncomplete(){
+  var fails = incompleteItems();
+  if (!fails.length) return true;
+  var msg = 'These items are still flagged as incomplete:\n\n', i;
+  for (i = 0; i < fails.length; i++){ msg += '- ' + fails[i] + '\n'; }
+  msg += '\nCopy or share the notes anyway?';
+  return window.confirm(msg);
+}
+
 function buildChecks(s){
   var checks = [];
   checks.push({ ok: !!trimv('fName'), label: 'Student name entered' });
@@ -918,6 +952,7 @@ function buildChecks(s){
   checks.push({ ok: (s.v1 !== '' && exOk), label: 'Value demonstrated + specific example' });
   checks.push({ ok: !!s.imp1, label: 'Improvement focus entered' });
   checks.push({ ok: s.firstLesson || !!s.score, label: 'Last homework score entered (or first lesson ticked)' });
+  checks.push({ ok: contentWordCount(s) <= 100, label: 'Class notes within 100 words' });
   return checks;
 }
 
@@ -969,6 +1004,9 @@ function render(){
     if (trimv('hText' + idx)) possible += 2;
   }
   $('pointsPill').innerHTML = 'This week&rsquo;s possible: ' + possible + ZH.fen;
+  var _wc = contentWordCount(s);
+  var _cw = $('contentWords');
+  if (_cw){ _cw.textContent = _wc + ' / 100 words'; _cw.style.color = (_wc > 100) ? '#C0392B' : ''; _cw.style.borderColor = (_wc > 100) ? '#C0392B' : ''; }
 
   // outputs
   $('outApp').textContent = buildApp(s);
@@ -1098,6 +1136,8 @@ function aiGenerateFromCurriculum(){
     var obj = extractJson(text);
     aiBusy('btnAiCurriculum', false);
     if (!obj){ setAiStatus('aiCurriculumStatus', 'Could not read the AI response. Try again.', 'err'); return; }
+    if (obj.unit !== undefined && obj.unit !== null && obj.unit !== '') $('fUnit').value = obj.unit;
+    if (obj.lesson !== undefined && obj.lesson !== null && obj.lesson !== '') $('fClass').value = obj.lesson;
     if (obj.topic){ $('fTopic').value = obj.topic; }
     if (obj.content && obj.content.length){
       clearContentRows();
@@ -1107,6 +1147,8 @@ function aiGenerateFromCurriculum(){
       }
     }
     if (obj.worked){ $('fWorked').value = obj.worked; $('fWorked').setAttribute('data-touched', '1'); }
+    if (obj.value){ var vi = valueIndex(obj.value); if (vi > -1) $('fVal1').value = String(vi); }
+    if (obj.valueExample){ $('fEx1').value = obj.valueExample; }
     if (obj.improvements && obj.improvements.length){
       $('fImp1').value = obj.improvements[0] || '';
       if (obj.improvements.length > 1) $('fImp2').value = obj.improvements[1] || '';
@@ -1190,6 +1232,7 @@ function insertAiFocus(){
 function shareLine(){
   var text = $('outLine').textContent;
   if (!text){ showToast('Nothing to share yet'); return; }
+  if (!confirmIfIncomplete()) return;
   if (navigator.share){
     navigator.share({ title: 'Harland class notes', text: text }).then(
       function(){ showToast('Shared'); },
@@ -1277,8 +1320,8 @@ function init(){
     $('pvTitle').textContent = 'LINE message format';
   });
 
-  $('btnCopyApp').addEventListener('click', function(){ copyText($('outApp').textContent); });
-  $('btnCopyLine').addEventListener('click', function(){ copyText($('outLine').textContent); });
+  $('btnCopyApp').addEventListener('click', function(){ if (confirmIfIncomplete()) copyText($('outApp').textContent); });
+  $('btnCopyLine').addEventListener('click', function(){ if (confirmIfIncomplete()) copyText($('outLine').textContent); });
   $('btnShareLine').addEventListener('click', shareLine);
 
   $('btnAiCurriculum').addEventListener('click', aiGenerateFromCurriculum);
