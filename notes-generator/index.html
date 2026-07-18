@@ -530,7 +530,7 @@ function setAiStatus(id, msg, kind){
 var CURRICULUM_PROMPT_HEAD =
   'You are a teaching assistant at Harland Education, a premium tutoring academy in Taipei. A teacher will paste raw lesson content from a curriculum document. Convert it into structured class-notes fields.\n\n'
 + 'Return ONLY a JSON object, with no preamble and no markdown fences, in exactly this shape:\n'
-+ '{"unit":2,"lesson":11,"topic":"one short line naming the lesson focus","content":[{"heading":"Strand: short topic","acts":"past-tense activity line\\nanother past-tense activity line"}],"worked":"one lowercase phrase naming the main skill practiced","value":"one of Respect, Resilience, Attitude, Adaptability, Diligence","valueExample":"short phrase completing the sentence when they ___","improvements":["optional area to work on next"]}\n\n'
++ '{"unit":2,"lesson":11,"topic":"one short line naming the lesson focus","content":[{"heading":"Strand: short topic","acts":"past-tense activity line\\nanother past-tense activity line"}],"worked":"one lowercase phrase naming the main skill practiced","value":"one of Respect, Resilience, Attitude, Adaptability, Diligence","valueExample":"short phrase completing the sentence when they ___","improvements":["optional area to work on next"],"homework":[{"type":"reading","text":"optional task line","link":"optional https url"}]}\n\n'
 + 'Rules:\n'
 + '- American spelling (organize, color, analyze).\n'
 + '- No em dashes anywhere. No semicolons.\n'
@@ -540,12 +540,13 @@ var CURRICULUM_PROMPT_HEAD =
 + '- Keep the combined content (all headings and activity lines together) to 100 words or fewer. Be concise.\n'
 + '- "topic" is a single line. "worked" is a short lowercase phrase with no trailing period.\n'
 + '- "value" is the single Harland value a student is most likely to demonstrate in this lesson. "valueExample" is a short specific phrase completing "when they ___" and must not include the words "when they". Treat value and valueExample as a best attempt for the teacher to review and edit.\n'
++ '- If the input specifies homework, include a "homework" array with 1 to 3 items. Classify each item by platform: type "reading" for ActivelyLearn or reading tasks, "ixl" for IXL, "quizlet" for Quizlet, otherwise "custom". For a known platform type, omit "text" to use the standard Harland task line, or include "text" only if the input states a different task. For "custom", "text" is required. Include "link" only if a URL appears in the input. If the input does not mention homework, omit the "homework" key entirely. Never invent homework.\n'
 + '- Do not invent student names, scores, or dates.\n\n'
 + 'Example\n'
 + 'Curriculum input:\n'
-+ '"Lesson 3.2: Students review tier-two vocabulary related to colonial settlements (settlement, charter, dispute). They then study the structure of an expository paragraph, focusing on writing a clear topic sentence, and draft one topic sentence of their own."\n'
++ '"Lesson 3.2: Students review tier-two vocabulary related to colonial settlements (settlement, charter, dispute). They then study the structure of an expository paragraph, focusing on writing a clear topic sentence, and draft one topic sentence of their own. Homework: complete the ActivelyLearn reading questions at home (https://app.activelylearn.com/x123)."\n'
 + 'JSON output:\n'
-+ '{"unit":3,"lesson":2,"topic":"Colonial settlement vocabulary and expository topic sentences","content":[{"heading":"Vocabulary: Colonial Settlements","acts":"Reviewed tier-two vocabulary: settlement, charter, dispute\\nMatched each term to an example in context"},{"heading":"Writing: Expository Topic Sentences","acts":"Studied the structure of an expository paragraph\\nDrafted an original topic sentence"}],"worked":"writing clear expository topic sentences","value":"Diligence","valueExample":"carefully revised a topic sentence until it was clear and precise","improvements":["adding supporting detail after the topic sentence"]}\n\n'
++ '{"unit":3,"lesson":2,"topic":"Colonial settlement vocabulary and expository topic sentences","content":[{"heading":"Vocabulary: Colonial Settlements","acts":"Reviewed tier-two vocabulary: settlement, charter, dispute\\nMatched each term to an example in context"},{"heading":"Writing: Expository Topic Sentences","acts":"Studied the structure of an expository paragraph\\nDrafted an original topic sentence"}],"worked":"writing clear expository topic sentences","value":"Diligence","valueExample":"carefully revised a topic sentence until it was clear and precise","improvements":["adding supporting detail after the topic sentence"],"homework":[{"type":"reading","link":"https://app.activelylearn.com/x123"}]}\n\n'
 + 'Now convert this curriculum input:\n"""\n';
 var CURRICULUM_PROMPT_TAIL = '\n"""';
 
@@ -683,6 +684,12 @@ function getPreset(id){
     if (HW_PRESETS[i].id === id) return HW_PRESETS[i];
   }
   return HW_PRESETS[3];
+}
+
+function clearHwRows(){
+  var blocks = document.querySelectorAll('.hw-block');
+  var i;
+  for (i = 0; i < blocks.length; i++){ blocks[i].parentNode.removeChild(blocks[i]); }
 }
 
 function removeHwRow(idx){
@@ -1155,6 +1162,15 @@ function aiGenerateFromCurriculum(){
     if (obj.improvements && obj.improvements.length){
       $('fImp1').value = obj.improvements[0] || '';
       if (obj.improvements.length > 1) $('fImp2').value = obj.improvements[1] || '';
+    }
+    if (obj.homework && obj.homework.length){
+      clearHwRows();
+      for (i = 0; i < obj.homework.length && i < 5; i++){
+        var hwItem = obj.homework[i] || {};
+        var hwType = (hwItem.type === 'reading' || hwItem.type === 'ixl' || hwItem.type === 'quizlet') ? hwItem.type : 'custom';
+        addHwRow(hwType, hwItem.link || '');
+        if (hwItem.text) $('hText' + hwCount).value = hwItem.text;
+      }
     }
     setAiStatus('aiCurriculumStatus', 'Fields filled. Review and edit below.', 'ok');
     render();
