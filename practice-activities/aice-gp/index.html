@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AICE General Paper Practice · Harland</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='12'%20fill='%231B2A4A'/%3E%3Ctext%20x='32'%20y='45'%20font-family='Georgia,serif'%20font-size='38'%20font-weight='700'%20text-anchor='middle'%20fill='%23C9A84C'%3EH%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F8F5EF;--ink:#1A1A1F;--navy:#1B2A4A;--gold:#C9A84C;--golddk:#A07820;
+  --line:#E3DCCE;--card:#FFFFFF;--slate:#4A4A56;--mist:#8A8A90;
+  --red:#B23A2C;--warn:#C07A1E;--u1:#1B2A4A;--u2:#A07820;
+}
+body{background:var(--cream);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-size:15px;line-height:1.7;min-height:100vh}
+.screen-only{display:block}
+.print-only{display:none}
+
+/* PROGRESS */
+#prog{position:fixed;top:0;left:0;right:0;height:3px;background:var(--line);z-index:300}
+#pb{height:100%;background:var(--gold);width:0%;transition:width 1s linear}
+
+/* TOPBAR */
+.bar{background:var(--card);border-bottom:2px solid var(--navy);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100}
+.bar-l{display:flex;align-items:center;gap:14px}
+.bar-l img{height:34px;display:block}
+.bar-lt{display:flex;flex-direction:column;gap:1px}
+.brand{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--golddk)}
+.exam-id{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:500;color:var(--navy)}
+.t-wrap{text-align:right}
+.t-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--golddk)}
+#timer{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--navy);letter-spacing:.04em;transition:color .3s}
+#timer.warn{color:var(--warn)}#timer.danger{color:var(--red)}
+.ptag{display:inline-block;margin-top:3px;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:var(--cream);border:1px solid var(--line);color:var(--slate)}
+.ptag.reading{background:#EDF3EC;border-color:#BFD4BC;color:#3F6E45}
+.ptag.writing{background:#EBEFF6;border-color:#C3CDE0;color:var(--navy)}
+.btn-help{width:34px;height:34px;border-radius:50%;border:1px solid var(--navy);background:var(--card);color:var(--navy);font-weight:600;font-size:15px;cursor:pointer}
+.btn-help:hover{background:var(--navy);color:var(--cream)}
+.btn-reset{border:1px solid var(--line);background:var(--card);color:var(--mist);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:6px;cursor:pointer}
+.btn-reset:hover{border-color:var(--red);color:var(--red)}
+#saveind{font-size:10px;color:var(--mist);opacity:0;transition:opacity .4s}
+#saveind.on{opacity:1}
+
+/* STORAGE NOTICE */
+#nostore{display:none;background:#FBF3E4;border-bottom:1px solid var(--gold);color:#7A5A18;font-size:12px;padding:8px 24px}
+#nostore.show{display:block}
+
+/* UNIT TABS */
+.unit-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--line)}
+.utab{flex:1;padding:12px 16px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--mist);transition:all .2s;border-bottom:2px solid transparent}
+.utab.active-u1{color:var(--u1);border-bottom-color:var(--u1);background:var(--cream)}
+.utab.active-u2{color:var(--u2);border-bottom-color:var(--u2);background:var(--cream)}
+.utab:hover:not(.active-u1):not(.active-u2){background:var(--cream);color:var(--ink)}
+
+/* WEEK TABS */
+.week-tabs{display:flex;background:var(--cream);border-bottom:1px solid var(--line);overflow-x:auto;flex-wrap:nowrap}
+.wtab{flex:none;padding:8px 14px;font-size:10.5px;font-weight:600;letter-spacing:.06em;cursor:pointer;border:none;background:transparent;color:var(--mist);transition:all .2s;white-space:nowrap;border-bottom:2px solid transparent}
+.wtab.aw1{color:var(--u1);border-bottom-color:var(--u1);background:var(--card)}
+.wtab.aw2{color:var(--u2);border-bottom-color:var(--u2);background:var(--card)}
+.wtab:hover:not(.aw1):not(.aw2){color:var(--ink);background:var(--card)}
+
+/* WEEK PROGRESS INDICATOR */
+.wprog{background:var(--card);padding:7px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.wpl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--golddk)}
+.pips{display:flex;gap:3px;flex:1}
+.pip{height:5px;flex:1;border-radius:2px;background:var(--line)}
+.pip.done{background:var(--golddk)}.pip.cur{background:var(--gold)}
+.wpm{font-size:9px;color:var(--slate);white-space:nowrap}
+
+/* MAIN */
+main{max-width:800px;margin:0 auto;padding:32px 24px 80px}
+
+/* COVER */
+.cover{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:26px 28px;margin-bottom:22px}
+.cover-meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 28px;margin-bottom:18px}
+.mr{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:4px 0;font-size:12.5px}
+.ml{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:9.5px;color:var(--golddk);align-self:center}
+.mv{color:var(--ink);text-align:right}
+#stu-name{border:none;border-bottom:1px solid var(--line);background:transparent;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);text-align:right;padding:0 0 1px;width:150px}
+#stu-name:focus{outline:none;border-bottom-color:var(--gold)}
+.ct{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;line-height:1.2;color:var(--navy);margin:6px 0 4px}
+.cs{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--golddk);margin-bottom:16px}
+.instr{background:var(--cream);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:6px;padding:14px 18px}
+.instr h3{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);margin-bottom:8px}
+.instr ul{padding-left:18px}
+.instr li{font-size:13px;margin-bottom:5px;color:var(--slate)}
+
+/* START */
+#start-screen{text-align:center;margin:34px 0}
+.sn{font-size:13px;color:var(--slate);margin-bottom:14px}
+.btn-begin{background:var(--navy);color:var(--cream);border:none;font-size:13px;font-weight:600;letter-spacing:.06em;padding:14px 34px;border-radius:8px;cursor:pointer}
+.btn-begin:hover{background:#24355C}
+
+/* SECTION HEADERS */
+.shdr{display:flex;align-items:center;gap:12px;margin:26px 0 12px}
+.sb{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:3px}
+.sb.rd{background:#EDF3EC;color:#3F6E45;border:1px solid #BFD4BC}
+.sb.wr{background:#EBEFF6;color:var(--navy);border:1px solid #C3CDE0}
+.sl{flex:1;height:1px;background:var(--line)}
+.sn2{font-size:10px;color:var(--mist);letter-spacing:.06em;text-transform:uppercase}
+
+/* PASSAGE */
+.pbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px 28px;margin-bottom:16px}
+.pk{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--golddk);margin-bottom:6px}
+.pt{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:500;color:var(--navy);margin-bottom:12px}
+.pb{font-size:14.5px;line-height:1.85;color:var(--ink)}
+.pb p{margin-bottom:12px}
+.pwc{font-size:11px;color:var(--mist);font-style:italic;margin-top:8px}
+.btn-write{display:block;width:100%;background:var(--card);color:var(--navy);border:1px solid var(--navy);font-size:12.5px;font-weight:600;letter-spacing:.04em;padding:12px 18px;border-radius:8px;cursor:pointer;margin-bottom:8px}
+.btn-write:hover{background:var(--navy);color:var(--cream)}
+
+/* ESSAY */
+.qblock{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 26px}
+.qtopic{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--golddk);margin-bottom:8px}
+.qstem{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;color:var(--navy);line-height:1.5;margin-bottom:6px}
+.qprompt{font-size:12px;color:var(--slate);font-style:italic;margin-bottom:16px}
+.tbar{display:flex;align-items:center;gap:10px;background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:7px 12px;margin-bottom:12px}
+.tl{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--golddk)}
+.tv{font-size:12px;font-weight:600;color:var(--navy)}
+.tn{font-size:10.5px;color:var(--mist);margin-left:auto}
+#essay{width:100%;min-height:340px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;font-family:'DM Sans',sans-serif;font-size:14.5px;line-height:1.8;color:var(--ink);resize:vertical}
+#essay:focus{outline:none;border-color:var(--gold)}
+#essay:disabled{background:var(--cream);color:var(--slate)}
+.wcrow{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.wc{font-size:12px;color:var(--mist)}
+.wc.g{color:var(--warn)}.wc.n{color:var(--golddk)}.wc.h{color:#3F6E45}
+.lmsg{font-size:12px;color:var(--red);font-weight:600;opacity:0}
+.lmsg.show{opacity:1}
+
+/* SUBMIT */
+.sub-area{text-align:center;margin:20px 0}
+.btn-sub{background:var(--navy);color:var(--cream);border:none;font-size:13px;font-weight:600;letter-spacing:.05em;padding:13px 32px;border-radius:8px;cursor:pointer}
+.btn-sub:hover:not(:disabled){background:#24355C}
+.btn-sub:disabled{background:var(--line);color:var(--mist);cursor:default}
+.subn{font-size:11px;color:var(--mist);margin-top:8px}
+
+/* DONE */
+.done{display:none;background:var(--cream);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:8px;padding:20px 24px;margin-top:18px}
+.done.show{display:block}
+.dtitle{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--navy);margin-bottom:12px}
+.steps{list-style:none;padding:0}
+.steps li{font-size:13px;color:var(--slate);margin-bottom:7px;padding-left:26px;position:relative}
+.steps li:before{content:attr(data-n);position:absolute;left:0;color:var(--golddk)}
+.btn-pdf{background:var(--card);color:var(--navy);border:1px solid var(--navy);font-size:12.5px;font-weight:600;padding:11px 26px;border-radius:8px;cursor:pointer;margin-top:10px}
+.btn-pdf:hover{background:var(--navy);color:var(--cream)}
+.chrome-note{font-size:11px;color:var(--mist);margin-left:10px}
+
+/* WELCOME */
+#welcome{position:fixed;inset:0;background:var(--cream);z-index:500;overflow-y:auto;display:none}
+#welcome.show{display:block}
+.wlc-bar{background:var(--card);border-bottom:2px solid var(--navy);padding:12px 26px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0}
+.wlc-brand{display:flex;align-items:center;gap:14px}
+.wlc-brand img{height:34px;display:block}
+.wlc-bt{display:flex;flex-direction:column;gap:1px}
+.btn-wlc-begin{background:var(--navy);color:var(--cream);border:none;font-size:12.5px;font-weight:600;letter-spacing:.05em;padding:11px 24px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn-wlc-begin:hover{background:#24355C}
+.wlc-body{max-width:860px;margin:0 auto;padding:40px 26px 90px}
+.wlc-hero{margin-bottom:34px}
+.wlc-hero h1{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:42px;line-height:1.1;color:var(--navy);margin-bottom:12px}
+.wlc-hero .sub{font-size:15px;color:var(--slate);max-width:620px}
+.wlc-section{margin-bottom:30px}
+.wlc-section-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.wlc-num{font-family:'DM Mono',monospace;font-size:12px;color:var(--golddk)}
+.wlc-section-hdr h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:24px;color:var(--navy)}
+.wlc-cards{display:grid;gap:12px}
+.wlc-cards.cols2{grid-template-columns:1fr 1fr}
+.wlc-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.wlc-card.accent{border-left:3px solid var(--gold)}
+.wlc-card h3{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:18px;color:var(--navy);margin-bottom:8px}
+.wlc-card p{font-size:13.5px;color:var(--slate);margin-bottom:8px}
+.wlc-card p:last-child{margin-bottom:0}
+.wlc-card strong{color:var(--ink)}
+.wlc-card ol,.wlc-card ul{padding-left:18px;font-size:13.5px;color:var(--slate)}
+.wlc-card li{margin-bottom:5px}
+.wlc-divider{height:1px;background:var(--line);margin:26px 0}
+.wlc-footer-btn{text-align:center;margin-top:30px}
+.phase-flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.pf-step{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.pf-label{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--golddk);margin-bottom:4px}
+.pf-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--navy);margin-bottom:5px}
+.pf-note{font-size:12px;color:var(--slate)}
+.xp-badge{display:inline-block;background:#F5EDDA;border:1px solid var(--gold);color:var(--golddk);font-size:9px;font-weight:600;letter-spacing:.08em;padding:1px 7px;border-radius:3px}
+
+@media(max-width:640px){
+  .cover-meta{grid-template-columns:1fr}
+  .wlc-cards.cols2{grid-template-columns:1fr}
+  .phase-flow{grid-template-columns:1fr}
+  .bar{padding:10px 14px}
+  #timer{font-size:22px}
+  .exam-id{font-size:13px}
+  main{padding:24px 14px 70px}
+}
+
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .screen-only{display:none!important}
+  #prog,.bar,.unit-tabs,.week-tabs,.wprog{display:none!important}
+  .print-only{display:block!important}
+  body{background:#FAFAF8!important;color:#1a1a2e!important;font-family:'Cormorant Garamond',Georgia,serif;font-size:11pt;line-height:1.75}
+  .ph{background:#0D0D0F!important;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+  .ph-logo{display:flex;align-items:center;gap:10px}
+  .ph-brand{font-family:'DM Sans',Arial,sans-serif;font-size:10pt;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#C9A84C}
+  .ph-right{font-family:'DM Sans',Arial,sans-serif;font-size:8pt;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#F5F0E8}
+  .p-cover{padding:32pt 40pt;border-bottom:1px solid #e0d8c8}
+  .p-badge{display:inline-block;border:1px solid #C9A84C;color:#8A6E2E;font-family:'DM Sans',Arial,sans-serif;font-size:8pt;font-weight:600;letter-spacing:.15em;text-transform:uppercase;padding:3pt 10pt;border-radius:20pt;margin-bottom:12pt}
+  .p-date{font-family:'DM Sans',Arial,sans-serif;font-size:9pt;letter-spacing:.1em;text-transform:uppercase;color:#666;margin-bottom:8pt}
+  .p-course{font-family:'Cormorant Garamond',Georgia,serif;font-size:16pt;color:#1a1a2e;margin-bottom:4pt}
+  .p-unit{font-family:'DM Sans',Arial,sans-serif;font-size:9pt;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#C9A84C;margin-bottom:20pt}
+  .p-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:30pt;font-weight:400;color:#1a1a2e;line-height:1.2;margin-bottom:12pt}
+  .p-divider{border:none;border-top:1.5px solid #C9A84C;margin:0 0 14pt}
+  .p-tagline{font-family:'Cormorant Garamond',Georgia,serif;font-size:12pt;font-style:italic;color:#555;margin-bottom:0}
+  .p-meta{margin-top:18pt;display:flex;gap:32pt;font-family:'DM Sans',Arial,sans-serif;font-size:9pt;color:#555}
+  .p-meta span strong{color:#1a1a2e}
+  .p-section{padding:24pt 40pt;border-bottom:1px solid #e8e4da}
+  .p-section-label{font-family:'DM Sans',Arial,sans-serif;font-size:8pt;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#C9A84C;margin-bottom:10pt}
+  .p-section-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:18pt;color:#1a1a2e;margin-bottom:14pt}
+  .p-passage-body{font-family:'Cormorant Garamond',Georgia,serif;font-size:12pt;line-height:1.85;color:#1a1a2e}
+  .p-passage-body p{margin-bottom:10pt}
+  .p-question-box{background:#f7f4ef!important;border-left:3pt solid #C9A84C;padding:12pt 16pt;margin:14pt 0;font-family:'Cormorant Garamond',Georgia,serif;font-size:12.5pt;font-style:italic;color:#1a1a2e}
+  .p-essay-body{font-family:'Cormorant Garamond',Georgia,serif;font-size:12pt;line-height:1.9;color:#1a1a2e;white-space:pre-wrap;min-height:200pt;border:1px solid #e0d8c8;padding:12pt;background:#fff!important}
+  .p-faaice-box{border:1px dashed #C9A84C;padding:16pt;min-height:120pt;background:#fdfcf9!important}
+  .p-faaice-label{font-family:'DM Sans',Arial,sans-serif;font-size:8pt;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#C9A84C;margin-bottom:8pt}
+  .p-faaice-fields{display:flex;gap:32pt;margin-bottom:14pt;font-family:'DM Sans',Arial,sans-serif;font-size:10pt;color:#1a1a2e}
+  .p-faaice-fields span{border-bottom:1px solid #ccc;padding-bottom:4pt;flex:1;color:#999}
+  .p-task{padding:16pt 40pt;border-bottom:1px solid #e8e4da}
+  .p-task-num{font-family:'DM Sans',Arial,sans-serif;font-size:8pt;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#C9A84C;margin-bottom:6pt}
+  .p-task-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:15pt;color:#1a1a2e;margin-bottom:10pt}
+  .p-task-body{font-family:'DM Sans',Arial,sans-serif;font-size:10pt;color:#333;line-height:1.7}
+  .p-task-body ol,.p-task-body ul{padding-left:18pt;margin-top:8pt}
+  .p-task-body li{margin-bottom:4pt}
+  .p-task-body .xp-tag{display:inline-block;background:#f0e8d0!important;border:1px solid #C9A84C;color:#8A6E2E;font-size:8pt;font-weight:600;letter-spacing:.1em;padding:1pt 7pt;border-radius:2pt;margin-left:6pt}
+  .p-drive{margin-top:10pt;background:#f7f4ef!important;border:1px solid #e0d8c8;padding:10pt 14pt;font-family:'DM Sans',Arial,sans-serif;font-size:9pt;color:#444}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"><div id="pb"></div></div>
+
+<!-- ══ WELCOME PAGE ══════════════════════════════════════════════════════ -->
+<div id="welcome" class="show">
+  <div class="wlc-bar">
+    <div class="wlc-brand">
+      <img alt="Harland Education" src="data:image/png;base64,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">
+      <div class="wlc-bt">
+        <div class="brand">Harland Academic Coaching</div>
+        <div class="exam-id">AICE General Paper 8021 · Paper 1 Practice</div>
+      </div>
+    </div>
+    <button class="btn-wlc-begin" onclick="hideWelcome()">Begin Practice →</button>
+  </div>
+
+  <div class="wlc-body">
+
+    <div class="wlc-hero">
+      <h1>Your AICE GP<br>Training System</h1>
+      <div class="sub">22 weeks of Cambridge AS Level Paper 1 practice. Every session is a cold sit. Every submission feeds a homework loop that earns XP across five training machines. This page explains how it all works.</div>
+      <div class="sub" style="margin-top:8px;font-size:13px;">Your progress, essays, and timer save automatically in this browser on this device, and every sit resumes where you left off.</div>
+    </div>
+
+    <!-- SECTION 1: WHAT THIS IS -->
+    <div class="wlc-section">
+      <div class="wlc-section-hdr">
+        <div class="wlc-num">01</div>
+        <h2>What This Artifact Is</h2>
+      </div>
+      <div class="wlc-cards cols2">
+        <div class="wlc-card accent">
+          <h3>Unit 1 — Foundations</h3>
+          <p>11 weeks. Sit time scales from <strong>25 minutes</strong> (Week 1) to <strong>75 minutes</strong> (Week 11) in 5-minute steps. Passages grow from ~200 to ~500 words. Essay targets scale from ~200 to 600–900 words.</p>
+          <p>Topics rotate across all three Cambridge GP domains: Economic &amp; Political, Science &amp; Environment, and Literature &amp; Media.</p>
+        </div>
+        <div class="wlc-card accent">
+          <h3>Unit 2 — Advanced</h3>
+          <p>Same 11-week time scaling as Unit 1. Difficulty starts at <strong>Unit 1 Week 6 level</strong> and ramps exponentially. Passages are more complex, vocabulary is richer, questions demand more nuanced argumentation.</p>
+          <p>Completing both units gives you <strong>22 timed Paper 1 practice sittings</strong> before the June 2027 examination.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: HOW A SESSION WORKS -->
+    <div class="wlc-section">
+      <div class="wlc-section-hdr">
+        <div class="wlc-num">02</div>
+        <h2>How a Session Works</h2>
+      </div>
+      <div class="wlc-card" style="margin-bottom:12px">
+        <p>Select your unit and week using the tabs at the top. Read the cover information. When you are ready — and only when you are ready — click <strong>Begin Reading</strong>.</p>
+      </div>
+      <div class="phase-flow">
+        <div class="pf-step">
+          <div class="pf-label">Step 1</div>
+          <div class="pf-title">Begin Reading</div>
+          <div class="pf-note">Timer starts. Passage appears.</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-label">Step 2</div>
+          <div class="pf-title">Read the Passage</div>
+          <div class="pf-note">Timer keeps running.</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-label">Step 3</div>
+          <div class="pf-title">Begin Writing</div>
+          <div class="pf-note">Essay area opens. Passage stays visible.</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-label">Step 4</div>
+          <div class="pf-title">Write Your Essay</div>
+          <div class="pf-note">No pausing. No hints. No internet.</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-label">Step 5</div>
+          <div class="pf-title">Submit &amp; Download PDF</div>
+          <div class="pf-note">Use Chrome → Save as PDF.</div>
+        </div>
+      </div>
+      <div class="wlc-card" style="margin-top:12px">
+        <h3>Important</h3>
+        <p>The timer runs continuously from the moment you click Begin Reading. There is no pause between reading and writing. If time expires before you submit, the essay area locks automatically. You can still download the PDF — submit whatever you have written.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 3: THE PDF -->
+    <div class="wlc-section">
+      <div class="wlc-section-hdr">
+        <div class="wlc-num">03</div>
+        <h2>The PDF and Google Drive</h2>
+      </div>
+      <div class="wlc-cards">
+        <div class="wlc-card">
+          <h3>What the PDF contains</h3>
+          <ol>
+            <li><strong>Section 1 — Reading Passage:</strong> the original text and question</li>
+            <li><strong>Section 2 — Your Essay:</strong> exactly what you typed, unedited</li>
+            <li><strong>Section 3 — /faaice Header:</strong> blank fields for Coach Stew to complete (Band, Score, AO1/AO2/AO3)</li>
+            <li><strong>Tasks 1–4:</strong> your full homework loop instructions with XP guidance</li>
+          </ol>
+        </div>
+        <div class="wlc-card">
+          <h3>After you download</h3>
+          <ol>
+            <li>Use <strong>Chrome or Edge</strong> for best results — select "Save as PDF" in the print dialog, not a printer.</li>
+            <li>Name the file: <strong>RyderHuang_U[X]W[X]_[DD-MM-YYYY].pdf</strong></li>
+            <li><strong>Drag the PDF to the shared Google Drive folder</strong> before leaving the session.</li>
+            <li>Do not email it. Coach Stew will complete the /faaice assessment in the Drive document and notify you when it is ready.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="wlc-divider"></div>
+
+    <!-- SECTION 4: THE HOMEWORK LOOP -->
+    <div class="wlc-section">
+      <div class="wlc-section-hdr">
+        <div class="wlc-num">04</div>
+        <h2>The Homework Loop — Four Tasks</h2>
+      </div>
+      <div class="wlc-card" style="margin-bottom:14px">
+        <p>Every session generates four homework tasks. They can be done in any order, but the loop is designed to flow from the essay outward — from correction to vocabulary to rehearsal. <strong>Every minute you invest earns XP.</strong> There is no deadline on any individual task except the one you set yourself.</p>
+      </div>
+      <div class="wlc-cards">
+        <div class="wlc-card accent">
+          <h3>Task 1 — Vocab Mining: Reading Passage <span class="xp-badge">VJ XP</span></h3>
+          <ol>
+            <li><strong>In class, before you leave:</strong> re-read the passage and highlight every word or phrase you could not have written yourself. Enter each into your Personalised Vocab Journal (PVJ) with your best guess at the meaning. This is <em>batching</em>.</li>
+            <li><strong>Homework:</strong> research each word properly — definition, example sentence, word family. This is your <em>Research Batch</em>.</li>
+            <li>When the batch is complete, notify Coach Stew. A <strong>/cq</strong> (comprehension quiz) will be set on the passage. Passing it greenlights the passage as a Rehearsal script. <span class="xp-badge">RS XP</span></li>
+          </ol>
+        </div>
+        <div class="wlc-card accent">
+          <h3>Task 2 — Essay Redraft Loop <span class="xp-badge">MBD XP</span></h3>
+          <ol>
+            <li>Read your <strong>/faaice</strong> assessment in full when Coach Stew delivers it. Start with the Socratic Questions. Do not begin rewriting until you have worked through them.</li>
+            <li>Redraft your essay on your own time — 10 minutes to 2 hours. <strong>Every minute of redraft time earns MBD XP.</strong> Submit via the scorecard when ready.</li>
+            <li>Coach Stew provides a second round of assessment. You may continue this loop as many times as you choose. Each round earns more MBD XP.</li>
+            <li>When you decide you are done, tell Coach Stew. This releases the <strong>AI-generated rewrite</strong> of your most up-to-date draft. Proceed to Task 3.</li>
+          </ol>
+        </div>
+        <div class="wlc-card accent">
+          <h3>Task 3 — Vocab Mining: AI Essay <span class="xp-badge">VJ XP</span></h3>
+          <ol>
+            <li>Repeat Task 1 exactly — but using the AI-generated essay as your source text instead of the original passage.</li>
+            <li>Batch new words into PVJ. Research the batch as your next homework task.</li>
+            <li>Notify Coach Stew for a <strong>/cq</strong> on the AI essay script. Passing it greenlights it as a second Rehearsal script. <span class="xp-badge">RS XP</span></li>
+          </ol>
+        </div>
+        <div class="wlc-card accent">
+          <h3>Task 4 — Rehearsal <span class="xp-badge">RS XP</span></h3>
+          <ol>
+            <li>Once a script is green-lit, rehearse it to the standard agreed with Coach Stew.</li>
+            <li>Log each completed rehearsal set on your scorecard.</li>
+            <li>Both the original passage and the AI essay can be active scripts simultaneously — each earns its own RS XP.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: XP SUMMARY -->
+    <div class="wlc-section">
+      <div class="wlc-section-hdr">
+        <div class="wlc-num">05</div>
+        <h2>XP Available Per Week</h2>
+      </div>
+      <div class="wlc-cards cols2">
+        <div class="wlc-card">
+          <h3>In-class XP</h3>
+          <ul>
+            <li><strong>MBD XP</strong> — your in-class writing time (from the moment you click Begin Reading to the moment you submit)</li>
+          </ul>
+        </div>
+        <div class="wlc-card">
+          <h3>Homework XP</h3>
+          <ul>
+            <li><strong>MBD XP</strong> — every minute of essay redrafting (Task 2)</li>
+            <li><strong>VJ XP</strong> — vocabulary batch entries and research (Tasks 1 &amp; 3)</li>
+            <li><strong>RS XP</strong> — rehearsal sets on green-lit scripts (Task 4)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="wlc-card" style="margin-top:14px">
+        <h3>The compounding effect</h3>
+        <p>As weeks progress and you internalise the homework loop, less in-class time is needed for setup and explanation. This leaves more time for the ever-expanding weekly sit. By Week 11 of Unit 2 you are sitting a full 75-minute Cambridge Paper 1 cold — with a complete five-machine XP cycle running in parallel.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 6: TIPS -->
+    <div class="wlc-section">
+      <div class="wlc-section-hdr">
+        <div class="wlc-num">06</div>
+        <h2>A Few Practical Notes</h2>
+      </div>
+      <div class="wlc-cards cols2">
+        <div class="wlc-card">
+          <h3>Changing weeks mid-session</h3>
+          <p>If you navigate to a different week while a session is in progress, you will be asked to confirm. Your current essay will not be saved. <strong>Always download the PDF before navigating away.</strong></p>
+        </div>
+        <div class="wlc-card">
+          <h3>If time expires</h3>
+          <p>The essay area locks automatically. This is intentional. Submit and download the PDF immediately — do not close the tab first. You can still receive /faaice feedback on a partial essay.</p>
+        </div>
+        <div class="wlc-card">
+          <h3>Word count guidance</h3>
+          <p>The word counter turns gold when you reach the week target. Cambridge does not impose a hard word limit on Paper 1, but examiners advise 600–900 words for a full-length response. Scaled targets in earlier weeks are calibrated to the time available.</p>
+        </div>
+        <div class="wlc-card">
+          <h3>Return to this page</h3>
+          <p>Click the <strong>?</strong> button in the top-right corner of the header bar at any time to return to this welcome page. Your current week selection will be preserved.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wlc-footer-btn">
+      <button class="btn-wlc-begin" onclick="hideWelcome()">Begin Practice →</button>
+    </div>
+
+  </div>
+</div>
+<!-- ══ END WELCOME PAGE ══════════════════════════════════════════════════ -->
+
+<div class="screen-only">
+
+<header class="bar">
+  <div class="bar-l">
+    <img alt="Harland Education" src="data:image/png;base64,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">
+    <div class="bar-lt">
+      <div class="brand">Harland Academic Coaching</div>
+      <div class="exam-id">AICE General Paper 8021 · Paper 1 Practice</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span id="saveind">Saved</span>
+    <div class="t-wrap">
+      <div class="t-lbl">Time Remaining</div>
+      <div id="timer">--:--</div>
+      <div class="ptag" id="ptag">Select a week</div>
+    </div>
+    <button class="btn-reset" onclick="resetStore()" title="Clear saved progress on this device">Reset progress</button>
+    <button class="btn-help" onclick="showWelcome()" title="How this works">?</button>
+  </div>
+</header>
+
+<div class="unit-tabs">
+  <button class="utab" id="utab-u1" onclick="setUnit('u1')">Unit 1 · Paper 1 Foundations</button>
+  <button class="utab" id="utab-u2" onclick="setUnit('u2')">Unit 2 · Paper 1 Advanced</button>
+</div>
+
+<div class="week-tabs" id="week-tabs"></div>
+
+<div class="wprog">
+  <div class="wpl">Progress</div>
+  <div class="pips" id="pips"></div>
+  <div class="wpm" id="wpm">Select a week to begin</div>
+</div>
+
+<div id="nostore">Saving is blocked in this browser, so progress will not survive closing the page. Use a normal (not private) window for saved progress.</div>
+
+<main>
+
+  <div class="cover">
+    <div class="cover-meta" id="cover-meta">
+      <div class="mr"><span class="ml">Paper</span><span class="mv">1 — Extended Essay</span></div>
+      <div class="mr"><span class="ml">Marks</span><span class="mv">30 marks (Cambridge AS)</span></div>
+      <div class="mr"><span class="ml">Sit Time</span><span class="mv" id="cm-time">—</span></div>
+      <div class="mr"><span class="ml">Student</span><input id="stu-name" value="Ryder Huang" oninput="saveSoon()"></div>
+      <div class="mr"><span class="ml">Week</span><span class="mv" id="cm-week">—</span></div>
+      <div class="mr"><span class="ml">Essay Target</span><span class="mv" id="cm-target">—</span></div>
+      <div class="mr"><span class="ml">Domain</span><span class="mv" id="cm-domain">—</span></div>
+      <div class="mr"><span class="ml">Unit</span><span class="mv" id="cm-unit">—</span></div>
+    </div>
+    <div class="ct">Cambridge International AS Level<br>English General Paper</div>
+    <div class="cs" id="cs-label">Paper 1 — Select a week to begin</div>
+    <div class="instr">
+      <h3>How this session works</h3>
+      <ul>
+        <li>Click <strong>Begin Reading</strong>. The timer starts immediately — no pausing.</li>
+        <li>Read the passage carefully. You may refer to it at any time during writing.</li>
+        <li>When ready to write, click <strong>Begin Writing</strong>. The timer keeps running.</li>
+        <li>When the timer expires, the essay area locks automatically.</li>
+        <li>Click <strong>Submit & Download PDF</strong>. Use Chrome and select "Save as PDF".</li>
+        <li>Drag the PDF to the shared Google Drive folder before leaving the session.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="start-screen" style="display:none">
+    <div class="sn">The timer starts the moment you click Begin Reading. Sit only when you are ready.</div>
+    <button class="btn-begin" onclick="beginReading()">Begin Reading</button>
+  </div>
+
+  <div id="passage-section" style="display:none">
+    <div class="shdr">
+      <div class="sb rd">Phase 1 — Read</div>
+      <div class="sl"></div>
+      <div class="sn2" id="ph1-note">Passage</div>
+    </div>
+    <div class="pbox">
+      <div class="pk" id="pass-domain"></div>
+      <div class="pt" id="pass-title"></div>
+      <div class="pb" id="pass-body"></div>
+      <div class="pwc" id="pass-wc"></div>
+    </div>
+    <button class="btn-write" onclick="beginWriting()" id="btn-write">I have finished reading — Begin Writing ↓</button>
+  </div>
+
+  <div id="essay-section" style="display:none">
+    <div class="shdr">
+      <div class="sb wr">Phase 2 — Write</div>
+      <div class="sl"></div>
+      <div class="sn2" id="ph2-note">Essay Response</div>
+    </div>
+    <div class="qblock">
+      <div class="qtopic" id="q-topic"></div>
+      <div class="qstem" id="q-stem"></div>
+      <div class="qprompt">To what extent do you agree? Give reasons for your answer. You may refer to the passage and to your own knowledge.</div>
+      <div class="tbar">
+        <div class="tl">Week target</div>
+        <div class="tv" id="tbar-target"></div>
+        <div class="tn" id="tbar-note"></div>
+      </div>
+      <textarea id="essay" placeholder="Begin writing your response here." oninput="essayInput()"></textarea>
+      <div class="wcrow">
+        <span class="wc" id="wc">0 words</span>
+        <span class="lmsg" id="lmsg">Time is up — response locked.</span>
+      </div>
+    </div>
+    <div class="sub-area">
+      <button class="btn-sub" onclick="submitEssay()" id="btn-sub" disabled>Submit &amp; Download PDF</button>
+      <div class="subn">Save the PDF and drag it to the shared Google Drive folder before leaving.</div>
+    </div>
+    <div class="done" id="done">
+      <div class="dtitle" id="done-title">Response submitted</div>
+      <ol class="steps">
+        <li data-n="①">Download the PDF using the button below.</li>
+        <li data-n="②"><strong>Drag the PDF to the shared Harland Google Drive folder.</strong></li>
+        <li data-n="③">Log your in-class writing time as <strong>MBD XP</strong> in the app now.</li>
+        <li data-n="④">Wait for your <strong>/faaice</strong> — Cambridge Band, Score, and AO breakdown.</li>
+        <li data-n="⑤">Read the Socratic Questions first. Then begin your redraft when ready.</li>
+        <li data-n="⑥">Mine the original passage for vocabulary → PVJ batch → Homework Task 1.</li>
+      </ol>
+      <button class="btn-pdf" onclick="doPrint()">Download PDF</button>
+      <span class="chrome-note">Use Chrome → Save as PDF</span>
+    </div>
+  </div>
+
+</main>
+</div><!-- end .screen-only -->
+
+<!-- ══ PRINT CONTENT ══════════════════════════════════════════════════════ -->
+<div class="print-only" id="print-root">
+
+  <div class="ph">
+    <div class="ph-logo">
+      <img alt="Harland Education" src="data:image/png;base64,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" style="height:26pt;display:block;">
+    </div>
+    <div class="ph-right">Writing Project &middot; Confidential</div>
+  </div>
+
+  <div class="p-cover">
+    <div class="p-badge" id="pr-badge">AICE GP — Unit 1 · Week 1</div>
+    <div class="p-date" id="pr-date"></div>
+    <div class="p-course">AICE General Paper 8021 &middot; Paper 1 Practice</div>
+    <div class="p-unit" id="pr-unit">Unit 1 · Week 1</div>
+    <div class="p-title" id="pr-passage-title">Reading Passage</div>
+    <hr class="p-divider">
+    <div class="p-tagline" id="pr-tagline">A practice session completed by Ryder Huang as part of AICE General Paper at Harland.</div>
+    <div class="p-meta">
+      <span><strong>Student:</strong> <span id="pr-student">Ryder Huang</span></span>
+      <span><strong>Sit time:</strong> <span id="pr-time">—</span></span>
+      <span><strong>Essay target:</strong> <span id="pr-target">—</span></span>
+      <span><strong>Domain:</strong> <span id="pr-domain">—</span></span>
+    </div>
+  </div>
+
+  <div class="p-section">
+    <div class="p-section-label">Section 1</div>
+    <div class="p-section-title">Reading Passage</div>
+    <div class="p-question-box" id="pr-question"></div>
+    <div class="p-passage-body" id="pr-passage"></div>
+  </div>
+
+  <div class="p-section">
+    <div class="p-section-label">Section 2</div>
+    <div class="p-section-title">Essay Response</div>
+    <div class="p-essay-body" id="pr-essay"></div>
+  </div>
+
+  <div class="p-section">
+    <div class="p-section-label">Section 3</div>
+    <div class="p-section-title">/faaice Assessment</div>
+    <div class="p-faaice-box">
+      <div class="p-faaice-label">Cambridge Assessment — Coach to complete</div>
+      <div class="p-faaice-fields">
+        <span>Band: _____</span>
+        <span>Score: _____ / 30</span>
+        <span>AO1 (20%): _____</span>
+        <span>AO2 (35%): _____</span>
+        <span>AO3 (45%): _____</span>
+      </div>
+      <div style="font-family:'DM Sans',Arial,sans-serif;font-size:10pt;color:#999;font-style:italic">
+        Coach Stew will complete the /faaice assessment and paste it below this line before sharing this document.
+      </div>
+    </div>
+  </div>
+
+  
+<div class="p-task">
+  <div class="p-task-num">Task 1</div>
+  <div class="p-task-title">Vocabulary Mining — Reading Passage</div>
+  <div class="p-task-body">
+    <strong>In class (before you leave):</strong>
+    <ol>
+      <li>Re-read the passage. Highlight every word or phrase you could not have written yourself.</li>
+      <li>Enter each word into your Personalised Vocab Journal (PVJ) with your best guess at its meaning. This is <em>batching</em>. <span class="xp-tag">VJ XP</span></li>
+    </ol>
+    <strong>Homework Task 1 — Research Batch:</strong>
+    <ol>
+      <li>Look up each word properly. Add a definition, example sentence, and word family to your PVJ entry. <span class="xp-tag">VJ XP</span></li>
+      <li>When your batch is complete, notify Coach Stew. A <strong>/cq</strong> (comprehension quiz) will be set on this passage.</li>
+      <li>Passing the /cq greenlights this passage as a Rehearsal script. <span class="xp-tag">RS XP available</span></li>
+    </ol>
+    <div class="p-drive">Log all Vocab Journal time on your scorecard. Every minute of research earns XP.</div>
+  </div>
+</div>
+
+<div class="p-task">
+  <div class="p-task-num">Task 2</div>
+  <div class="p-task-title">Essay Redraft — Feedback Loop</div>
+  <div class="p-task-body">
+    <ol>
+      <li>Read your /faaice assessment above in full. Start with the Socratic Questions (Section 4). Do not begin rewriting until you have worked through them.</li>
+      <li>Redraft your essay on your own time — anywhere from 10 minutes to 2 hours. Every minute you invest earns <strong>MBD XP</strong>. <span class="xp-tag">MBD XP</span></li>
+      <li>When your redraft is ready, submit it via the scorecard. Coach Stew will provide a second round of assessment.</li>
+      <li>You may continue this feedback loop as many times as you choose. Each round of redrafting earns additional MBD XP.</li>
+      <li>When you decide you are done with the loop, notify Coach Stew. This triggers the release of the <strong>AI-generated rewrite</strong> of your most up-to-date draft. Proceed to Task 3.</li>
+    </ol>
+    <div class="p-drive">File name for scorecard submission: <em>RyderHuang_U[X]W[X]_Draft[N]_[date]</em></div>
+  </div>
+</div>
+
+<div class="p-task">
+  <div class="p-task-num">Task 3</div>
+  <div class="p-task-title">Vocabulary Mining — AI-Generated Essay</div>
+  <div class="p-task-body">
+    <p>Repeat Task 1 using the AI-generated essay as your source text instead of the original passage.</p>
+    <ol>
+      <li>Highlight every word or phrase in the AI essay that you could not have written yourself.</li>
+      <li>Batch these into your PVJ with a guess. <span class="xp-tag">VJ XP</span></li>
+      <li>Research the batch as your next Homework Task. <span class="xp-tag">VJ XP</span></li>
+      <li>When complete, notify Coach Stew for a /cq on the AI essay script.</li>
+      <li>Passing the /cq greenlights the AI essay as a second Rehearsal script. <span class="xp-tag">RS XP available</span></li>
+    </ol>
+  </div>
+</div>
+
+<div class="p-task">
+  <div class="p-task-num">Task 4</div>
+  <div class="p-task-title">Rehearsal — Claim XP</div>
+  <div class="p-task-body">
+    <p>Once a script has been green-lit (either the original passage or the AI essay), you may rehearse it and claim Rehearsal XP on your scorecard.</p>
+    <ol>
+      <li>Rehearse the script to the standard agreed with Coach Stew.</li>
+      <li>Log each completed rehearsal set on your scorecard. <span class="xp-tag">RS XP</span></li>
+      <li>Both the original passage and the AI essay can be active rehearsal scripts simultaneously — each earns its own XP.</li>
+    </ol>
+    <div class="p-drive"><strong>Google Drive:</strong> Drag this PDF to the shared Harland coaching folder. File name: <em>RyderHuang_U[X]W[X]_[DD-MM-YYYY].pdf</em> — Use Chrome or Edge and select "Save as PDF" in the print dialog.</div>
+  </div>
+</div>
+
+
+</div><!-- end .print-only -->
+
+<script>
+
+
+var CURRICULUM = {};
+
+CURRICULUM['u1'] = [
+  null,
+  {
+    week:1, timeMin:25, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"The Case for Democracy", passageWc:210,
+    essayMin:180, essayMax:220,
+    question:"\"Democracy is ultimately the best system of government available to modern nations.\" To what extent do you agree with this statement?",
+    passage:"For most of recorded history, ordinary people had no say in how they were governed. Kings, emperors, and warlords made decisions on behalf of populations who had little recourse if those decisions were wrong. The development of democratic systems in the modern era represented a fundamental shift: power, in theory at least, would be derived from the consent of the governed.\n\nProponents of democracy argue that it is uniquely capable of correcting its own errors. When a policy fails, citizens can vote out the government responsible and replace it with one that offers an alternative approach. This self-correcting mechanism, they suggest, distinguishes democracy from systems where poor leadership can persist indefinitely without challenge.\n\nCritics, however, argue that democracy is vulnerable to its own excesses. Elected leaders have been known to undermine the very institutions designed to hold them accountable. Populism \u2014 the appeal to simple answers for complex problems \u2014 has found fertile ground in democratic systems, sometimes producing outcomes that threaten minority rights and long-term stability.\n\nWhether these weaknesses represent a fundamental flaw in democratic governance, or simply challenges to be managed within it, remains one of the defining political questions of the modern era."
+  },
+  {
+    week:2, timeMin:30, domain:"Science, Technology & Environment",
+    passageTitle:"The Double-Edged Sword of Technology", passageWc:235,
+    essayMin:215, essayMax:260,
+    question:"\"Technology has done more harm than good to modern society.\" How far do you agree with this view?",
+    passage:"Few forces have reshaped human life as fundamentally as technology. From the printing press to the smartphone, successive waves of technological innovation have transformed how we communicate, work, and understand the world around us.\n\nAdvocates argue that technology has been an overwhelmingly positive force. Life expectancy has doubled over the past century, in large part due to advances in medicine, sanitation, and food production. Digital communication has connected people across continents, enabling collaboration and the rapid spread of ideas that would previously have taken decades to circulate.\n\nCritics, however, point to a growing list of unintended consequences. Social media platforms designed to connect people have been linked to rising rates of anxiety and depression, particularly among adolescents. Automation threatens to displace millions of workers in industries from manufacturing to financial services, with no guarantee that comparable employment will emerge to replace them. The environmental cost of powering global digital infrastructure \u2014 an energy demand that now rivals that of many nations \u2014 remains largely invisible to its users.\n\nThe question of whether technology improves or diminishes human wellbeing may ultimately depend on who has access to it, who controls it, and who bears the costs when it fails."
+  },
+  {
+    week:3, timeMin:35, domain:"Literature, Language, Arts & Media",
+    passageTitle:"Who Tells the Story?", passageWc:268,
+    essayMin:250, essayMax:300,
+    question:"\"The media has a responsibility to tell the truth, even when the truth is uncomfortable.\" To what extent do you agree?",
+    passage:"Journalism has long been described as the fourth estate \u2014 an unofficial but essential check on the power of governments, corporations, and institutions. The idea is simple: a society cannot hold its leaders accountable if citizens do not know what those leaders are doing.\n\nSupporters of a free and robust press argue that investigative journalism has repeatedly proven its worth. From the exposure of government corruption to the revelation of corporate malpractice, reporters operating in the public interest have triggered policy changes, prosecutions, and reforms that might otherwise never have occurred. In this view, a healthy democracy is not possible without a free press.\n\nOthers, however, raise uncomfortable questions about who controls the media and whose interests it actually serves. Most major news organisations are owned by a small number of wealthy individuals or corporations, raising legitimate concerns about editorial independence. Meanwhile, the rise of digital media has created a landscape in which speed is prioritised over accuracy, and where sensational stories generate more engagement \u2014 and therefore more revenue \u2014 than careful, nuanced reporting.\n\nThere is also the question of what the media's responsibilities actually are. Is a journalist obliged to remain neutral, presenting competing perspectives without taking sides? Or does the pursuit of truth sometimes require taking a clear position, even at the risk of being accused of bias? The answer may define not just the role of the journalist, but the kind of public discourse a society is capable of having."
+  },
+  {
+    week:4, timeMin:40, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"The Question of Foreign Aid", passageWc:315,
+    essayMin:285, essayMax:345,
+    question:"\"Wealthy nations have a moral obligation to provide foreign aid to developing countries.\" How far do you agree?",
+    passage:"Every year, wealthy nations transfer hundreds of billions of dollars to poorer countries in the form of foreign aid. The stated goal is straightforward: to reduce poverty, improve health and education, and promote stability in regions that have been left behind by global economic development. Whether aid actually achieves these goals, however, is far more contested.\n\nSupporters argue that foreign aid has produced measurable results. Child mortality rates have fallen sharply across sub-Saharan Africa, in part due to aid-funded vaccination programmes. Emergency humanitarian assistance has prevented famines that would otherwise have caused catastrophic loss of life. In fragile states recovering from conflict, international development funding has helped to rebuild basic infrastructure and public services.\n\nCritics challenge this picture on several grounds. The economist Dambisa Moyo has argued that aid creates dependency, undermining the development of local industries and government accountability. When governments can rely on external funding rather than taxation, they have less incentive to be responsive to their own citizens. Others point to the conditions attached to much aid \u2014 requirements for economic liberalisation or privatisation \u2014 as evidence that donor nations use aid primarily to serve their own strategic interests.\n\nThere is also a more fundamental question about fairness. Global poverty is not simply the result of misfortune or poor governance in developing nations. It is, at least in part, the product of centuries of colonial extraction, ongoing trade rules that favour wealthy nations, and a financial system designed to serve the interests of the already-rich. Seen in this light, foreign aid may be less an act of generosity than a partial and inadequate response to a problem the donors themselves helped to create."
+  },
+  {
+    week:5, timeMin:45, domain:"Science, Technology & Environment",
+    passageTitle:"Growth vs. the Planet", passageWc:348,
+    essayMin:325, essayMax:390,
+    question:"\"Economic growth and environmental protection are fundamentally incompatible.\" How far is this true?",
+    passage:"Since the Industrial Revolution, economic growth has been the defining measure of national success. Countries gauge their progress through the rise and fall of GDP; political leaders are judged by whether the economy is expanding or contracting. The assumption underlying this system is that more production, more consumption, and more trade are inherently good things.\n\nThat assumption is now under serious challenge. The scientific consensus is unambiguous: human industrial activity has raised atmospheric carbon dioxide to levels not seen for millions of years, driving a rise in global temperatures that is already reshaping weather patterns, sea levels, and ecosystems. The relationship between economic growth and environmental destruction is not coincidental. In a world of finite resources, producing and consuming more necessarily means using more energy, generating more waste, and placing greater pressure on the natural systems that all life depends upon.\n\nProponents of continued growth argue that technology can decouple economic expansion from environmental damage. Renewable energy now costs less per unit than fossil fuels in many markets. Electric vehicles, more efficient buildings, and precision agriculture all represent examples of innovation reducing the environmental footprint of economic activity. On this view, the problem is not growth itself but the failure to price environmental costs accurately \u2014 a failure correctable through carbon taxes, regulation, and investment in clean technology.\n\nSceptics are less confident. They observe that technological efficiency gains have historically been outpaced by the growth in overall consumption \u2014 a phenomenon known as the rebound effect. More fuel-efficient cars, for instance, tend to lead to more driving, not less. A genuinely sustainable economy, some argue, would require not merely cleaner production but a fundamental rethinking of what counts as wealth and wellbeing \u2014 a transition that current political and economic systems appear poorly equipped to manage."
+  },
+  {
+    week:6, timeMin:50, domain:"Literature, Language, Arts & Media",
+    passageTitle:"The Algorithm and the Agora", passageWc:398,
+    essayMin:365, essayMax:440,
+    question:"\"Social media has done more harm than good to political life.\" To what extent do you agree?",
+    passage:"Ancient Athens gave democracy the agora \u2014 a public space where citizens could gather, debate, and hold their leaders to account. The digital age has given us something that resembles, at first glance, a global version of that space: social media platforms where billions of people can publish their opinions, organise around shared causes, and demand accountability from powerful institutions. Whether these platforms actually strengthen democratic participation or undermine it is one of the most contested questions of our time.\n\nThose who see social media as a democratising force point to its role in enabling political movements that would previously have struggled to gain traction. The Arab Spring protests of 2010 and 2011 were partly organised through social media, allowing activists to coordinate rapidly and communicate with international audiences. Social media has provided a platform for groups historically marginalised in mainstream media \u2014 amplifying voices that might otherwise have gone unheard.\n\nBut this optimism must be weighed against a growing body of evidence that social media also damages the conditions that democratic deliberation requires. Recommendation algorithms are designed not to maximise the quality of public debate but to maximise engagement, which typically means showing users content that triggers strong emotional responses \u2014 outrage, fear, or righteous indignation. The result, many researchers suggest, is an accelerating process of political polarisation in which citizens inhabit separate information ecosystems and find it increasingly difficult to agree on basic facts, let alone policies.\n\nThe spread of misinformation presents a related but distinct concern. Social media platforms have proven extraordinarily effective at circulating false or misleading content, often faster and further than accurate corrections. During the Covid-19 pandemic, health misinformation spread across networks in ways that had measurable consequences for vaccination rates and public behaviour. Democratic systems depend on an informed citizenry; when the information environment is saturated with falsehood, that foundation is weakened.\n\nWhether the solution lies in stronger platform regulation, enhanced digital literacy, or a more fundamental redesign of social media's business model remains deeply contested. What seems increasingly clear is that the algorithm and the agora are in tension \u2014 and that tension has real consequences for how democracy functions."
+  },
+  {
+    week:7, timeMin:55, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"Justice and Its Discontents", passageWc:427,
+    essayMin:400, essayMax:480,
+    question:"\"The primary purpose of punishment should be rehabilitation, not retribution.\" How far do you agree?",
+    passage:"Few questions in political philosophy are more fundamental than how a society should respond to those who break its rules. The answer a nation gives to this question reflects deep assumptions about human nature, the purpose of the state, and the value of individual freedom.\n\nThe dominant model in most Western legal systems has historically combined punishment with deterrence. Criminals are sentenced not only as a consequence of the harm they have caused, but as a warning to others who might consider similar actions. Advocates of this approach argue that it works on its own terms: removing dangerous individuals from society protects potential victims, and the prospect of imprisonment discourages at least some people from committing crimes. Punishment, in this view, also serves a moral function \u2014 it communicates that certain actions are genuinely wrong, not merely inconvenient.\n\nCritics of punitive systems, however, point to several inconvenient realities. High incarceration rates have not consistently produced lower crime rates. The United States, with one of the world's largest prison populations, does not have notably lower crime than comparable nations with far shorter average sentences. Moreover, prisons as currently constituted frequently function as environments that entrench criminal behaviour: a first-time offender sent to prison often emerges with a broader criminal network, reduced employment prospects, and greater alienation from mainstream society than when they entered.\n\nThe rehabilitation model, associated with Nordic prison systems in particular, starts from a different premise. If criminal behaviour is produced by circumstances \u2014 poverty, trauma, mental illness, lack of education \u2014 then the most effective response is not to punish but to address those underlying causes. Norwegian prisons offer education, vocational training, and psychological support; recidivism rates in Norway are among the lowest in the world.\n\nThe disagreement between these positions is not merely technical. It reflects a deeper division about whether human beings are fundamentally responsible for their choices, or whether the choices available to them are shaped by forces largely beyond their control. The answer to that question, more than any evidence about recidivism rates, may determine what any given society believes justice actually requires."
+  },
+  {
+    week:8, timeMin:60, domain:"Science, Technology & Environment",
+    passageTitle:"The Limits of Science", passageWc:458,
+    essayMin:440, essayMax:525,
+    question:"\"Science is the most important driver of human progress.\" To what extent is this true?",
+    passage:"The past four centuries have witnessed the most dramatic expansion of human knowledge in history. From Newton's laws of motion to the mapping of the human genome, from the germ theory of disease to the development of quantum mechanics, science has repeatedly overturned assumptions about the natural world and opened possibilities that previous generations would have considered impossible.\n\nThe practical consequences of this knowledge revolution have been profound. Modern medicine has defeated diseases that once killed millions annually. The Green Revolution in agriculture enabled the world to feed a population that many in the mid-twentieth century believed could not be sustained. The development of vaccines, sanitation systems, and antibiotics has extended average human lifespans more dramatically in the past hundred years than in all of preceding history combined.\n\nGiven this record, it is tempting to view science as the primary engine of human progress. And for many people, this view seems self-evident: in a world increasingly shaped by technology and data, what cannot be measured and tested seems at best secondary, at worst irrelevant.\n\nYet this confidence deserves scrutiny. Science has produced not only antibiotics but nerve agents, not only nuclear power but nuclear weapons. The Haber-Bosch process for synthesising fertiliser, which has fed billions, has also driven runaway nitrogen pollution in waterways and soils worldwide. The internal combustion engine transformed human mobility and helped build the modern economy; it has also driven the carbon emissions now destabilising the global climate. Science, in other words, is not neutral. It is a powerful tool whose consequences depend entirely on the values, priorities, and power structures that guide its application.\n\nThere is also the question of what science cannot tell us. It can describe what is, but not what ought to be. Questions of justice, meaning, beauty, and obligation lie beyond the reach of the scientific method \u2014 not because they are unimportant, but because they are not empirical in nature. Progress may require science \u2014 but it requires other things as well: wisdom about what to pursue, judgment about who bears the costs, and institutions capable of directing powerful knowledge toward genuinely humane ends."
+  },
+  {
+    week:9, timeMin:65, domain:"Literature, Language, Arts & Media",
+    passageTitle:"Whose Language Is It?", passageWc:478,
+    essayMin:475, essayMax:570,
+    question:"\"The global dominance of English is a form of cultural imperialism.\" How far do you agree?",
+    passage:"Approximately 1.5 billion people speak English worldwide. Of these, fewer than 400 million are native speakers. The remaining billion or more have learned English as a second or additional language, often because fluency has become a practical prerequisite for participation in international business, higher education, science, and diplomacy. No other language in history has achieved this kind of global reach, and whether that reach represents a neutral development or a form of cultural power is a question that remains deeply contested.\n\nDefenders of English's global role argue that it functions less as a national language than as a neutral medium of international communication \u2014 a lingua franca that allows people from radically different backgrounds to collaborate and exchange ideas. Scientific research is overwhelmingly published in English; without a common language, the global coordination of responses to challenges like climate change or pandemic disease would be far more difficult to achieve. For many speakers, English is simply a useful tool, adopted pragmatically rather than ideologically.\n\nCritics of this view point out that the choice of English as the world's default language was not made by mutual agreement. It emerged from the history of British colonialism and American economic dominance \u2014 processes that involved not merely cultural influence but coercion, displacement, and the suppression of indigenous languages and traditions. In many former British colonies, policies of English-only education actively undermined local languages, some of which have since disappeared. In contexts where English proficiency correlates with access to opportunity, speakers of other languages face a structural disadvantage that has nothing to do with the intrinsic value of their languages or cultures.\n\nThe consequences of linguistic dominance extend beyond communication. Language shapes thought: the concepts, metaphors, and categories available in a language influence how its speakers perceive and organise experience. When a language disappears, it takes with it irreplaceable ways of understanding the world \u2014 ecological knowledge, literary traditions, philosophical frameworks that cannot be fully translated. Linguists estimate that around half of the world's approximately seven thousand languages are currently endangered, with one dying approximately every two weeks."
+  },
+  {
+    week:10, timeMin:70, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"People in Motion", passageWc:490,
+    essayMin:510, essayMax:615,
+    question:"\"The benefits of immigration outweigh the challenges it creates for host nations.\" How far do you agree?",
+    passage:"Human beings have always moved. For most of history, migration was not a policy question but a fact of life \u2014 communities shifted in response to climate, conflict, economic opportunity, and the inexorable pull of better prospects elsewhere. The nation-state system that emerged in the nineteenth and twentieth centuries introduced a new framework: the idea that populations belong within defined territorial boundaries, and that crossing those boundaries requires permission.\n\nThis framework now faces unprecedented pressure. Climate change is already displacing communities in low-lying coastal regions and drought-affected agricultural zones. Economic inequality between nations creates powerful incentives for movement from poorer to wealthier countries. Conflict, persecution, and state failure continue to generate refugees at rates not seen since the Second World War.\n\nThe case for openness to immigration rests partly on economic grounds. In most wealthy nations, ageing populations and declining birth rates are creating labour shortages that immigration can help to address. Migrants contribute to the tax base, fill essential roles in healthcare, agriculture, and construction, and frequently start businesses that generate employment. Historically, countries built in large part by immigration \u2014 the United States, Canada, Australia \u2014 have benefited substantially from the energy and enterprise of those who chose to move there.\n\nBut economic arguments alone rarely settle political debates about migration, because concerns about it are not exclusively economic. Questions of cultural identity \u2014 who belongs, what shared values a society holds, how quickly change can be absorbed \u2014 are felt deeply by communities that experience rapid demographic shifts, particularly in areas where existing public services are already stretched. Populist political movements across Europe and North America have drawn energy from these anxieties, often deliberately conflating legitimate questions about the pace of social change with hostility to migrants as individuals.\n\nWhat seems clear is that the movement of people is not going to slow significantly in the coming decades. The question is not whether migration will continue, but how societies choose to manage it \u2014 and what that choice says about the kind of communities they want to be."
+  },
+  {
+    week:11, timeMin:75, domain:"Science, Technology & Environment",
+    passageTitle:"The Machine That Decides", passageWc:507,
+    essayMin:600, essayMax:900,
+    question:"\"Artificial intelligence represents a greater threat than opportunity for humanity.\" To what extent do you agree?",
+    passage:"For most of human history, the decision to use lethal force \u2014 in war, in law enforcement, in the defence of a community \u2014 has been made by a human being. Whatever the strategic logic, whatever the scale of the conflict, a person gave the order, aimed the weapon, pulled the trigger. That fact has always carried moral weight: the human who takes a life, whether in justified self-defence or unjustified aggression, is accountable in a way that a mechanism cannot be.\n\nArtificial intelligence is beginning to change this. Autonomous weapons systems \u2014 machines capable of selecting and engaging targets without direct human instruction \u2014 have moved from the realm of science fiction to the battlefield. Loitering munitions have already been deployed in multiple conflicts. AI-assisted targeting systems have directed artillery fire and airstrikes. The logic of military development points toward systems that are faster, more accurate, and more autonomous than any human operator.\n\nAdvocates of autonomous systems make several arguments. Removing human soldiers from direct combat reduces military casualties. Machines, unlike humans, do not act out of fear, anger, or the desire for revenge \u2014 the emotional states that contribute to war crimes and atrocities. In high-speed environments, autonomous systems can react in milliseconds, far faster than any human can process and respond.\n\nThe case against is equally powerful. The most fundamental concern is accountability: when an autonomous system kills a civilian \u2014 as, given the complexity of conflict environments, it inevitably will \u2014 who is responsible? The engineer who wrote the targeting algorithm? The commander who deployed the system? The manufacturer who sold it? International humanitarian law was developed on the assumption that a human being always made the final decision to use force. Autonomous systems break that assumption, creating what legal scholars call an accountability gap that current frameworks are not equipped to fill.\n\nThere is also the question of escalation. The 2010 Flash Crash \u2014 in which automated trading algorithms erased nearly a trillion dollars of stock market value in minutes \u2014 offers a sobering analogy: automated systems interacting with one another in high-speed environments can produce outcomes no individual designer intended, and no human can reverse in time.\n\nArtificial intelligence, like most powerful technologies, is neither inherently beneficial nor inherently harmful. Whether it serves human ends or subverts them depends on the values embedded in its design, the legal frameworks that govern its use, and the willingness of the international community to enforce those frameworks \u2014 even when doing so requires restraint from those with the most to gain from abandoning them."
+  }
+];
+CURRICULUM['u2'] = [
+  null,
+  {
+    week:1, timeMin:25, domain:"Literature, Language, Arts & Media",
+    passageTitle:"The Limits of Free Expression", passageWc:265,
+    essayMin:200, essayMax:250,
+    question:"\"Freedom of speech must be restricted when it endangers social cohesion.\" To what extent do you agree?",
+    passage:"The principle that individuals should be free to express their views without fear of government censorship is one of the cornerstones of liberal democracy. Yet few principles are as contested in practice as this one. Speech that some regard as essential to democratic debate others experience as incitement to hatred or violence. Where the line between protected expression and harmful speech should be drawn is a question that democratic societies have answered in radically different ways.\n\nThe absolutist position, most commonly associated with the First Amendment tradition of the United States, holds that the cure for bad speech is more speech, not suppression. On this view, the dangers of allowing governments to define the boundaries of acceptable expression are greater than the harms caused by offensive or misleading content. History offers ample evidence that censorship has more often been used to silence the powerless than the powerful.\n\nBut the absolutist position is also a minority one globally. Most liberal democracies impose some restrictions on speech: prohibitions on incitement to violence, laws against defamation, rules governing the disclosure of national security information. European courts have generally held that the right to free expression must be balanced against other rights \u2014 including the right to dignity \u2014 in ways that American jurisprudence has historically resisted.\n\nThe rise of social media has added new complexity to this question. When platforms capable of reaching billions become the primary public square, the question of who controls those platforms \u2014 and by what rules \u2014 has become inseparable from questions about the nature of free speech itself."
+  },
+  {
+    week:2, timeMin:30, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"The Guaranteed Income", passageWc:305,
+    essayMin:240, essayMax:285,
+    question:"\"A universal basic income is the most effective solution to modern economic inequality.\" How far do you agree?",
+    passage:"The idea of a universal basic income \u2014 a regular, unconditional payment made by the state to every citizen, regardless of employment status or other income \u2014 has moved from the margins of political debate to its mainstream with remarkable speed. Once associated primarily with libertarian economists and utopian social theorists, UBI has in recent years attracted serious attention from governments, technology companies, and development organisations as a potential response to economic precarity and the disruption posed by automation.\n\nSupporters argue that UBI addresses several fundamental weaknesses of existing welfare systems simultaneously. Means-tested benefits \u2014 payments withdrawn as income rises \u2014 create poverty traps: rational actors can find themselves financially worse off by taking low-paid work than by remaining on benefits. UBI eliminates this perverse incentive by making payments universal and unconditional. It also provides a genuine safety net for workers in the gig economy or informal sector who currently fall between the gaps of systems designed for permanent full-time employment.\n\nCritics raise concerns on multiple fronts. The fiscal cost of meaningful UBI is very significant, raising questions about how it would be funded without undermining the public services it is intended to complement. Some argue that UBI could weaken workers' incentives to seek employment, though evidence from pilot programmes in Finland, Kenya, and elsewhere has not consistently supported this concern.\n\nBeneath the technical debates lies a deeper philosophical question: whether security and freedom are best achieved through universal entitlements or targeted support. The answer reflects fundamental assumptions about what a state owes its citizens, and what citizens owe one another."
+  },
+  {
+    week:3, timeMin:35, domain:"Science, Technology & Environment",
+    passageTitle:"Splitting the Atom, Again", passageWc:338,
+    essayMin:280, essayMax:330,
+    question:"\"Nuclear energy should be central to any serious response to climate change.\" How far do you agree?",
+    passage:"After decades in which nuclear power was widely regarded as a technology in terminal decline \u2014 tainted by the disasters at Three Mile Island, Chernobyl, and Fukushima \u2014 it is undergoing a remarkable rehabilitation. As the urgency of the climate crisis intensifies and the limitations of intermittent renewable energy sources become more apparent, nuclear power has re-emerged as a potential cornerstone of decarbonised electricity systems.\n\nThe case for nuclear power rests primarily on its capacity to generate large quantities of electricity with very low carbon emissions, without the intermittency that limits wind and solar. The sun does not always shine; the wind does not always blow. Nuclear reactors, by contrast, can provide continuous, reliable baseload power, which is precisely what electricity grids require. Over its full lifecycle, nuclear power produces fewer carbon emissions per unit of electricity than any fossil fuel, and compares favourably even with some renewable technologies when manufacturing and material costs are accounted for.\n\nThe objections to nuclear power are formidable and widely felt. The accidents at Chernobyl and Fukushima demonstrated the potential for catastrophic harm when nuclear facilities fail. The management of radioactive waste \u2014 which remains hazardous for thousands of years \u2014 remains an unresolved challenge for which no country has yet found a fully satisfactory long-term solution. Nuclear facilities take many years to construct and are extremely expensive to build, making them a slow and costly response to an urgent problem.\n\nThe debate over nuclear energy ultimately forces a confrontation between different kinds of risk. The risks posed by climate change are vast and increasingly certain. The risks posed by nuclear power are real but low-probability. How a society weighs these competing risks may say as much about its political culture as about the underlying technical evidence."
+  },
+  {
+    week:4, timeMin:40, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"The Return of the Nation", passageWc:372,
+    essayMin:315, essayMax:375,
+    question:"\"Rising nationalism poses a greater threat to global stability than international terrorism.\" To what extent do you agree?",
+    passage:"The decades following the Second World War were marked, in much of the Western world, by a gradual movement toward international institutions, economic integration, and the pooling of national sovereignty. The European Union, the United Nations, the World Trade Organisation, and a proliferating network of multilateral bodies embodied a conviction that the greatest threats facing humanity could only be addressed through cooperation that transcended national boundaries.\n\nThat conviction has been under sustained challenge since at least 2016. The British vote to leave the European Union, the election of nationalist governments across Hungary, Poland, Brazil, and the United States, and the resurgence of ethno-nationalist movements in countries that had appeared to have left them behind all suggested that the internationalist consensus was more fragile than its advocates had assumed.\n\nDefenders of national sentiment argue that its resurgence reflects legitimate concerns that internationalist elites had failed to take seriously. Globalisation produced winners and losers within nations, not merely between them: communities whose industries were dismantled by international competition, whose wages were suppressed by labour market liberalisation, and whose cultural landscapes were transformed by rapid demographic change found that mainstream political parties offered them few meaningful responses.\n\nCritics of the nationalist turn are equally insistent. They point to the historical record: the last great era of European nationalism produced two world wars, genocide, and the near-total collapse of the international order. They argue that the problems most urgently confronting humanity \u2014 climate change, pandemic disease, the governance of artificial intelligence \u2014 are intrinsically global in nature and cannot be addressed by nations acting alone. And they observe that nationalist rhetoric has, in a troubling number of cases, shaded into the scapegoating of minorities and the erosion of the institutions that protect civil liberties."
+  },
+  {
+    week:5, timeMin:45, domain:"Science, Technology & Environment",
+    passageTitle:"Beyond the Atmosphere", passageWc:378,
+    essayMin:355, essayMax:420,
+    question:"\"Investment in space exploration is unjustifiable while poverty persists on Earth.\" To what extent do you agree?",
+    passage:"In July 1969, Neil Armstrong became the first human being to walk on the surface of another world. The moment was widely understood not merely as a triumph of American engineering and Cold War competition, but as a statement about the possibilities of human ambition: that the boundaries of what our species could achieve were, quite literally, unlimited.\n\nIt has, however, acquired some uncomfortable company. In a world where hundreds of millions of people lack access to clean water, adequate nutrition, or basic healthcare, the spectacle of billionaires competing to reach the edge of the atmosphere has provoked a pointed question: can the expenditure of vast resources on space exploration be justified when so much urgent need exists on Earth?\n\nThe defenders of space investment argue that the question presents a false choice. Space programmes have historically produced technological spillovers that benefit terrestrial life in ways that are difficult to predict in advance. The development of satellite technology has transformed communications, navigation, weather forecasting, and agricultural management. More fundamentally, proponents argue, the exploration of space is not a luxury but a long-term existential investment: a species that exists on a single planet is, by definition, one catastrophic event away from extinction.\n\nCritics are sceptical of these arguments. Technological spillovers from space programmes, they suggest, could be achieved more efficiently through direct investment in research. The timescale on which space colonisation could meaningfully reduce existential risk is so long as to be practically irrelevant to decisions being made today. And there is something morally dissonant, they argue, about societies that cannot provide adequate healthcare to their most vulnerable citizens directing billions toward aerospace ambitions.\n\nThe debate about space reflects a broader tension between present obligations and future possibilities: how much should a generation invest in projects whose benefits may not be realised for centuries?"
+  },
+  {
+    week:6, timeMin:50, domain:"Literature, Language, Arts & Media",
+    passageTitle:"The Value of the Impractical", passageWc:405,
+    essayMin:395, essayMax:470,
+    question:"\"Arts education is as important to a nation's development as scientific and technical education.\" How far do you agree?",
+    passage:"In most education systems, the subjects deemed most valuable are those most clearly connected to economic productivity: mathematics, science, computer programming, engineering. Arts subjects \u2014 music, drama, visual art, literature \u2014 tend to occupy a subordinate position in curricula and are disproportionately vulnerable when budget pressures require cuts. The implicit assumption is that the arts are, in some fundamental sense, a luxury: enriching perhaps, but not essential in the way that quantitative and technical skills are essential.\n\nThis assumption deserves more critical scrutiny than it usually receives. Arts education does not merely develop aesthetic sensibility; it cultivates a cluster of capacities that are widely recognised as economically and socially valuable. The study of literature develops the ability to interpret complex texts, construct sustained arguments, and empathise with perspectives radically different from one's own. Drama training builds confidence in public speaking, collaborative working, and the ability to inhabit and project different viewpoints. Music education has been linked in multiple studies to improvements in mathematical reasoning and general cognitive development.\n\nBeyond these instrumental arguments lies a deeper point about what education is for. If the goal of schooling is to produce productive economic units, then the marginalisation of the arts may be defensible. But if education aims to develop whole human beings \u2014 citizens capable of meaningful participation in cultural and political life \u2014 then the arts are not peripheral to the curriculum but central to it.\n\nThere is also a question of social equity. Access to arts education has historically been distributed very unevenly: students from wealthier families supplement school provision with private music lessons and theatre groups, while those from less privileged backgrounds depend entirely on what schools offer. When arts programmes are cut, the losses fall disproportionately on those who have least access to alternatives. The countries whose education systems consistently rank highest in international assessments \u2014 Finland, Estonia \u2014 have not achieved those results by narrowing their curricula to the economically legible."
+  },
+  {
+    week:7, timeMin:55, domain:"Science, Technology & Environment",
+    passageTitle:"The Watching State", passageWc:445,
+    essayMin:435, essayMax:515,
+    question:"\"Mass surveillance is an acceptable price to pay for national security.\" How far do you agree?",
+    passage:"The capacity of modern states and corporations to monitor their citizens and customers has grown to a degree that would have been unimaginable a generation ago. CCTV cameras blanket urban centres in many countries. Smartphones record their users' locations continuously. Online platforms track browsing behaviour, purchasing patterns, and social connections with extraordinary granularity. In some nations \u2014 most notably China \u2014 this data is integrated with facial recognition technology and social credit systems to produce a surveillance architecture of unprecedented scope.\n\nDefenders of expanded state surveillance argue that the security benefits are real and significant. Terrorist attacks, which by their nature are planned covertly, have been disrupted by intelligence agencies using data collected through mass surveillance programmes. In a world in which organised crime, terrorism, and hostile state actors make sophisticated use of digital communications, security services prohibited from accessing those communications are placed at a systematic disadvantage.\n\nThe critique of mass surveillance operates on several levels. The most basic is practical: there is limited evidence that mass collection of data significantly improves security outcomes. The volume of data generated by mass surveillance is so large that security services frequently lack the capacity to analyse it effectively.\n\nAt a deeper level, surveillance critics argue that the capacity to monitor people changes the relationship between the state and the individual in ways that undermine freedom even when the data collected is never used. The knowledge that one is being watched produces what legal scholars call the chilling effect: a modification of behaviour in response to perceived scrutiny. People who know they are being monitored say less, associate less freely, and participate less actively in political life. A society in which this effect is pervasive is not, in a meaningful sense, a free one.\n\nThere is also the question of who controls the surveillance apparatus and on what terms. Systems built for legitimate security purposes have been repurposed, in many historical cases, to monitor political opponents, journalists, and civil society organisations. The power to watch, once created, has a tendency to expand beyond its original justifications \u2014 a tendency that democratic institutions have shown themselves only partially capable of constraining."
+  },
+  {
+    week:8, timeMin:60, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"The Obligations of Power", passageWc:465,
+    essayMin:470, essayMax:555,
+    question:"\"Large corporations have a moral responsibility to society that goes beyond the pursuit of profit.\" To what extent do you agree?",
+    passage:"In 1970, the economist Milton Friedman published a famous essay arguing that the social responsibility of business was, precisely, to make profit for its shareholders. The executive who diverted corporate resources to social causes was, Friedman argued, spending money that belonged to shareholders without their consent \u2014 a form of taxation without representation. This view was enormously influential, shaping the culture of business schools and the strategies of corporations for the following half-century.\n\nThat framework is now under serious and sustained challenge. The evidence that corporations operating purely in pursuit of short-term shareholder value produce significant harm \u2014 environmental destruction, worker exploitation, the erosion of local communities, the capture of regulatory systems \u2014 has accumulated to a degree that is difficult to ignore. The financial crisis of 2008, precipitated in large part by financial institutions whose executives were rationally maximising their own compensation at the expense of systemic stability, demonstrated on a global scale the consequences of treating profit as the only relevant measure of corporate success.\n\nThe concept of stakeholder capitalism \u2014 the idea that corporations have obligations not only to shareholders but to employees, communities, suppliers, and the environment \u2014 has gained considerable traction as an alternative framework. Major corporations have adopted environmental, social, and governance commitments; the Business Roundtable, an association of American CEOs, issued a statement in 2019 explicitly repudiating the shareholder primacy doctrine.\n\nSceptics of corporate social responsibility point out that voluntary commitments made in the absence of binding regulation tend to be honoured when convenient and abandoned when costly. The fundamental problem is structural: in competitive markets, companies that genuinely internalise the costs of environmental or social harm are disadvantaged relative to competitors who do not. Without a regulatory floor that applies equally to all participants, the dynamics of competition consistently reward the less responsible actor.\n\nThe deeper question is what kind of economy a society wants to have, and what instruments it is willing to use to achieve it. A market economy in which corporations operate purely in pursuit of profit, externalising costs onto workers, communities, and the environment, is itself the product of specific legal and political choices \u2014 choices that could, in principle, be made differently."
+  },
+  {
+    week:9, timeMin:65, domain:"Economic, Historical, Moral, Political & Social",
+    passageTitle:"The People and Their Leaders", passageWc:492,
+    essayMin:505, essayMax:600,
+    question:"\"Populism represents a fundamental threat to liberal democracy.\" To what extent do you agree?",
+    passage:"Populism \u2014 a political style that presents itself as the authentic voice of the ordinary people against a corrupt or self-serving elite \u2014 is not a new phenomenon. What is new is the degree to which populist movements and parties have come to dominate democratic politics across much of the world. From the United States to Brazil, from Hungary to the Philippines, politicians who position themselves as outsiders challenging a discredited establishment have achieved power or significant political influence with a frequency that has alarmed liberal democratic institutions.\n\nUnderstanding what drives this development requires, first, acknowledging that the populist critique of liberal democracy contains elements that are not entirely without merit. Contemporary democratic systems in many countries have presided over rising inequality, the erosion of labour rights, the capture of regulatory bodies by the industries they are supposed to regulate, and the marginalisation of large sections of the population from meaningful political participation. The claim that mainstream politicians have been more responsive to the interests of corporations and financial institutions than to those of ordinary citizens is not a paranoid fantasy but a position supported by a considerable body of political science research.\n\nThe problem with populism is not that it identifies real failures in democratic governance. The problem is that its characteristic solutions tend to deepen rather than resolve the underlying crises. Populist leaders typically concentrate power in the executive, weaken the independent institutions \u2014 courts, free media, electoral commissions \u2014 that provide accountability in democratic systems, and define the political community in ways that exclude significant portions of the population. Hungary under Viktor Orb\u00e1n offers a well-documented example: a government that arrived in power with a genuine democratic mandate has systematically dismantled the checks and balances that distinguish liberal from illiberal democracy.\n\nThere is also the question of populism's relationship to truth. The deployment of misinformation has been a feature of major populist movements in a number of countries. When populist leaders insist that objective facts are fabrications of a hostile elite, they are attacking the epistemic foundations without which democratic deliberation \u2014 the capacity of citizens to reason together about shared problems \u2014 is not possible."
+  },
+  {
+    week:10, timeMin:70, domain:"Literature, Language, Arts & Media",
+    passageTitle:"Culture in the Age of Globalisation", passageWc:498,
+    essayMin:540, essayMax:645,
+    question:"\"Globalisation is destroying cultural diversity.\" How far do you agree with this view?",
+    passage:"The global circulation of cultural products \u2014 films, music, television, fashion, cuisine \u2014 has accelerated dramatically in the digital age. A teenager in Taipei can watch the same streaming series as a teenager in S\u00e3o Paulo; a musician in Lagos can reach listeners in Oslo through digital platforms; a phrase from American youth culture can enter everyday speech on the other side of the world within weeks. Whether this represents an enriching expansion of cultural possibility or the homogenisation of human experience at the expense of local distinctiveness is one of the more complex questions raised by globalisation.\n\nThose who welcome cultural globalisation point to its democratising and connective dimensions. Access to the full range of human cultural production \u2014 literature, cinema, music, art \u2014 is no longer limited to those with the resources to travel or attend elite cultural institutions. Cross-cultural exchange has historically been a powerful engine of artistic innovation: jazz, rock and roll, hip-hop, and many other influential art forms emerged from the creative collision of different cultural traditions.\n\nBut the critique of cultural globalisation rests on a serious observation about asymmetry. Cultural exchange between Hollywood and a small-language film industry in West Africa is not a relationship between equals. Hollywood's production budgets, distribution networks, and marketing reach are so vastly greater than those of most other film industries that the competition is not meaningful in economic terms. When a small-language cinema loses its audience to American productions \u2014 not because American films are better but because they are more expensively promoted \u2014 something of value is lost.\n\nMany societies have found ways to sustain local cultural production while remaining open to global influences \u2014 through public funding for local arts, language preservation programmes, or regulatory requirements for domestic content in broadcasting. Whether these measures are adequate to the scale of the challenge is a question without a simple answer. What seems clear is that the market alone, left to its own logic, will not resolve it."
+  },
+  {
+    week:11, timeMin:75, domain:"Literature, Language, Arts & Media",
+    passageTitle:"The Age of Unreason", passageWc:512,
+    essayMin:600, essayMax:900,
+    question:"\"The spread of misinformation represents the greatest threat to democracy in the twenty-first century.\" To what extent do you agree?",
+    passage:"In November 2016, Oxford Dictionaries announced that their word of the year was post-truth \u2014 an adjective defined as relating to circumstances in which objective facts are less influential in shaping public opinion than appeals to emotion and personal belief. The choice reflected a gathering anxiety: that something fundamental had changed in the relationship between democratic politics and factual reality, and that the change was dangerous.\n\nThe concern was not without foundation. The Brexit referendum in the United Kingdom had featured campaigns that made demonstrably false claims about the financial consequences of European Union membership. The United States presidential election of the same year saw a candidate whose public statements contained a historically unusual proportion of material that was false or misleading. In both cases, the falsehoods did not prevent their proponents from winning \u2014 raising a disturbing question: had the political value of truthfulness declined to the point where it no longer provided a meaningful advantage in democratic competition?\n\nThe mechanisms by which misinformation spreads in contemporary media environments are now reasonably well understood. Social media platforms \u2014 designed to maximise engagement rather than promote accuracy \u2014 have proven far more effective at distributing emotionally resonant content, including false content, than at promoting careful, evidenced reasoning. Research consistently shows that false stories spread faster on social media than true ones, in part because novelty and emotional charge are more effective engagement drivers than factual accuracy.\n\nBut it would be a mistake to attribute the problem entirely to social media or digital technology. The capacity of citizens to evaluate competing knowledge claims requires not only good information infrastructure but also the analytical skills to use it. Educational systems that prioritise the consumption of content over the development of critical reasoning create fertile ground for misinformation regardless of the specific medium through which it travels.\n\nThere is also the risk of misdiagnosis. The charge of peddling misinformation has itself been weaponised as a political tool \u2014 used not only against those who genuinely spread falsehoods but against inconvenient truths and voices that challenge dominant narratives for legitimate reasons. The challenge for democratic societies is to develop institutions and practices capable of sustaining shared standards of evidence and accountability \u2014 and that is a political, educational, and cultural challenge, not primarily a technological one."
+  }
+];
+
+var cUnit='u1', cWeek=1, cPhase='idle', timerInt=null, remaining=0, totalTime=0;
+
+/* ---------- persistence ---------- */
+var KEY='harland_aice_gp_practice_v1';
+var canStore=false, booted=false, saveT=null;
+try{localStorage.setItem('__t','1');localStorage.removeItem('__t');canStore=true;}catch(e){canStore=false;}
+var sessions={};
+
+function skey(){return cUnit+'-'+cWeek;}
+function getData(){return CURRICULUM[cUnit][cWeek];}
+
+function stashCurrent(){
+  if(cPhase==='idle')return;
+  var s=sessions[skey()]||{};
+  s.ph=cPhase;
+  s.rem=remaining;
+  s.essay=document.getElementById('essay').value;
+  if(cPhase==='submitted')s.sub=true;
+  sessions[skey()]=s;
+}
+function saveState(){
+  if(!booted||!canStore)return;
+  stashCurrent();
+  try{
+    localStorage.setItem(KEY,JSON.stringify({
+      v:1,
+      name:document.getElementById('stu-name').value,
+      unit:cUnit, week:cWeek, sessions:sessions
+    }));
+    flashSaved();
+  }catch(e){}
+}
+function saveSoon(){if(saveT)clearTimeout(saveT);saveT=setTimeout(saveState,400);}
+function flashSaved(){
+  var el=document.getElementById('saveind');
+  if(!el)return;
+  el.className='on';
+  if(el._t)clearTimeout(el._t);
+  el._t=setTimeout(function(){el.className='';},1200);
+}
+function loadStored(){
+  if(!canStore){
+    var n=document.getElementById('nostore');
+    if(n)n.className='show';
+    return null;
+  }
+  var raw=null;
+  try{raw=localStorage.getItem(KEY);}catch(e){}
+  if(!raw)return null;
+  var st=null;
+  try{st=JSON.parse(raw);}catch(e){return null;}
+  if(!st)return null;
+  sessions=st.sessions||{};
+  if(st.name)document.getElementById('stu-name').value=st.name;
+  if(st.unit==='u1'||st.unit==='u2')cUnit=st.unit;
+  if(st.week>=1&&st.week<=11)cWeek=st.week;
+  return st;
+}
+function resetStore(){
+  if(window.confirm('Reset all saved progress on this device? Submitted PDFs you have already downloaded are unaffected.')){
+    try{localStorage.removeItem(KEY);}catch(e){}
+    window.location.reload();
+  }
+}
+
+/* ---------- helpers ---------- */
+function pad2(n){return (n<10?'0':'')+n;}
+function fmt(s){
+  if(s<0)s=0;
+  var m=Math.floor(s/60),sec=s%60;
+  return pad2(m)+':'+pad2(sec);
+}
+
+/* ---------- navigation ---------- */
+function setUnit(u){
+  if(cPhase==='reading'||cPhase==='writing'){
+    if(!window.confirm('Leave this sit? Your time and writing are saved, and the sit resumes where you left off.'))return;
+  }
+  saveState();
+  cUnit=u; cWeek=1;
+  renderUnitTabs(); renderWeekTabs(); loadWeek();
+  saveState();
+}
+function setWeek(w){
+  if(cPhase==='reading'||cPhase==='writing'){
+    if(!window.confirm('Leave this sit? Your time and writing are saved, and the sit resumes where you left off.'))return;
+  }
+  saveState();
+  cWeek=w; renderWeekTabs(); loadWeek();
+  saveState();
+}
+
+function renderUnitTabs(){
+  var u1=document.getElementById('utab-u1');
+  var u2=document.getElementById('utab-u2');
+  u1.className='utab'+(cUnit==='u1'?' active-u1':'');
+  u2.className='utab'+(cUnit==='u2'?' active-u2':'');
+}
+
+function renderWeekTabs(){
+  var c=document.getElementById('week-tabs');
+  c.innerHTML='';
+  var i;
+  for(i=1;i<=11;i++){
+    var b=document.createElement('button');
+    b.className='wtab'+(i===cWeek?(cUnit==='u1'?' aw1':' aw2'):'');
+    var d=CURRICULUM[cUnit][i];
+    var sess=sessions[cUnit+'-'+i];
+    b.textContent='W'+i+' \u00B7 '+d.timeMin+'min'+((sess&&sess.sub)?' \u2713':'');
+    b.onclick=(function(w){return function(){setWeek(w);};})(i);
+    c.appendChild(b);
+  }
+}
+
+function renderPips(){
+  var c=document.getElementById('pips');
+  c.innerHTML='';
+  var i;
+  for(i=1;i<=11;i++){
+    var p=document.createElement('div');
+    var sess=sessions[cUnit+'-'+i];
+    p.className='pip'+((sess&&sess.sub)?' done':(i===cWeek?' cur':''));
+    c.appendChild(p);
+  }
+  var d=getData();
+  document.getElementById('wpm').textContent=
+    (cUnit==='u1'?'Unit 1':'Unit 2')+' \u00B7 Week '+cWeek+' of 11 \u00B7 '+d.timeMin+' min \u00B7 ~'+d.passageWc+' word passage';
+}
+
+/* ---------- week loading (with restore) ---------- */
+function loadWeek(){
+  if(timerInt){clearInterval(timerInt);timerInt=null;}
+  cPhase='idle';
+  var d=getData();
+  totalTime=d.timeMin*60;
+  remaining=totalTime;
+
+  var el;
+  el=document.getElementById('timer'); el.textContent=fmt(remaining); el.className='';
+  document.getElementById('pb').style.width='0%';
+  setTag('Not started','');
+
+  document.getElementById('cm-time').textContent=d.timeMin+' minutes';
+  document.getElementById('cm-week').textContent='Week '+d.week+' of 11';
+  document.getElementById('cm-target').textContent=d.essayMin+'\u2013'+d.essayMax+' words';
+  document.getElementById('cm-domain').textContent=d.domain;
+  document.getElementById('cm-unit').textContent=(cUnit==='u1'?'Unit 1 \u00B7 Foundations':'Unit 2 \u00B7 Advanced');
+  document.getElementById('cs-label').textContent=
+    'Paper 1 \u00B7 '+(cUnit==='u1'?'Unit 1':'Unit 2')+' Week '+d.week+' of 11';
+
+  document.getElementById('ph1-note').textContent='Passage \u00B7 ~'+d.passageWc+' words';
+  document.getElementById('ph2-note').textContent='Essay \u00B7 '+d.essayMin+'\u2013'+d.essayMax+' words';
+  document.getElementById('pass-domain').textContent='Reading Passage \u00B7 '+d.domain;
+  document.getElementById('pass-title').textContent=d.passageTitle;
+  var paras=d.passage.split('\n\n'), ph='', i;
+  for(i=0;i<paras.length;i++){ph+='<p>'+paras[i]+'</p>';}
+  document.getElementById('pass-body').innerHTML=ph;
+  document.getElementById('pass-wc').textContent='Approximately '+d.passageWc+' words';
+  document.getElementById('q-topic').textContent='Topic area \u00B7 '+d.domain;
+  document.getElementById('q-stem').textContent=d.question;
+  document.getElementById('tbar-target').textContent=d.essayMin+'\u2013'+d.essayMax+' words';
+  document.getElementById('tbar-note').textContent=
+    cWeek<11?'Builds to 600\u2013900 by Week 11':'Cambridge full-length target';
+
+  document.getElementById('start-screen').style.display='block';
+  document.getElementById('passage-section').style.display='none';
+  document.getElementById('essay-section').style.display='none';
+  document.getElementById('btn-write').style.display='';
+  document.getElementById('essay').value='';
+  document.getElementById('essay').disabled=false;
+  document.getElementById('wc').textContent='0 words';
+  document.getElementById('wc').className='wc';
+  document.getElementById('lmsg').className='lmsg';
+  document.getElementById('btn-sub').disabled=true;
+  document.getElementById('done').className='done';
+
+  restoreSession();
+  renderPips();
+}
+
+function setTag(text,cls){
+  var tag=document.getElementById('ptag');
+  tag.textContent=text;
+  tag.className='ptag'+(cls?' '+cls:'');
+}
+
+function restoreSession(){
+  var s=sessions[skey()];
+  if(!s||(!s.ph)||s.ph==='idle')return;
+
+  if(s.sub||s.ph==='submitted'){
+    cPhase='submitted';
+    remaining=(typeof s.rem==='number')?s.rem:0;
+    document.getElementById('timer').textContent=fmt(remaining);
+    document.getElementById('start-screen').style.display='none';
+    document.getElementById('passage-section').style.display='block';
+    document.getElementById('btn-write').style.display='none';
+    document.getElementById('essay-section').style.display='block';
+    document.getElementById('essay').value=s.essay||'';
+    document.getElementById('essay').disabled=true;
+    document.getElementById('btn-sub').disabled=true;
+    countWords();
+    setTag('Submitted','');
+    document.getElementById('done-title').textContent=
+      'Submitted \u00B7 '+(cUnit==='u1'?'Unit 1':'Unit 2')+' Week '+cWeek;
+    document.getElementById('done').className='done show';
+    return;
+  }
+
+  remaining=(typeof s.rem==='number')?s.rem:totalTime;
+  document.getElementById('timer').textContent=fmt(remaining);
+  document.getElementById('pb').style.width=((totalTime-remaining)/totalTime*100)+'%';
+
+  if(s.ph==='reading'){
+    cPhase='reading';
+    document.getElementById('start-screen').style.display='none';
+    document.getElementById('passage-section').style.display='block';
+    setTag('Reading','reading');
+    if(remaining>0){startClock();}else{timeUp();}
+    return;
+  }
+  if(s.ph==='writing'){
+    cPhase='writing';
+    document.getElementById('start-screen').style.display='none';
+    document.getElementById('passage-section').style.display='block';
+    document.getElementById('btn-write').style.display='none';
+    document.getElementById('essay-section').style.display='block';
+    document.getElementById('essay').value=s.essay||'';
+    document.getElementById('btn-sub').disabled=false;
+    countWords();
+    setTag('Writing','writing');
+    if(remaining>0){startClock();}else{timeUp();}
+  }
+}
+
+/* ---------- clock ---------- */
+function startClock(){
+  if(timerInt){clearInterval(timerInt);}
+  timerInt=setInterval(function(){
+    remaining--;
+    var t=document.getElementById('timer');
+    t.textContent=fmt(remaining);
+    document.getElementById('pb').style.width=((totalTime-remaining)/totalTime*100)+'%';
+    var warn=Math.floor(totalTime*0.1);
+    if(remaining<=warn*2&&remaining>warn)t.className='warn';
+    else if(remaining<=warn)t.className='danger';
+    if(remaining%15===0){saveState();}
+    if(remaining<=0){clearInterval(timerInt);timerInt=null;timeUp();}
+  },1000);
+}
+
+function timeUp(){
+  var t=document.getElementById('timer');
+  t.textContent='TIME';
+  t.className='danger';
+  lock();
+  saveState();
+}
+
+function beginReading(){
+  cPhase='reading';
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('passage-section').style.display='block';
+  setTag('Reading','reading');
+  startClock();
+  saveState();
+}
+
+function beginWriting(){
+  if(cPhase!=='reading')return;
+  cPhase='writing';
+  document.getElementById('btn-write').style.display='none';
+  document.getElementById('essay-section').style.display='block';
+  setTag('Writing','writing');
+  document.getElementById('btn-sub').disabled=false;
+  document.getElementById('essay').focus();
+  saveState();
+}
+
+function countWords(){
+  var txt=document.getElementById('essay').value.replace(/^\s+|\s+$/g,'');
+  var n=txt===''?0:txt.split(/\s+/).length;
+  var d=getData();
+  var el=document.getElementById('wc');
+  el.textContent=n+' word'+(n!==1?'s':'');
+  el.className='wc'+(n===0?'':n<Math.floor(d.essayMin*0.6)?' g':n<d.essayMin?' n':' h');
+}
+
+function essayInput(){
+  countWords();
+  saveSoon();
+}
+
+function lock(){
+  document.getElementById('essay').disabled=true;
+  document.getElementById('lmsg').className='lmsg show';
+  setTag('Time up','');
+}
+
+function submitEssay(){
+  if(cPhase==='submitted')return;
+  cPhase='submitted';
+  if(timerInt){clearInterval(timerInt);timerInt=null;}
+  lock();
+  setTag('Submitted','');
+  document.getElementById('btn-sub').disabled=true;
+  document.getElementById('done-title').textContent=
+    'Submitted \u00B7 '+(cUnit==='u1'?'Unit 1':'Unit 2')+' Week '+cWeek;
+  document.getElementById('done').className='done show';
+  document.getElementById('done').scrollIntoView({behavior:'smooth',block:'start'});
+  var s=sessions[skey()]||{};
+  s.sub=true; s.ph='submitted'; s.essay=document.getElementById('essay').value; s.rem=remaining;
+  sessions[skey()]=s;
+  saveState();
+  renderWeekTabs();
+  renderPips();
+}
+
+/* ---------- print ---------- */
+function studentName(){
+  var v=document.getElementById('stu-name').value.replace(/^\s+|\s+$/g,'');
+  return v||'Student';
+}
+function doPrint(){
+  var d=getData();
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+  var unitLabel=(cUnit==='u1'?'Unit 1':'Unit 2')+' \u00B7 Week '+cWeek;
+
+  document.getElementById('pr-badge').textContent='AICE GP \u00B7 '+unitLabel;
+  document.getElementById('pr-date').textContent=dateStr;
+  document.getElementById('pr-unit').textContent=unitLabel;
+  document.getElementById('pr-passage-title').textContent=d.passageTitle;
+  document.getElementById('pr-tagline').textContent=
+    'A practice session completed by '+studentName()+' as part of AICE General Paper at Harland.';
+  document.getElementById('pr-student').textContent=studentName();
+  document.getElementById('pr-time').textContent=d.timeMin+' minutes';
+  document.getElementById('pr-target').textContent=d.essayMin+'\u2013'+d.essayMax+' words';
+  document.getElementById('pr-domain').textContent=d.domain;
+  document.getElementById('pr-question').textContent=d.question;
+  var paras=d.passage.split('\n\n'), ph='', i;
+  for(i=0;i<paras.length;i++){ph+='<p>'+paras[i]+'</p>';}
+  document.getElementById('pr-passage').innerHTML=ph;
+  document.getElementById('pr-essay').textContent=
+    document.getElementById('essay').value||'[No response entered]';
+
+  window.print();
+}
+
+function showWelcome(){document.getElementById('welcome').className='show';}
+function hideWelcome(){document.getElementById('welcome').className='';}
+
+/* INIT */
+(function(){
+  var st=loadStored();
+  renderUnitTabs();
+  renderWeekTabs();
+  loadWeek();
+  booted=true;
+  if(st){hideWelcome();}
+})();
+
+</script>
+</body>
+</html>
