@@ -7,6 +7,12 @@ Internal teacher tools for Harland Education. A small static collection of singl
 - Landing page: https://harland-education.github.io/harland-tools/
 - Class Notes Generator: https://harland-education.github.io/harland-tools/notes-generator/
 - Unit Completion Generator: https://harland-education.github.io/harland-tools/completion-generator/
+- Practice and Activities: https://harland-education.github.io/harland-tools/practice-activities/
+- Targeted Writing Drills, Grade 8 Analytical Writing Unit 1 (student instrument): https://harland-education.github.io/harland-tools/practice-activities/drills/analytical-writing-l8-u1/
+
+## Practice and Activities
+
+A separate student facing area for practice instruments, given to students by link and QR through their teacher. It has its own landing page and is not listed on the teacher hub. The first instrument is the Targeted Writing Drills for Grade 8 Analytical Writing Unit 1, which saves student progress in the browser and continues at home. Like the teacher tools, each instrument is a sealed single file whose only external dependency is Google Fonts. The QR for the drills is assets/qr-aw-drills-l8-u1.png.
 
 ## How the AI features work
 
